@@ -56,4 +56,4 @@ jobs:
           file: src/main/docker/Dockerfile.jvm
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ghcr.io/${{ github.repository_owner }}/homelab-manager:latest
+          tags: ghcr.io/${{ github.repository_owner }}/sqq-inscription:latest
