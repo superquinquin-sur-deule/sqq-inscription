@@ -1,8 +1,13 @@
 <template>
   <main class="container">
     <header class="header">
-      <h1>Inscription à la Coopérative SuperQuinquin sur Deûle</h1>
-      <p class="subtitle">Devenez sociétaire et réglez vos parts sociales en quelques minutes.</p>
+      <div class="brand">
+        <img src="/superquinquin_logo_deule.svg" alt="SuperQuinquin sur Deûle" class="logo" />
+        <div class="brand-text">
+          <h1>Inscription à la Coopérative SuperQuinquin sur Deûle</h1>
+          <p class="subtitle">Devenez sociétaire et réglez vos parts sociales en quelques minutes.</p>
+        </div>
+      </div>
     </header>
 
     <form class="form" @submit.prevent="submit">
@@ -360,21 +365,20 @@ function decSoutien() {
   --accent: #f1dc43;
   --accent-dark: #d8c237;
   --accent-contrast: #111827; /* texte sombre sur jaune */
-  --radius-lg: 16px;
-  --radius-md: 12px;
-  --radius-sm: 10px;
 }
 
 .container {
+  background: #efefee;
   max-width: 980px;
   margin: 0 auto;
   padding: 2.5rem 1rem 3.25rem;
   color: var(--text);
+  border-radius: 10px;
 }
 
 .header {
-  background: #f1dc43;
-  border-radius: var(--radius-lg);
+  background: transparent;
+  border-radius: 10px;
   padding: 1.5rem 1.25rem;
   margin-bottom: 1rem;
   position: relative;
@@ -391,7 +395,27 @@ function decSoutien() {
 .header h1 {
   margin: 0 0 .35rem;
   font-size: 1.9rem;
-  letter-spacing: .2px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  display: block;
+  height: 96px; /* bigger logo */
+}
+
+/* Ensure title aligns well next to the taller logo */
+.brand h1 {
+  margin: 0 0 .35rem;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
 }
 
 .subtitle {
@@ -402,7 +426,6 @@ function decSoutien() {
 .form {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
   padding: 1.25rem;
   box-shadow: var(--shadow);
 }
@@ -480,7 +503,6 @@ function decSoutien() {
   box-shadow: 0 0 0 4px rgba(241, 220, 67, .35);
 }
 
-/* Petites aides pour des champs plus intuitifs */
 #cp {
   max-width: 180px;
 }
@@ -529,7 +551,6 @@ input[type="radio"], input[type="checkbox"] {
 .option {
   padding: .9rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   margin-bottom: .85rem;
   background: linear-gradient(180deg, #ffffff, #fdfdfd);
   position: relative;
@@ -543,8 +564,6 @@ input[type="radio"], input[type="checkbox"] {
   top: -1px;
   bottom: -1px;
   width: 5px;
-  border-top-left-radius: var(--radius-md);
-  border-bottom-left-radius: var(--radius-md);
   background: linear-gradient(180deg, var(--accent), #ffe873);
 }
 
@@ -653,11 +672,9 @@ input[type="radio"], input[type="checkbox"] {
   transform: translateY(0);
 }
 
-/* Hide native number arrows only on the soutien input */
 #soutienParts {
   width: 120px;
   text-align: center;
-  /* Remove default spinners in Firefox */
   appearance: textfield;
 }
 
@@ -665,14 +682,25 @@ input[type="radio"], input[type="checkbox"] {
   appearance: textfield;
 }
 
-/* Remove default spinners in Chromium/WebKit */
 #soutienParts::-webkit-outer-spin-button,
 #soutienParts::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
+#nbParts::-webkit-outer-spin-button,
+#nbParts::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 @media (max-width: 720px) {
+  .brand {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .5rem;
+  }
+
   .grid, .subgrid {
     grid-template-columns: 1fr;
   }

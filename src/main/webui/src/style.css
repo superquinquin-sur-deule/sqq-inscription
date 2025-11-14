@@ -1,11 +1,10 @@
 :root {
-  /* Base typographique et rendu */
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   color-scheme: light;
   --accent: #f1dc43;
-  --bg: #f6f7fb;
+  --bg: white;
   color: #1f2937;
   background: var(--bg);
   font-synthesis: none;
