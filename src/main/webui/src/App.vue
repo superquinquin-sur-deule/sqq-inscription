@@ -1,141 +1,3 @@
-<script setup lang="ts">
-import {computed, reactive, watch} from 'vue'
-
-type Genre = 'madame' | 'monsieur'
-
-const form = reactive({
-  genre: '' as '' | Genre,
-  nom: '',
-  prenom: '',
-  adresse: '',
-  ville: '',
-  codePostal: '',
-  email: '',
-  telephone: '',
-  dateNaissance: '',
-  nbFoyer: 1 as number | undefined,
-  // Parts sociales
-  parts: {
-    p100: {checked: false},
-    p10: {checked: false},
-    totalParts: 0,
-  },
-  // Binôme (optionnel)
-  binome: {
-    enabled: false,
-    nom: '',
-    prenom: '',
-    email: '',
-  },
-  accepteStatuts: false,
-})
-
-// Base parts imposées par les options cochées
-const baseParts = computed(() => {
-  let parts = 0
-  if (form.parts.p100.checked) parts += 10
-  if (form.parts.p10.checked) parts += 1
-  if (form.binome.enabled) parts += 2
-  return parts
-})
-
-// Total en euros = nombre total de parts * 10€
-const total = computed(() => (form.parts.totalParts || 0) * 10)
-
-// Nombre total de parts à 10€ = totalParts
-// (gardé simple, valeurs entières uniquement via l'UI)
-
-// Maintient le nombre total de parts au minimum requis par les options
-watch(
-    () => [form.parts.p100.checked, form.parts.p10.checked, form.binome.enabled],
-    () => {
-      const minParts = baseParts.value
-      if (!minParts) {
-        // Si rien n'est sélectionné, on remet à 0 pour éviter un reste fantôme
-        form.parts.totalParts = 0
-        return
-      }
-      // Initialise si 0, sinon borne inférieure
-      if (!form.parts.totalParts || form.parts.totalParts < minParts) {
-        form.parts.totalParts = minParts
-      }
-    },
-    {deep: false}
-)
-
-// Si l'utilisateur saisit un nombre de parts inférieur au minimum requis, on ajuste
-watch(
-    () => form.parts.totalParts,
-    (v) => {
-      const minParts = baseParts.value
-      if (v == null) {
-        form.parts.totalParts = minParts || 0
-        return
-      }
-      if (v < minParts) {
-        form.parts.totalParts = minParts
-      }
-      // Force entier positif
-      if (v < 0) form.parts.totalParts = minParts || 0
-      if (!Number.isInteger(v)) form.parts.totalParts = Math.floor(v)
-    }
-)
-
-function isEmail(v: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
-}
-
-function isPhone(v: string) {
-  // accepte formats FR simples, chiffres, espaces, +, .
-  return /^[+]?([0-9]?[\s\-.]?){6,15}[0-9]$/.test(v)
-}
-
-function isPostalCode(v: string) {
-  // 5 chiffres FR
-  return /^\d{5}$/.test(v)
-}
-
-const isPartsValid = computed(() => {
-  const anySelected = form.parts.p100.checked || form.parts.p10.checked || form.binome.enabled
-  if (!anySelected) return false
-
-  // Total de parts doit être au moins égal au minimum imposé par la sélection
-  if (!form.parts.totalParts || form.parts.totalParts < baseParts.value) return false
-
-  if (form.binome.enabled) {
-    if (!form.binome.nom.trim()) return false
-    if (!form.binome.prenom.trim()) return false
-    if (!isEmail(form.binome.email)) return false
-  }
-  return true
-})
-
-const isFormValid = computed(() => {
-  return (
-      !!form.genre &&
-      form.nom.trim().length > 0 &&
-      form.prenom.trim().length > 0 &&
-      form.adresse.trim().length > 0 &&
-      form.ville.trim().length > 0 &&
-      isPostalCode(form.codePostal) &&
-      isEmail(form.email) &&
-      isPhone(form.telephone) &&
-      !!form.dateNaissance &&
-      !!form.nbFoyer && form.nbFoyer > 0 &&
-      isPartsValid.value &&
-      form.accepteStatuts
-  )
-})
-
-function submit() {
-  if (!isFormValid.value) return
-  // Ici on déclencherait la logique de paiement réelle.
-  // Pour l'instant, simple aperçu.
-  // eslint-disable-next-line no-alert
-  alert(`Paiement de ${total.value.toFixed(2)}€ initié. Merci, ${form.prenom} ${form.nom} !`)
-}
-</script>
-
 <template>
   <main class="container">
     <header class="header">
@@ -271,6 +133,26 @@ function submit() {
             </div>
           </div>
         </div>
+        <div class="option">
+          <label class="checkbox">
+            <input type="checkbox" v-model="form.parts.soutien.checked"/>
+            <span class="title">Soutenir SuperQuinQuin</span>
+          </label>
+          <p class="details">
+            Je déclare vouloir soutenir la Coopérative SuperQuinquin en souscrivant a des parts supplémentaires
+          </p>
+          <div class="subgrid" v-if="form.parts.soutien.checked">
+            <div class="field">
+              <label for="soutienParts">Nombre de parts supplémentaires</label>
+              <div class="stepper">
+                <button type="button" class="stepper-btn" @click="decSoutien()">−</button>
+                <input id="soutienParts" type="number" min="0" step="1" v-model.number="form.parts.soutien.parts"/>
+                <button type="button" class="stepper-btn" @click="incSoutien()">+</button>
+              </div>
+              <small class="hint">Soit {{ (form.parts.soutien.parts || 0) * 10 }} € supplémentaires</small>
+            </div>
+          </div>
+        </div>
         <div class="subgrid recap">
           <div class="field">
             <label for="nbParts">Nombre total de parts à 10€</label>
@@ -309,10 +191,165 @@ function submit() {
   </main>
 </template>
 
+<script setup lang="ts">
+import {computed, reactive, watch} from 'vue'
+
+type Genre = 'madame' | 'monsieur'
+
+const form = reactive({
+  genre: '' as '' | Genre,
+  nom: '',
+  prenom: '',
+  adresse: '',
+  ville: '',
+  codePostal: '',
+  email: '',
+  telephone: '',
+  dateNaissance: '',
+  nbFoyer: 1 as number | undefined,
+  parts: {
+    p100: {checked: false},
+    p10: {checked: false},
+    soutien: {
+      checked: false,
+      parts: 0
+    },
+    totalParts: 0,
+  },
+  binome: {
+    enabled: false,
+    nom: '',
+    prenom: '',
+    email: '',
+  },
+  accepteStatuts: false,
+})
+
+// Base parts imposées par les options cochées
+const baseParts = computed(() => {
+  let parts = 0
+  if (form.parts.p100.checked) parts += 10
+  if (form.parts.p10.checked) parts += 1
+  if (form.binome.enabled) parts += 2
+  if (form.parts.soutien.checked) parts += form.parts.soutien.parts
+  return parts
+})
+
+const total = computed(() => (form.parts.totalParts || 0) * 10)
+
+watch(
+    () => [
+      form.parts.p100.checked,
+      form.parts.p10.checked,
+      form.binome.enabled,
+      form.parts.soutien.checked,
+      form.parts.soutien.parts,
+    ],
+    () => {
+      // Normalise soutien parts
+      if (!form.parts.soutien.checked) {
+        // Do not force to 0 to avoid losing user input if they toggle back,
+        // baseParts won't count it when unchecked.
+        // But ensure it's a valid non-negative integer when used.
+        // No-op here when unchecked.
+      } else {
+        const sp = Number(form.parts.soutien.parts || 0)
+        form.parts.soutien.parts = !Number.isFinite(sp) || sp < 0 ? 0 : Math.floor(sp)
+      }
+
+      const minParts = baseParts.value
+      if (!minParts) {
+        form.parts.totalParts = 0
+        return
+      }
+      if (!form.parts.totalParts || form.parts.totalParts < minParts) {
+        form.parts.totalParts = minParts
+      }
+    },
+    {deep: false}
+)
+
+watch(
+    () => form.parts.totalParts,
+    (v) => {
+      const minParts = baseParts.value
+      if (v == null) {
+        form.parts.totalParts = minParts || 0
+        return
+      }
+      if (v < minParts) {
+        form.parts.totalParts = minParts
+      }
+      if (v < 0) form.parts.totalParts = minParts || 0
+      if (!Number.isInteger(v)) form.parts.totalParts = Math.floor(v)
+    }
+)
+
+function isEmail(v: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+}
+
+function isPhone(v: string) {
+  // accepte formats FR simples, chiffres, espaces, +, .
+  return /^[+]?([0-9]?[\s\-.]?){6,15}[0-9]$/.test(v)
+}
+
+function isPostalCode(v: string) {
+  return /^\d{5}$/.test(v)
+}
+
+const isPartsValid = computed(() => {
+  const anySelected = form.parts.p100.checked || form.parts.p10.checked || form.binome.enabled || form.parts.soutien.checked
+  if (!anySelected) return false
+
+  if (!form.parts.totalParts || form.parts.totalParts < baseParts.value) return false
+
+  if (form.binome.enabled) {
+    if (!form.binome.nom.trim()) return false
+    if (!form.binome.prenom.trim()) return false
+    if (!isEmail(form.binome.email)) return false
+  }
+  return true
+})
+
+const isFormValid = computed(() => {
+  return (
+      !!form.genre &&
+      form.nom.trim().length > 0 &&
+      form.prenom.trim().length > 0 &&
+      form.adresse.trim().length > 0 &&
+      form.ville.trim().length > 0 &&
+      isPostalCode(form.codePostal) &&
+      isEmail(form.email) &&
+      isPhone(form.telephone) &&
+      !!form.dateNaissance &&
+      !!form.nbFoyer && form.nbFoyer > 0 &&
+      isPartsValid.value &&
+      form.accepteStatuts
+  )
+})
+
+function submit() {
+  if (!isFormValid.value) return
+  alert(`Paiement de ${total.value.toFixed(2)}€ initié. Merci, ${form.prenom} ${form.nom} !`)
+}
+
+function incSoutien() {
+  if (!form.parts.soutien.checked) form.parts.soutien.checked = true
+  const v = Number(form.parts.soutien.parts || 0)
+  form.parts.soutien.parts = Number.isFinite(v) ? Math.floor(v) + 1 : 1
+}
+
+function decSoutien() {
+  if (!form.parts.soutien.checked) return
+  const v = Number(form.parts.soutien.parts || 0)
+  const next = Number.isFinite(v) ? Math.floor(v) - 1 : 0
+  form.parts.soutien.parts = next < 0 ? 0 : next
+}
+</script>
+
 <style scoped>
-/* Thème moderne et coloré */
 :root {
-  /* Couleurs de base */
   --text: #1f2937;
   --muted: #6b7280;
   --error: #b3261e;
@@ -320,11 +357,9 @@ function submit() {
   --surface: #ffffff;
   --border: #e6e8ee;
   --shadow: 0 10px 30px rgba(16, 24, 40, 0.06);
-  /* Accent demandé */
   --accent: #f1dc43;
   --accent-dark: #d8c237;
   --accent-contrast: #111827; /* texte sombre sur jaune */
-  /* Forme */
   --radius-lg: 16px;
   --radius-md: 12px;
   --radius-sm: 10px;
@@ -579,6 +614,62 @@ input[type="radio"], input[type="checkbox"] {
 
 .btn:not(:disabled):active {
   transform: translateY(0);
+}
+
+/* Soutien stepper styles */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.stepper-btn {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  border-radius: 999px; /* round */
+  border: none;
+  background: var(--accent); /* yellow accent */
+  color: var(--accent-contrast);
+  font-weight: 800;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(241, 220, 67, .35);
+  transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.stepper-btn:hover {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(241, 220, 67, .45);
+}
+
+.stepper-btn:active {
+  transform: translateY(0);
+}
+
+/* Hide native number arrows only on the soutien input */
+#soutienParts {
+  width: 120px;
+  text-align: center;
+  /* Remove default spinners in Firefox */
+  appearance: textfield;
+}
+
+#nbParts {
+  appearance: textfield;
+}
+
+/* Remove default spinners in Chromium/WebKit */
+#soutienParts::-webkit-outer-spin-button,
+#soutienParts::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 @media (max-width: 720px) {
