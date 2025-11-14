@@ -165,13 +165,11 @@
         <div class="subgrid recap">
           <div class="field">
             <label for="nbParts">Nombre total de parts à 10€</label>
-            <input id="nbParts" type="number" :min="baseParts" step="1" v-model.number="form.parts.totalParts" readonly/>
-            <small class="hint" v-if="baseParts">Minimum requis selon vos choix: {{ baseParts }} part<span
-                v-if="baseParts>1">s</span></small>
+            <input id="nbParts" type="number" :value="totalParts" readonly/>
           </div>
           <div class="field">
             <label for="mtTotal">Montant total en euros</label>
-            <input id="mtTotal" :value="total.toFixed(2) + ' €'" readonly/>
+            <input id="mtTotal" :value="totalAmount.toFixed(2) + ' €'" readonly/>
           </div>
         </div>
       </section>
@@ -192,9 +190,9 @@
       <footer class="footer">
         <div class="total">
           <span>Total à payer</span>
-          <strong>{{ total.toFixed(2) }} €</strong>
+          <strong>{{ totalAmount.toFixed(2) }} €</strong>
         </div>
-        <button type="submit" class="btn" :disabled="!isFormValid">Payer {{ total.toFixed(2) }} €</button>
+        <button type="submit" class="btn" :disabled="!isFormValid">Payer {{ totalAmount.toFixed(2) }} €</button>
       </footer>
     </form>
   </main>
@@ -217,84 +215,43 @@ const form = reactive({
   dateNaissance: '',
   nbFoyer: 1 as number | undefined,
   parts: {
-    p100: {checked: false},
-    p10: {checked: false},
+    p100: {
+      checked: false,
+      parts: 10
+    },
+    p10: {
+      checked: false,
+      parts: 1
+    },
     soutien: {
       checked: false,
       parts: 0
-    },
-    totalParts: 0,
+    }
   },
   binome: {
     enabled: false,
     nom: '',
     prenom: '',
     email: '',
+    parts: 2
   },
   accepteStatuts: false,
 })
 
-// Base parts imposées par les options cochées
-const baseParts = computed(() => {
-  let parts = 0
-  if (form.parts.p100.checked) parts += 10
-  if (form.parts.p10.checked) parts += 1
-  if (form.binome.enabled) parts += 2
-  if (form.parts.soutien.checked) parts += form.parts.soutien.parts
-  return parts
-})
+function partsCount() {
+  const p100parts = form.parts.p100.checked ? form.parts.p100.parts : 0
+  const p10parts = form.parts.p10.checked ? form.parts.p10.parts : 0
+  const binomeparts = form.binome.enabled ? form.binome.parts : 0
+  const soutienparts = form.parts.soutien.checked ? form.parts.soutien.parts : 0
 
-const total = computed(() => (form.parts.totalParts || 0) * 10)
 
-watch(
-    () => [
-      form.parts.p100.checked,
-      form.parts.p10.checked,
-      form.binome.enabled,
-      form.parts.soutien.checked,
-      form.parts.soutien.parts,
-    ],
-    () => {
-      // Normalise soutien parts
-      if (!form.parts.soutien.checked) {
-        // Do not force to 0 to avoid losing user input if they toggle back,
-        // baseParts won't count it when unchecked.
-        // But ensure it's a valid non-negative integer when used.
-        // No-op here when unchecked.
-      } else {
-        const sp = Number(form.parts.soutien.parts || 0)
-        form.parts.soutien.parts = !Number.isFinite(sp) || sp < 0 ? 0 : Math.floor(sp)
-      }
+  return p100parts + p10parts + binomeparts + soutienparts;
+}
 
-      const minParts = baseParts.value
-      if (!minParts) {
-        form.parts.totalParts = 0
-        return
-      }
-      if (!form.parts.totalParts || form.parts.totalParts < minParts) {
-        form.parts.totalParts = minParts
-      }
-    },
-    {deep: false}
-)
+const totalParts = computed(() => partsCount())
 
-watch(
-    () => form.parts.totalParts,
-    (v) => {
-      const minParts = baseParts.value
-      if (v == null) {
-        form.parts.totalParts = minParts || 0
-        return
-      }
-      if (v < minParts) {
-        form.parts.totalParts = minParts
-      }
-      if (v < 0) form.parts.totalParts = minParts || 0
-      if (!Number.isInteger(v)) form.parts.totalParts = Math.floor(v)
-    }
-)
+const totalAmount = computed(() => partsCount() * 10)
 
-// Normalisation du nombre de personnes au foyer: entier >= 1
 watch(
     () => form.nbFoyer,
     (v) => {
@@ -312,7 +269,6 @@ function isEmail(v: string) {
 }
 
 function isPhone(v: string) {
-  // accepte formats FR simples, chiffres, espaces, +, .
   return /^[+]?([0-9]?[\s\-.]?){6,15}[0-9]$/.test(v)
 }
 
@@ -320,19 +276,7 @@ function isPostalCode(v: string) {
   return /^\d{5}$/.test(v)
 }
 
-const isPartsValid = computed(() => {
-  const anySelected = form.parts.p100.checked || form.parts.p10.checked || form.binome.enabled || form.parts.soutien.checked
-  if (!anySelected) return false
-
-  if (!form.parts.totalParts || form.parts.totalParts < baseParts.value) return false
-
-  if (form.binome.enabled) {
-    if (!form.binome.nom.trim()) return false
-    if (!form.binome.prenom.trim()) return false
-    if (!isEmail(form.binome.email)) return false
-  }
-  return true
-})
+const isPartsValid = computed(() => form.parts.p100.checked || form.parts.p10.checked)
 
 const isFormValid = computed(() => {
   return (
@@ -353,7 +297,7 @@ const isFormValid = computed(() => {
 
 function submit() {
   if (!isFormValid.value) return
-  alert(`Paiement de ${total.value.toFixed(2)}€ initié. Merci, ${form.prenom} ${form.nom} !`)
+  alert(`Paiement de ${totalAmount.value.toFixed(2)}€ initié. Merci, ${form.prenom} ${form.nom} !`)
 }
 
 function incSoutien() {
@@ -481,7 +425,6 @@ function decFoyer() {
 }
 
 .hint {
-  margin: -0.25rem 0 .75rem;
   color: var(--muted);
 }
 
