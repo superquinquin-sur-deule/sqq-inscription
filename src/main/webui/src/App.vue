@@ -133,9 +133,31 @@
               <input id="bPrenom" v-model.trim="form.binome.prenom"/>
             </div>
             <div class="field full">
+              <label for="bAdresse">Adresse du binôme <span class="req">*</span></label>
+              <input id="bAdresse" v-model.trim="form.binome.adresse"/>
+            </div>
+            <div class="field">
+              <label for="bVille">Ville du binôme <span class="req">*</span></label>
+              <input id="bVille" v-model.trim="form.binome.ville"/>
+            </div>
+            <div class="field">
+              <label for="bCp">Code postal du binôme <span class="req">*</span></label>
+              <input id="bCp" v-model.trim="form.binome.codePostal" inputmode="numeric" maxlength="5" placeholder="59000"/>
+              <small v-if="form.binome.codePostal && !/^\d{5}$/.test(form.binome.codePostal)" class="error">Code postal invalide</small>
+            </div>
+            <div class="field full">
               <label for="bEmail">Email du binôme <span class="req">*</span></label>
               <input id="bEmail" v-model.trim="form.binome.email" type="email" placeholder="binome@exemple.fr"/>
               <small v-if="form.binome.email && !isEmail(form.binome.email)" class="error">Email invalide</small>
+            </div>
+            <div class="field">
+              <label for="bTel">Téléphone du binôme <span class="req">*</span></label>
+              <input id="bTel" v-model.trim="form.binome.telephone" placeholder="06 00 00 00 00"/>
+              <small v-if="form.binome.telephone && !isPhone(form.binome.telephone)" class="error">Téléphone invalide</small>
+            </div>
+            <div class="field">
+              <label for="bDob">Date de naissance du binôme <span class="req">*</span></label>
+              <input id="bDob" v-model="form.binome.dateNaissance" type="date"/>
             </div>
             <div class="field full">
               <small class="hint">L’option binôme ajoute automatiquement 2 parts (soit 20€) au minimum requis.</small>
@@ -232,7 +254,12 @@ const form = reactive({
     enabled: false,
     nom: '',
     prenom: '',
+    adresse: '',
+    ville: '',
+    codePostal: '',
     email: '',
+    telephone: '',
+    dateNaissance: '',
     parts: 2
   },
   accepteStatuts: false,
@@ -279,7 +306,7 @@ function isPostalCode(v: string) {
 const isPartsValid = computed(() => form.parts.p100.checked || form.parts.p10.checked)
 
 const isFormValid = computed(() => {
-  return (
+  const baseValid = (
       !!form.genre &&
       form.nom.trim().length > 0 &&
       form.prenom.trim().length > 0 &&
@@ -293,6 +320,23 @@ const isFormValid = computed(() => {
       isPartsValid.value &&
       form.accepteStatuts
   )
+
+  if (!baseValid) return false
+
+  if (!form.binome.enabled) return true
+
+  const binomeValid = (
+      form.binome.nom.trim().length > 0 &&
+      form.binome.prenom.trim().length > 0 &&
+      form.binome.adresse.trim().length > 0 &&
+      form.binome.ville.trim().length > 0 &&
+      isPostalCode(form.binome.codePostal) &&
+      isEmail(form.binome.email) &&
+      isPhone(form.binome.telephone) &&
+      !!form.binome.dateNaissance
+  )
+
+  return binomeValid
 })
 
 function submit() {
