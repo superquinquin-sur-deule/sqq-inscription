@@ -72,7 +72,11 @@
 
           <div class="field">
             <label for="foyer">Nombre de personnes au foyer <span class="req">*</span></label>
-            <input id="foyer" v-model.number="form.nbFoyer" type="number" min="1"/>
+            <div class="stepper">
+              <button type="button" class="stepper-btn" @click="decFoyer()">−</button>
+              <input id="foyer" v-model.number="form.nbFoyer" type="number" min="1" step="1"/>
+              <button type="button" class="stepper-btn" @click="incFoyer()">+</button>
+            </div>
           </div>
         </div>
       </section>
@@ -144,7 +148,7 @@
             <span class="title">Soutenir SuperQuinQuin</span>
           </label>
           <p class="details">
-            Je déclare vouloir soutenir la Coopérative SuperQuinquin en souscrivant a des parts supplémentaires
+            Je veux soutenir SuperQuinquin en souscrivant a des parts supplémentaires
           </p>
           <div class="subgrid" v-if="form.parts.soutien.checked">
             <div class="field">
@@ -290,6 +294,19 @@ watch(
     }
 )
 
+// Normalisation du nombre de personnes au foyer: entier >= 1
+watch(
+    () => form.nbFoyer,
+    (v) => {
+      if (v == null || !Number.isFinite(v as number)) {
+        form.nbFoyer = 1
+        return
+      }
+      if ((v as number) < 1) form.nbFoyer = 1
+      if (!Number.isInteger(v as number)) form.nbFoyer = Math.floor(v as number)
+    }
+)
+
 function isEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
 }
@@ -350,6 +367,17 @@ function decSoutien() {
   const v = Number(form.parts.soutien.parts || 0)
   const next = Number.isFinite(v) ? Math.floor(v) - 1 : 0
   form.parts.soutien.parts = next < 0 ? 0 : next
+}
+
+function incFoyer() {
+  const v = Number(form.nbFoyer || 1)
+  form.nbFoyer = Number.isFinite(v) ? Math.floor(v) + 1 : 2
+}
+
+function decFoyer() {
+  const v = Number(form.nbFoyer || 1)
+  const next = Number.isFinite(v) ? Math.floor(v) - 1 : 1
+  form.nbFoyer = next < 1 ? 1 : next
 }
 </script>
 
@@ -508,7 +536,9 @@ function decSoutien() {
 }
 
 #foyer {
-  max-width: 220px;
+  width: 120px;
+  text-align: center;
+  appearance: textfield;
 }
 
 .inline {
@@ -684,6 +714,12 @@ input[type="radio"], input[type="checkbox"] {
 
 #soutienParts::-webkit-outer-spin-button,
 #soutienParts::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#foyer::-webkit-outer-spin-button,
+#foyer::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
