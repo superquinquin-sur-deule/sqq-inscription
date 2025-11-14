@@ -165,7 +165,7 @@
         <div class="subgrid recap">
           <div class="field">
             <label for="nbParts">Nombre total de parts à 10€</label>
-            <input id="nbParts" type="number" :min="baseParts" step="1" v-model.number="form.parts.totalParts"/>
+            <input id="nbParts" type="number" :min="baseParts" step="1" v-model.number="form.parts.totalParts" readonly/>
             <small class="hint" v-if="baseParts">Minimum requis selon vos choix: {{ baseParts }} part<span
                 v-if="baseParts>1">s</span></small>
           </div>
