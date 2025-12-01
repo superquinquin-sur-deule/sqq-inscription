@@ -164,26 +164,6 @@
             </div>
           </div>
         </div>
-        <div class="option">
-          <label class="checkbox">
-            <input type="checkbox" v-model="form.parts.soutien.checked"/>
-            <span class="title">Soutenir SuperQuinQuin</span>
-          </label>
-          <p class="details">
-            Je veux soutenir SuperQuinquin en souscrivant a des parts supplémentaires
-          </p>
-          <div class="subgrid" v-if="form.parts.soutien.checked">
-            <div class="field">
-              <label for="soutienParts">Nombre de parts supplémentaires</label>
-              <div class="stepper">
-                <button type="button" class="stepper-btn" @click="decSoutien()">−</button>
-                <input id="soutienParts" type="number" min="0" step="1" v-model.number="form.parts.soutien.parts"/>
-                <button type="button" class="stepper-btn" @click="incSoutien()">+</button>
-              </div>
-              <small class="hint">Soit {{ (form.parts.soutien.parts || 0) * 10 }} € supplémentaires</small>
-            </div>
-          </div>
-        </div>
         <div class="subgrid recap">
           <div class="field">
             <label for="nbParts">Nombre total de parts à 10€</label>
@@ -207,6 +187,29 @@
             Je déclare avoir pris connaissance et accepter les Statuts provisoires de la coopérative SuperQuinquin sur Deûle. Je déclare avoir bien compris que mes parts sociales sont un investissement soumis à un risque de perte en capital en cas de déficit de la coopérative. Je déclare ne violer aucune norme ou réglementation en souscrivant les parts sociales de la Coopérative.
           </span>
         </label>
+      </section>
+
+      <section class="section">
+        <div class="soutien">
+          <label class="checkbox">
+            <input type="checkbox" v-model="form.parts.soutien.checked"/>
+            <span class="title">Soutenir SuperQuinQuin</span>
+          </label>
+          <p class="details">
+            Je veux soutenir SuperQuinquin en souscrivant des parts supplémentaires
+          </p>
+          <div class="subgrid" v-if="form.parts.soutien.checked">
+            <div class="field">
+              <label for="soutienParts">Nombre de parts supplémentaires</label>
+              <div class="stepper">
+                <button type="button" class="stepper-btn stepper-btn-white" @click="decSoutien()">−</button>
+                <input id="soutienParts" type="number" min="0" step="1" v-model.number="form.parts.soutien.parts"/>
+                <button type="button" class="stepper-btn stepper-btn-white" @click="incSoutien()">+</button>
+              </div>
+              <small class="hint">Soit {{ (form.parts.soutien.parts || 0) * 10 }} € supplémentaires</small>
+            </div>
+          </div>
+        </div>
       </section>
 
       <footer class="footer">
@@ -595,6 +598,13 @@ input[type="radio"], input[type="checkbox"] {
   background: linear-gradient(180deg, var(--accent), #ffe873);
 }
 
+.soutien {
+  background: none;
+  border: var(--accent) 4px solid;
+  border-radius: 8px;
+  padding: .9rem;
+}
+
 .recap .field input {
   background: #fbfbfe;
 }
@@ -688,6 +698,14 @@ input[type="radio"], input[type="checkbox"] {
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(241, 220, 67, .35);
   transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.stepper-btn-white {
+  background: white;
+}
+
+.stepper-btn-white:hover {
+  background: white !important;
 }
 
 .stepper-btn:hover {
