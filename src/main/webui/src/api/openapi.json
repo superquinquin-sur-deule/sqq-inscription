@@ -1,0 +1,186 @@
+{
+  "openapi" : "3.1.0",
+  "components" : {
+    "schemas" : {
+      "CooperateurDTO" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "genre" : {
+            "$ref" : "#/components/schemas/Genre"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          },
+          "ville" : {
+            "type" : "string"
+          },
+          "codePostal" : {
+            "type" : "string"
+          },
+          "etudiantOuMinimasSociaux" : {
+            "type" : "boolean"
+          },
+          "nombreDePersonnesDansLeFoyer" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "parts" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "partsDeSoutien" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "acceptationDesStatus" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "CreateCooperateurDTO" : {
+        "type" : "object",
+        "properties" : {
+          "genre" : {
+            "$ref" : "#/components/schemas/Genre"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          },
+          "ville" : {
+            "type" : "string"
+          },
+          "codePostal" : {
+            "type" : "string"
+          },
+          "etudiantOuMinimasSociaux" : {
+            "type" : "boolean"
+          },
+          "nombreDePersonnesDansLeFoyer" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "partsDeSoutien" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "acceptationDesStatus" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "Genre" : {
+        "type" : "string",
+        "enum" : [ "MADAME", "MONSIEUR" ]
+      }
+    }
+  },
+  "paths" : {
+    "/api/v1/administration/cooperateurs" : {
+      "get" : {
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CooperateurDTO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary" : "List",
+        "tags" : [ "Admin Resource" ]
+      }
+    },
+    "/api/v1/registrations" : {
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "examples" : {
+                "default" : {
+                  "value" : {
+                    "genre" : "MADAME",
+                    "prenom" : "Jean-Michel",
+                    "nom" : "Dubois",
+                    "telephone" : "0772664457",
+                    "email" : "jean.michel@dubois.com",
+                    "adresse" : "7 rue des Bleuets",
+                    "ville" : "Lomme",
+                    "codePostal" : "59160",
+                    "etudiantOuMinimasSociaux" : false,
+                    "nombreDePersonnesDansLeFoyer" : 2,
+                    "partsDeSoutien" : 0,
+                    "acceptationDesStatus" : true
+                  }
+                }
+              },
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateCooperateurDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Register",
+        "tags" : [ "Registration Resource" ]
+      }
+    }
+  },
+  "info" : {
+    "title" : "sqq-inscription API",
+    "version" : "1.0-SNAPSHOT"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8080",
+    "description" : "Auto generated value"
+  }, {
+    "url" : "http://0.0.0.0:8080",
+    "description" : "Auto generated value"
+  } ]
+}

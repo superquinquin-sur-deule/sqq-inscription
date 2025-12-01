@@ -221,9 +221,11 @@
 </template>
 
 <script setup lang="ts">
-import {computed, reactive, watch} from 'vue'
+import {computed, reactive} from 'vue'
+import {getSqqInscriptionAPI} from "./api/service/catalog.ts";
+import type {Genre} from "./api/model";
 
-type Genre = 'madame' | 'monsieur'
+const sqqInscriptionAPI = getSqqInscriptionAPI();
 
 const form = reactive({
   genre: '' as '' | Genre,
@@ -279,18 +281,6 @@ const totalParts = computed(() => partsCount())
 
 const totalAmount = computed(() => partsCount() * 10)
 
-watch(
-    () => form.nbFoyer,
-    (v) => {
-      if (v == null || !Number.isFinite(v as number)) {
-        form.nbFoyer = 1
-        return
-      }
-      if ((v as number) < 1) form.nbFoyer = 1
-      if (!Number.isInteger(v as number)) form.nbFoyer = Math.floor(v as number)
-    }
-)
-
 function isEmail(v: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
 }
@@ -325,7 +315,7 @@ const isFormValid = computed(() => {
 
   if (!form.binome.enabled) return true
 
-  const binomeValid = (
+  return (
       form.binome.nom.trim().length > 0 &&
       form.binome.prenom.trim().length > 0 &&
       form.binome.adresse.trim().length > 0 &&
@@ -335,13 +325,34 @@ const isFormValid = computed(() => {
       isPhone(form.binome.telephone) &&
       !!form.binome.dateNaissance
   )
-
-  return binomeValid
 })
 
-function submit() {
+async function submit() {
   if (!isFormValid.value) return
-  alert(`Paiement de ${totalAmount.value.toFixed(2)}€ initié. Merci, ${form.prenom} ${form.nom} !`)
+
+  try {
+    const response = await sqqInscriptionAPI.postApiV1Registrations({
+      genre: "MADAME",
+      nom: form.nom,
+      prenom: form.prenom,
+      adresse: form.adresse,
+      email: form.email,
+      codePostal: form.codePostal,
+      etudiantOuMinimasSociaux: false,
+      acceptationDesStatus: form.accepteStatuts,
+      nombreDePersonnesDansLeFoyer: form.nbFoyer,
+      partsDeSoutien: form.parts.soutien.checked ? form.parts.soutien.parts : 0,
+      telephone: form.telephone,
+      ville: form.ville,
+    });
+
+    if (response.headers.location) {
+      window.location.href = response.headers.location;
+    }
+  } catch (error) {
+    alert("Une erreur est survenue lors de l'inscription. Veuillez réessayer.");
+    console.error(error);
+  }
 }
 
 function incSoutien() {
