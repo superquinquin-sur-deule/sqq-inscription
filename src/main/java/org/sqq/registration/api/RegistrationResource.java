@@ -4,14 +4,13 @@ import com.stripe.exception.StripeException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.openapi.annotations.media.ExampleObject;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.sqq.registration.Cooperateur;
-import org.sqq.registration.api.dto.CreateCooperateurDTO;
+import org.sqq.registration.Genre;
 import org.sqq.registration.stripe.Stripe;
 
 import java.net.URI;
@@ -27,39 +26,42 @@ public class RegistrationResource {
     }
 
     @POST
-    @RequestBody(content = @org.eclipse.microprofile.openapi.annotations.media.Content(
-            mediaType = MediaType.APPLICATION_JSON,
-            examples = @ExampleObject(
-                    name = "default",
-                    value = """
-                            {
-                              "genre": "MADAME",
-                              "prenom": "Jean-Michel",
-                              "nom": "Dubois",
-                              "telephone": "0772664457",
-                              "email": "jean.michel@dubois.com",
-                              "adresse": "7 rue des Bleuets",
-                              "ville": "Lomme",
-                              "codePostal": "59160",
-                              "etudiantOuMinimasSociaux": false,
-                              "nombreDePersonnesDansLeFoyer": 2,
-                              "partsDeSoutien": 0,
-                              "acceptationDesStatus": true
-                            }
-                            """
-            )
-    ))
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Transactional
-    public Response register(CreateCooperateurDTO dto) throws StripeException {
-        Cooperateur cooperateur = dto.toCooperateur();
+    public Response registerForm(
+            @FormParam("genre") String genre,
+            @FormParam("prenom") String prenom,
+            @FormParam("nom") String nom,
+            @FormParam("telephone") String telephone,
+            @FormParam("email") String email,
+            @FormParam("adresse") String adresse,
+            @FormParam("ville") String ville,
+            @FormParam("codePostal") String codePostal,
+            @FormParam("etudiantOuMinimasSociaux") String etuOuMinimas,
+            @FormParam("nombreDePersonnesDansLeFoyer") String nbFoyer,
+            @FormParam("partsDeSoutien") String partsDeSoutien,
+            @FormParam("acceptationDesStatus") String acceptation
+    ) throws StripeException {
+        Cooperateur cooperateur = new Cooperateur(
+                Genre.valueOf(genre),
+                prenom,
+                nom,
+                telephone,
+                email,
+                adresse,
+                ville,
+                codePostal,
+                Boolean.parseBoolean(etuOuMinimas),
+                Long.parseLong(nbFoyer),
+                Long.parseLong(partsDeSoutien),
+                null,
+                Boolean.parseBoolean(acceptation)
+        );
 
         validator.validate(cooperateur);
         cooperateur.persist();
 
         URI paymentUrl = stripe.paySouscription(cooperateur);
-        
-        return Response.temporaryRedirect(paymentUrl).build();
+        return Response.seeOther(paymentUrl).build();
     }
-
 }

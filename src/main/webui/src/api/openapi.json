@@ -53,49 +53,6 @@
           }
         }
       },
-      "CreateCooperateurDTO" : {
-        "type" : "object",
-        "properties" : {
-          "genre" : {
-            "$ref" : "#/components/schemas/Genre"
-          },
-          "prenom" : {
-            "type" : "string"
-          },
-          "nom" : {
-            "type" : "string"
-          },
-          "telephone" : {
-            "type" : "string"
-          },
-          "email" : {
-            "type" : "string"
-          },
-          "adresse" : {
-            "type" : "string"
-          },
-          "ville" : {
-            "type" : "string"
-          },
-          "codePostal" : {
-            "type" : "string"
-          },
-          "etudiantOuMinimasSociaux" : {
-            "type" : "boolean"
-          },
-          "nombreDePersonnesDansLeFoyer" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "partsDeSoutien" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "acceptationDesStatus" : {
-            "type" : "boolean"
-          }
-        }
-      },
       "Genre" : {
         "type" : "string",
         "enum" : [ "MADAME", "MONSIEUR" ]
@@ -128,27 +85,47 @@
       "post" : {
         "requestBody" : {
           "content" : {
-            "application/json" : {
-              "examples" : {
-                "default" : {
-                  "value" : {
-                    "genre" : "MADAME",
-                    "prenom" : "Jean-Michel",
-                    "nom" : "Dubois",
-                    "telephone" : "0772664457",
-                    "email" : "jean.michel@dubois.com",
-                    "adresse" : "7 rue des Bleuets",
-                    "ville" : "Lomme",
-                    "codePostal" : "59160",
-                    "etudiantOuMinimasSociaux" : false,
-                    "nombreDePersonnesDansLeFoyer" : 2,
-                    "partsDeSoutien" : 0,
-                    "acceptationDesStatus" : true
+            "application/x-www-form-urlencoded" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "genre" : {
+                    "type" : "string"
+                  },
+                  "prenom" : {
+                    "type" : "string"
+                  },
+                  "nom" : {
+                    "type" : "string"
+                  },
+                  "telephone" : {
+                    "type" : "string"
+                  },
+                  "email" : {
+                    "type" : "string"
+                  },
+                  "adresse" : {
+                    "type" : "string"
+                  },
+                  "ville" : {
+                    "type" : "string"
+                  },
+                  "codePostal" : {
+                    "type" : "string"
+                  },
+                  "etudiantOuMinimasSociaux" : {
+                    "type" : "string"
+                  },
+                  "nombreDePersonnesDansLeFoyer" : {
+                    "type" : "string"
+                  },
+                  "partsDeSoutien" : {
+                    "type" : "string"
+                  },
+                  "acceptationDesStatus" : {
+                    "type" : "string"
                   }
                 }
-              },
-              "schema" : {
-                "$ref" : "#/components/schemas/CreateCooperateurDTO"
               }
             }
           },
@@ -167,7 +144,7 @@
             "description" : "Bad Request"
           }
         },
-        "summary" : "Register",
+        "summary" : "Register Form",
         "tags" : [ "Registration Resource" ]
       }
     }

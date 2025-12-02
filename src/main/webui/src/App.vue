@@ -10,18 +10,18 @@
       </div>
     </header>
 
-    <form class="form" @submit.prevent="submit">
+    <form class="form" method="post" action="/api/v1/registrations">
       <section class="section">
         <h2>Informations personnelles</h2>
         <div class="grid">
           <div class="field full">
             <div class="inline">
               <label class="radio">
-                <input type="radio" name="genre" value="madame" v-model="form.genre"/>
+                <input type="radio" name="genre" value="MADAME" v-model="form.genre"/>
                 <span>Madame</span>
               </label>
               <label class="radio">
-                <input type="radio" name="genre" value="monsieur" v-model="form.genre"/>
+                <input type="radio" name="genre" value="MONSIEUR" v-model="form.genre"/>
                 <span>Monsieur</span>
               </label>
             </div>
@@ -29,39 +29,39 @@
 
           <div class="field">
             <label for="nom">Nom <span class="req">*</span></label>
-            <input id="nom" v-model.trim="form.nom" required/>
+            <input id="nom" name="nom" v-model.trim="form.nom" required/>
           </div>
 
           <div class="field">
             <label for="prenom">Prénom <span class="req">*</span></label>
-            <input id="prenom" v-model.trim="form.prenom" required/>
+            <input id="prenom" name="prenom" v-model.trim="form.prenom" required/>
           </div>
 
           <div class="field full">
             <label for="adresse">Adresse <span class="req">*</span></label>
-            <input id="adresse" v-model.trim="form.adresse" required/>
+            <input id="adresse" name="adresse" v-model.trim="form.adresse" required/>
           </div>
 
           <div class="field">
             <label for="ville">Ville <span class="req">*</span></label>
-            <input id="ville" v-model.trim="form.ville" required/>
+            <input id="ville" name="ville" v-model.trim="form.ville" required/>
           </div>
 
           <div class="field">
             <label for="cp">Code postal <span class="req">*</span></label>
-            <input id="cp" v-model.trim="form.codePostal" inputmode="numeric" maxlength="5" placeholder="59000"/>
+            <input id="cp" name="codePostal" v-model.trim="form.codePostal" inputmode="numeric" maxlength="5" placeholder="59000"/>
             <small v-if="form.codePostal && !/^\d{5}$/.test(form.codePostal)" class="error">Code postal invalide</small>
           </div>
 
           <div class="field">
             <label for="email">Email <span class="req">*</span></label>
-            <input id="email" v-model.trim="form.email" type="email" placeholder="vous@exemple.fr"/>
+            <input id="email" name="email" v-model.trim="form.email" type="email" placeholder="vous@exemple.fr"/>
             <small v-if="form.email && !isEmail(form.email)" class="error">Email invalide</small>
           </div>
 
           <div class="field">
             <label for="tel">Téléphone <span class="req">*</span></label>
-            <input id="tel" v-model.trim="form.telephone" placeholder="06 00 00 00 00"/>
+            <input id="tel" name="telephone" v-model.trim="form.telephone" placeholder="06 00 00 00 00"/>
             <small v-if="form.telephone && !isPhone(form.telephone)" class="error">Téléphone invalide</small>
           </div>
 
@@ -74,7 +74,7 @@
             <label for="foyer">Nombre de personnes au foyer <span class="req">*</span></label>
             <div class="stepper">
               <button type="button" class="stepper-btn" @click="decFoyer()">−</button>
-              <input id="foyer" v-model.number="form.nbFoyer" type="number" min="1" step="1"/>
+              <input id="foyer" name="nombreDePersonnesDansLeFoyer" v-model.number="form.nbFoyer" type="number" min="1" step="1"/>
               <button type="button" class="stepper-btn" @click="incFoyer()">+</button>
             </div>
           </div>
@@ -212,6 +212,9 @@
         </div>
       </section>
 
+      <input type="hidden" name="etudiantOuMinimasSociaux" :value="form.parts.p10.checked ? 'true' : 'false'"/>
+      <input type="hidden" name="partsDeSoutien" :value="form.parts.soutien.checked ? String(form.parts.soutien.parts || 0) : '0'"/>
+      <input type="hidden" name="acceptationDesStatus" :value="form.accepteStatuts ? 'true' : 'false'"/>
       <footer class="footer">
         <div class="total">
           <span>Total à payer</span>
@@ -225,10 +228,8 @@
 
 <script setup lang="ts">
 import {computed, reactive} from 'vue'
-import {getSqqInscriptionAPI} from "./api/service/catalog.ts";
 import type {Genre} from "./api/model";
 
-const sqqInscriptionAPI = getSqqInscriptionAPI();
 
 const form = reactive({
   genre: '' as '' | Genre,
@@ -330,35 +331,6 @@ const isFormValid = computed(() => {
   )
 })
 
-async function submit() {
-  if (!isFormValid.value) return
-
-  try {
-    const response = await sqqInscriptionAPI.postApiV1Registrations({
-      genre: "MADAME",
-      nom: form.nom,
-      prenom: form.prenom,
-      adresse: form.adresse,
-      email: form.email,
-      codePostal: form.codePostal,
-      etudiantOuMinimasSociaux: form.parts.p10.checked,
-      acceptationDesStatus: form.accepteStatuts,
-      nombreDePersonnesDansLeFoyer: form.nbFoyer,
-      partsDeSoutien: form.parts.soutien.checked ? form.parts.soutien.parts : 0,
-      telephone: form.telephone,
-      ville: form.ville,
-    });
-
-    if (response.headers.location) {
-      window.open(response.headers.location);
-    }
-
-
-  } catch (error) {
-    alert("Une erreur est survenue lors de l'inscription. Veuillez réessayer.");
-    console.error(error);
-  }
-}
 
 function incSoutien() {
   if (!form.parts.soutien.checked) form.parts.soutien.checked = true
@@ -781,33 +753,3 @@ input[type="radio"], input[type="checkbox"] {
   var(--bg);
 }
 </style>
-
-
-/* Custom round yellow checkboxes */
-input[type="checkbox"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 999px; /* make it perfectly round */
-  border: 2px solid var(--border);
-  background: #ffffff;
-  display: inline-grid;
-  place-content: center;
-  vertical-align: middle;
-  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
-}
-
-input[type="checkbox"]:hover {
-  border-color: var(--accent);
-}
-
-input[type="checkbox"]:checked {
-  background-color: var(--accent); /* yellow when checked */
-  border-color: var(--accent);
-}
-
-input[type="checkbox"]:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 4px rgba(241, 220, 67, .35); /* accessible focus ring */
-}
