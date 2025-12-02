@@ -341,7 +341,7 @@ async function submit() {
       adresse: form.adresse,
       email: form.email,
       codePostal: form.codePostal,
-      etudiantOuMinimasSociaux: false,
+      etudiantOuMinimasSociaux: form.parts.p10.checked,
       acceptationDesStatus: form.accepteStatuts,
       nombreDePersonnesDansLeFoyer: form.nbFoyer,
       partsDeSoutien: form.parts.soutien.checked ? form.parts.soutien.parts : 0,
@@ -350,8 +350,10 @@ async function submit() {
     });
 
     if (response.headers.location) {
-      window.location.href = response.headers.location;
+      window.open(response.headers.location);
     }
+
+
   } catch (error) {
     alert("Une erreur est survenue lors de l'inscription. Veuillez réessayer.");
     console.error(error);
@@ -779,3 +781,33 @@ input[type="radio"], input[type="checkbox"] {
   var(--bg);
 }
 </style>
+
+
+/* Custom round yellow checkboxes */
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px; /* make it perfectly round */
+  border: 2px solid var(--border);
+  background: #ffffff;
+  display: inline-grid;
+  place-content: center;
+  vertical-align: middle;
+  transition: background-color .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+input[type="checkbox"]:hover {
+  border-color: var(--accent);
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--accent); /* yellow when checked */
+  border-color: var(--accent);
+}
+
+input[type="checkbox"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(241, 220, 67, .35); /* accessible focus ring */
+}

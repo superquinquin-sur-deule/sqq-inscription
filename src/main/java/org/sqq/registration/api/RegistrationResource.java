@@ -57,10 +57,9 @@ public class RegistrationResource {
         validator.validate(cooperateur);
         cooperateur.persist();
 
-//        URI paymentUrl = stripe.paySouscription(cooperateur);
+        URI paymentUrl = stripe.paySouscription(cooperateur);
         
-//        return Response.temporaryRedirect(paymentUrl).build();
-        return Response.temporaryRedirect(URI.create("https://google.com?test=1234")).build();
+        return Response.temporaryRedirect(paymentUrl).build();
     }
 
 }
