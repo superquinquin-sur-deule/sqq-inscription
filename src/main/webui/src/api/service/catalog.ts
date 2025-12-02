@@ -7,7 +7,7 @@
 import * as axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
-import type { CooperateurDTO, CreateCooperateurDTO } from "../model";
+import type { CooperateurDTO, PostApiV1RegistrationsBody } from "../model";
 
 export const getSqqInscriptionAPI = () => {
   /**
@@ -22,22 +22,93 @@ export const getSqqInscriptionAPI = () => {
   };
 
   /**
-   * @summary Register
+   * @summary Register Form
    */
   const postApiV1Registrations = <TData = AxiosResponse<unknown>>(
-    createCooperateurDTO: CreateCooperateurDTO,
+    postApiV1RegistrationsBody: PostApiV1RegistrationsBody,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    const formUrlEncoded = new URLSearchParams();
+    if (postApiV1RegistrationsBody.genre !== undefined) {
+      formUrlEncoded.append(`genre`, postApiV1RegistrationsBody.genre);
+    }
+    if (postApiV1RegistrationsBody.prenom !== undefined) {
+      formUrlEncoded.append(`prenom`, postApiV1RegistrationsBody.prenom);
+    }
+    if (postApiV1RegistrationsBody.nom !== undefined) {
+      formUrlEncoded.append(`nom`, postApiV1RegistrationsBody.nom);
+    }
+    if (postApiV1RegistrationsBody.telephone !== undefined) {
+      formUrlEncoded.append(`telephone`, postApiV1RegistrationsBody.telephone);
+    }
+    if (postApiV1RegistrationsBody.email !== undefined) {
+      formUrlEncoded.append(`email`, postApiV1RegistrationsBody.email);
+    }
+    if (postApiV1RegistrationsBody.adresse !== undefined) {
+      formUrlEncoded.append(`adresse`, postApiV1RegistrationsBody.adresse);
+    }
+    if (postApiV1RegistrationsBody.ville !== undefined) {
+      formUrlEncoded.append(`ville`, postApiV1RegistrationsBody.ville);
+    }
+    if (postApiV1RegistrationsBody.codePostal !== undefined) {
+      formUrlEncoded.append(
+        `codePostal`,
+        postApiV1RegistrationsBody.codePostal,
+      );
+    }
+    if (postApiV1RegistrationsBody.etudiantOuMinimasSociaux !== undefined) {
+      formUrlEncoded.append(
+        `etudiantOuMinimasSociaux`,
+        postApiV1RegistrationsBody.etudiantOuMinimasSociaux,
+      );
+    }
+    if (postApiV1RegistrationsBody.nombreDePersonnesDansLeFoyer !== undefined) {
+      formUrlEncoded.append(
+        `nombreDePersonnesDansLeFoyer`,
+        postApiV1RegistrationsBody.nombreDePersonnesDansLeFoyer,
+      );
+    }
+    if (postApiV1RegistrationsBody.partsDeSoutien !== undefined) {
+      formUrlEncoded.append(
+        `partsDeSoutien`,
+        postApiV1RegistrationsBody.partsDeSoutien,
+      );
+    }
+    if (postApiV1RegistrationsBody.acceptationDesStatus !== undefined) {
+      formUrlEncoded.append(
+        `acceptationDesStatus`,
+        postApiV1RegistrationsBody.acceptationDesStatus,
+      );
+    }
+
+    return axios.default.post(`/api/v1/registrations`, formUrlEncoded, options);
+  };
+
+  /**
+   * @summary Successful Payment
+   */
+  const postApiV1RegistrationsSuccessCooperateurId = <
+    TData = AxiosResponse<unknown>,
+  >(
+    cooperateurId: number,
     options?: AxiosRequestConfig,
   ): Promise<TData> => {
     return axios.default.post(
-      `/api/v1/registrations`,
-      createCooperateurDTO,
+      `/api/v1/registrations/success/${cooperateurId}`,
+      undefined,
       options,
     );
   };
 
-  return { getApiV1AdministrationCooperateurs, postApiV1Registrations };
+  return {
+    getApiV1AdministrationCooperateurs,
+    postApiV1Registrations,
+    postApiV1RegistrationsSuccessCooperateurId,
+  };
 };
 export type GetApiV1AdministrationCooperateursResult = AxiosResponse<
   CooperateurDTO[]
 >;
 export type PostApiV1RegistrationsResult = AxiosResponse<unknown>;
+export type PostApiV1RegistrationsSuccessCooperateurIdResult =
+  AxiosResponse<unknown>;

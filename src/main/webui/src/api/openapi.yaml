@@ -37,6 +37,14 @@ components:
           format: int64
         acceptationDesStatus:
           type: boolean
+        status:
+          $ref: "#/components/schemas/CooperateurStatus"
+    CooperateurStatus:
+      type: string
+      enum:
+      - PAYMENT_PENDING
+      - PAID
+      - PROCESSED
     Genre:
       type: string
       enum:
@@ -99,6 +107,24 @@ paths:
         "400":
           description: Bad Request
       summary: Register Form
+      tags:
+      - Registration Resource
+  /api/v1/registrations/success/{cooperateurId}:
+    post:
+      parameters:
+      - name: cooperateurId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Successful Payment
       tags:
       - Registration Resource
 info:

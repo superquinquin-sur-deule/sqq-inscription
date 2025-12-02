@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0-SNAPSHOT
  */
 import type { Genre } from "./genre";
+import type { CooperateurStatus } from "./cooperateurStatus";
 
 export interface CooperateurDTO {
   id?: number;
@@ -21,4 +22,5 @@ export interface CooperateurDTO {
   parts?: number;
   partsDeSoutien?: number;
   acceptationDesStatus?: boolean;
+  status?: CooperateurStatus;
 }

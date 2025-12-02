@@ -228,8 +228,7 @@
 
 <script setup lang="ts">
 import {computed, reactive} from 'vue'
-import type {Genre} from "./api/model";
-
+import type {Genre} from "../api/model";
 
 const form = reactive({
   genre: '' as '' | Genre,
