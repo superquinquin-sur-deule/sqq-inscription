@@ -36,6 +36,7 @@ public class Cooperateur extends PanacheEntity {
     @NotNull
     public boolean acceptationDesStatus;
     public CooperateurStatus status;
+    public String stripeSessionId;
 
     public Cooperateur() {
     }

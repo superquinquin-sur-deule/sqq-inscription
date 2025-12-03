@@ -4,9 +4,8 @@
       <div class="brand">
         <img src="/superquinquin_logo_deule.svg" alt="SuperQuinquin sur Deûle" class="logo"/>
         <div class="brand-text">
-          <h1>Merci pour votre inscription !</h1>
-          <p class="subtitle">Votre paiement a bien été confirmé. Bienvenue à la Coopérative SuperQuinquin sur
-            Deûle.</p>
+          <h1>Merci pour ta souscription !</h1>
+          <p class="subtitle">Ton paiement à bien été confirmé, tu es maintenant officiellement un.e cooperateur.rice de SuperQuinquin sur Deûle.</p>
         </div>
       </div>
     </header>
@@ -22,14 +21,9 @@
       <div class="next-steps">
         <h3>Et maintenant ?</h3>
         <ul>
-          <li>Surveillez votre boîte mail pour le message de confirmation.</li>
-          <li>Blablabla</li>
-          <li>blablablabla</li>
+          <li>Surveille ta boite mail, tu vas recevoir ton mail d'accueil parmi les coop'</li>
+          <li>Rejoins le mouvement en construisant avec nous ton futur magasin</li>
         </ul>
-      </div>
-
-      <div class="actions">
-        <router-link to="/" class="btn primary">Retour à l’inscription</router-link>
       </div>
 
       <p class="help">

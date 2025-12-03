@@ -1,6 +1,7 @@
 package org.sqq.registration.api.dto;
 
 import org.sqq.registration.Cooperateur;
+import org.sqq.registration.CooperateurStatus;
 import org.sqq.registration.Genre;
 
 public class CooperateurDTO {
@@ -18,40 +19,28 @@ public class CooperateurDTO {
     public Long parts;
     public Long partsDeSoutien;
     public boolean acceptationDesStatus;
-
-    public CooperateurDTO(Long id, Genre genre, String prenom, String nom, String telephone, String email, String adresse, String ville, String codePostal, Boolean etudiantOuMinimasSociaux, Long nombreDePersonnesDansLeFoyer, Long parts, Long partsDeSoutien, boolean acceptationDesStatus) {
-        this.id = id;
-        this.genre = genre;
-        this.prenom = prenom;
-        this.nom = nom;
-        this.telephone = telephone;
-        this.email = email;
-        this.adresse = adresse;
-        this.ville = ville;
-        this.codePostal = codePostal;
-        this.etudiantOuMinimasSociaux = etudiantOuMinimasSociaux;
-        this.nombreDePersonnesDansLeFoyer = nombreDePersonnesDansLeFoyer;
-        this.parts = parts;
-        this.partsDeSoutien = partsDeSoutien;
-        this.acceptationDesStatus = acceptationDesStatus;
-    }
+    public CooperateurStatus status;
+    
 
     public static CooperateurDTO fromCooperateur(Cooperateur cooperateur) {
-        return new CooperateurDTO(
-                cooperateur.id,
-                cooperateur.genre,
-                cooperateur.prenom,
-                cooperateur.nom,
-                cooperateur.telephone,
-                cooperateur.email,
-                cooperateur.adresse,
-                cooperateur.ville,
-                cooperateur.codePostal,
-                cooperateur.etudiantOuMinimasSociaux,
-                cooperateur.nombreDePersonnesDansLeFoyer,
-                cooperateur.parts,
-                cooperateur.partsDeSoutien,
-                cooperateur.acceptationDesStatus
-        );
+        var dto = new CooperateurDTO();
+        
+        dto.id = cooperateur.id;
+        dto.genre = cooperateur.genre;
+        dto.prenom = cooperateur.prenom;
+        dto.nom = cooperateur.nom;
+        dto.telephone = cooperateur.telephone;
+        dto.email = cooperateur.email;
+        dto.adresse = cooperateur.adresse;
+        dto.ville = cooperateur.ville;
+        dto.codePostal = cooperateur.codePostal;
+        dto.etudiantOuMinimasSociaux = cooperateur.etudiantOuMinimasSociaux;
+        dto.nombreDePersonnesDansLeFoyer = cooperateur.nombreDePersonnesDansLeFoyer;
+        dto.parts = cooperateur.parts;
+        dto.partsDeSoutien = cooperateur.partsDeSoutien;
+        dto.acceptationDesStatus = cooperateur.acceptationDesStatus;
+        dto.status = cooperateur.status;
+        
+        return dto;
     }
 }

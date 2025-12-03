@@ -1,12 +1,10 @@
 package org.sqq.registration.api;
 
 import com.stripe.exception.StripeException;
+import io.quarkus.logging.Log;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.FormParam;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.sqq.registration.Cooperateur;
@@ -42,6 +40,7 @@ public class RegistrationResource {
             @FormParam("partsDeSoutien") String partsDeSoutien,
             @FormParam("acceptationDesStatus") String acceptation
     ) throws StripeException {
+        Log.infof("New registration: %s %s %s", prenom, nom, email);
         Cooperateur cooperateur = new Cooperateur(
                 Genre.valueOf(genre),
                 prenom,
@@ -63,5 +62,15 @@ public class RegistrationResource {
 
         URI paymentUrl = stripe.paySouscription(cooperateur);
         return Response.seeOther(paymentUrl).build();
+    }
+    
+    @POST
+    @Path("/success/{cooperateurId}")
+    @Transactional
+    public Response successfulPayment(@PathParam("cooperateurId") Long cooperateurId) throws StripeException {
+        Log.infof("Payment successful for cooperateur %d", cooperateurId);
+        Cooperateur cooperateur = Cooperateur.findById(cooperateurId);
+        stripe.updatePaymentStatus(cooperateur);
+        return Response.ok().build();
     }
 }
