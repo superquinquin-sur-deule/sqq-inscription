@@ -47,7 +47,7 @@ class RegistrationResourceTest {
                 .then().statusCode(303);
 
         given()
-                .auth().preemptive().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
@@ -86,7 +86,7 @@ class RegistrationResourceTest {
                 .then().statusCode(303);
 
         given()
-                .auth().preemptive().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
@@ -119,7 +119,7 @@ class RegistrationResourceTest {
                 .then().statusCode(303);
 
         Number id = given()
-                .auth().preemptive().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
@@ -132,14 +132,14 @@ class RegistrationResourceTest {
                 .statusCode(200);
 
         given()
-                .auth().preemptive().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "password")
                 .when().post("/api/v1/administration/cooperateurs/" + id + "/process")
                 .then()
                 .statusCode(200)
                 .body("status", equalTo("PROCESSED"));
 
         given()
-                .auth().preemptive().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
@@ -167,7 +167,7 @@ class RegistrationResourceTest {
                 .then().statusCode(303);
 
         Number id = given()
-                .auth().preemptive().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
@@ -180,7 +180,7 @@ class RegistrationResourceTest {
                 .statusCode(200);
 
         given()
-                .auth().preemptive().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
@@ -208,7 +208,7 @@ class RegistrationResourceTest {
                 .then().statusCode(303);
 
         Number id = given()
-                .auth().preemptive().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
@@ -216,13 +216,13 @@ class RegistrationResourceTest {
                 .path("find { it.email == 'nicolas.durand@mailbox.org' }.id");
 
         given()
-                .auth().preemptive().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "password")
                 .when().post("/api/v1/administration/cooperateurs/" + id + "/process")
                 .then()
                 .statusCode(400);
 
         given()
-                .auth().preemptive().basic("admin", "admin")
+                .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
