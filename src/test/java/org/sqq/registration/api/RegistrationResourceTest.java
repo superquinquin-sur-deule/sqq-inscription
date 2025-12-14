@@ -53,7 +53,7 @@ class RegistrationResourceTest {
                 .body("find { it.email == 'jean.michel@mailbox.org' }.nom", equalTo("Michel"))
                 .body("find { it.email == 'jean.michel@mailbox.org' }.prenom", equalTo("Jean"))
                 .body("find { it.email == 'jean.michel@mailbox.org' }.binome", nullValue());
-    } 
+    }
 
     @Test
     void shouldCreateCooperateurWithBinome() {
@@ -95,5 +95,48 @@ class RegistrationResourceTest {
                 .body("find { it.email == 'pierre.dupont@mailbox.org' }.binome.nom", equalTo("Dupont"))
                 .body("find { it.email == 'pierre.dupont@mailbox.org' }.binome.prenom", equalTo("Marie"))
                 .body("find { it.email == 'pierre.dupont@mailbox.org' }.binome.genre", equalTo("MADAME"));
+    }
+
+    @Test
+    void shouldProcessCooperateur() {
+        given().redirects().follow(false)
+                .formParam("genre", "MADAME")
+                .formParam("prenom", "Lucie")
+                .formParam("nom", "Bernard")
+                .formParam("telephone", "0600000001")
+                .formParam("email", "lucie.bernard@mailbox.org")
+                .formParam("adresse", "12 rue des Lilas")
+                .formParam("ville", "Lille")
+                .formParam("codePostal", "59000")
+                .formParam("etudiantOuMinimasSociaux", "false")
+                .formParam("nombreDePersonnesDansLeFoyer", "1")
+                .formParam("partsDeSoutien", "0")
+                .formParam("acceptationDesStatus", "true")
+                .formParam("binomeEnabled", "false")
+                .contentType("application/x-www-form-urlencoded")
+                .when().post("/api/v1/registrations")
+                .then().statusCode(303);
+
+        Number id = given()
+                .auth().preemptive().basic("admin", "admin")
+                .when().get("/api/v1/administration/cooperateurs")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("find { it.email == 'lucie.bernard@mailbox.org' }.id");
+
+        given()
+                .auth().preemptive().basic("admin", "admin")
+                .when().post("/api/v1/administration/cooperateurs/" + id + "/process")
+                .then()
+                .statusCode(200)
+                .body("status", equalTo("PROCESSED"));
+
+        given()
+                .auth().preemptive().basic("admin", "admin")
+                .when().get("/api/v1/administration/cooperateurs")
+                .then()
+                .statusCode(200)
+                .body("find { it.id == " + id + " }.status", equalTo("PROCESSED"));
     }
 }
