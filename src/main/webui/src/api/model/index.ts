@@ -10,3 +10,4 @@ export * from "./cooperateurStatus";
 export * from "./createCooperateurDTO";
 export * from "./genre";
 export * from "./postApiV1RegistrationsBody";
+export * from "./binomeDTO";

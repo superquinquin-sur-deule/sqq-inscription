@@ -80,6 +80,57 @@ export const getSqqInscriptionAPI = () => {
         postApiV1RegistrationsBody.acceptationDesStatus,
       );
     }
+    if (postApiV1RegistrationsBody.binomeEnabled !== undefined) {
+      formUrlEncoded.append(
+        `binomeEnabled`,
+        postApiV1RegistrationsBody.binomeEnabled,
+      );
+    }
+    if (postApiV1RegistrationsBody.binomeNom !== undefined) {
+      formUrlEncoded.append(`binomeNom`, postApiV1RegistrationsBody.binomeNom);
+    }
+    if (postApiV1RegistrationsBody.binomePrenom !== undefined) {
+      formUrlEncoded.append(
+        `binomePrenom`,
+        postApiV1RegistrationsBody.binomePrenom,
+      );
+    }
+    if (postApiV1RegistrationsBody.binomeAdresse !== undefined) {
+      formUrlEncoded.append(
+        `binomeAdresse`,
+        postApiV1RegistrationsBody.binomeAdresse,
+      );
+    }
+    if (postApiV1RegistrationsBody.binomeVille !== undefined) {
+      formUrlEncoded.append(
+        `binomeVille`,
+        postApiV1RegistrationsBody.binomeVille,
+      );
+    }
+    if (postApiV1RegistrationsBody.binomeCodePostal !== undefined) {
+      formUrlEncoded.append(
+        `binomeCodePostal`,
+        postApiV1RegistrationsBody.binomeCodePostal,
+      );
+    }
+    if (postApiV1RegistrationsBody.binomeEmail !== undefined) {
+      formUrlEncoded.append(
+        `binomeEmail`,
+        postApiV1RegistrationsBody.binomeEmail,
+      );
+    }
+    if (postApiV1RegistrationsBody.binomeTelephone !== undefined) {
+      formUrlEncoded.append(
+        `binomeTelephone`,
+        postApiV1RegistrationsBody.binomeTelephone,
+      );
+    }
+    if (postApiV1RegistrationsBody.binomeDateNaissance !== undefined) {
+      formUrlEncoded.append(
+        `binomeDateNaissance`,
+        postApiV1RegistrationsBody.binomeDateNaissance,
+      );
+    }
 
     return axios.default.post(`/api/v1/registrations`, formUrlEncoded, options);
   };

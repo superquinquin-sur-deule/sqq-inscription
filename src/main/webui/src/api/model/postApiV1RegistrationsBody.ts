@@ -18,4 +18,13 @@ export type PostApiV1RegistrationsBody = {
   nombreDePersonnesDansLeFoyer?: string;
   partsDeSoutien?: string;
   acceptationDesStatus?: string;
+  binomeEnabled?: string;
+  binomeNom?: string;
+  binomePrenom?: string;
+  binomeAdresse?: string;
+  binomeVille?: string;
+  binomeCodePostal?: string;
+  binomeEmail?: string;
+  binomeTelephone?: string;
+  binomeDateNaissance?: string;
 };

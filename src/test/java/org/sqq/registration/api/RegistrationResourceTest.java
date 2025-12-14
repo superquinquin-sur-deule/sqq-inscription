@@ -43,6 +43,7 @@ class RegistrationResourceTest {
                 .formParam("nombreDePersonnesDansLeFoyer", "2")
                 .formParam("partsDeSoutien", "0")
                 .formParam("acceptationDesStatus", "true")
+                .formParam("binomeEnabled", "false")
                 .contentType("application/x-www-form-urlencoded")
                 .when().post("/api/v1/registrations")
                 .then().statusCode(303);

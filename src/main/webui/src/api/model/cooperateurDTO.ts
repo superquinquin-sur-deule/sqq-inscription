@@ -6,6 +6,7 @@
  */
 import type { Genre } from "./genre";
 import type { CooperateurStatus } from "./cooperateurStatus";
+import type { BinomeDTO } from "./binomeDTO";
 
 export interface CooperateurDTO {
   id?: number;
@@ -23,4 +24,5 @@ export interface CooperateurDTO {
   partsDeSoutien?: number;
   acceptationDesStatus?: boolean;
   status?: CooperateurStatus;
+  binome?: BinomeDTO;
 }

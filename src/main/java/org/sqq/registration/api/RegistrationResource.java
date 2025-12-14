@@ -7,6 +7,7 @@ import jakarta.validation.Validator;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.sqq.registration.Binome;
 import org.sqq.registration.Cooperateur;
 import org.sqq.registration.Genre;
 import org.sqq.registration.stripe.Stripe;
@@ -38,9 +39,33 @@ public class RegistrationResource {
             @FormParam("etudiantOuMinimasSociaux") String etuOuMinimas,
             @FormParam("nombreDePersonnesDansLeFoyer") String nbFoyer,
             @FormParam("partsDeSoutien") String partsDeSoutien,
-            @FormParam("acceptationDesStatus") String acceptation
+            @FormParam("acceptationDesStatus") String acceptation,
+            @FormParam("binomeEnabled") String binomeEnabled,
+            @FormParam("binomeNom") String binomeNom,
+            @FormParam("binomePrenom") String binomePrenom,
+            @FormParam("binomeAdresse") String binomeAdresse,
+            @FormParam("binomeVille") String binomeVille,
+            @FormParam("binomeCodePostal") String binomeCodePostal,
+            @FormParam("binomeEmail") String binomeEmail,
+            @FormParam("binomeTelephone") String binomeTelephone,
+            @FormParam("binomeDateNaissance") String binomeDateNaissance
     ) throws StripeException {
         Log.infof("New registration: %s %s %s", prenom, nom, email);
+        
+        Binome binome = null;
+        if (Boolean.parseBoolean(binomeEnabled)) {
+            binome = new Binome();
+            binome.nom = binomeNom;
+            binome.prenom = binomePrenom;
+            binome.adresse = binomeAdresse;
+            binome.ville = binomeVille;
+            binome.codePostal = binomeCodePostal;
+            binome.email = binomeEmail;
+            binome.telephone = binomeTelephone;
+            binome.dateNaissance = binomeDateNaissance;
+            binome.persist();
+        }
+        
         Cooperateur cooperateur = new Cooperateur(
                 Genre.valueOf(genre),
                 prenom,
@@ -53,7 +78,7 @@ public class RegistrationResource {
                 Boolean.parseBoolean(etuOuMinimas),
                 Long.parseLong(nbFoyer),
                 Long.parseLong(partsDeSoutien),
-                null,
+                binome,
                 Boolean.parseBoolean(acceptation)
         );
 

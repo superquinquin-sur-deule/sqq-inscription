@@ -2,6 +2,42 @@
   "openapi" : "3.1.0",
   "components" : {
     "schemas" : {
+      "BinomeDTO" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "genre" : {
+            "$ref" : "#/components/schemas/Genre"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          },
+          "ville" : {
+            "type" : "string"
+          },
+          "codePostal" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string"
+          },
+          "dateNaissance" : {
+            "type" : "string"
+          }
+        }
+      },
       "CooperateurDTO" : {
         "type" : "object",
         "properties" : {
@@ -53,6 +89,9 @@
           },
           "status" : {
             "$ref" : "#/components/schemas/CooperateurStatus"
+          },
+          "binome" : {
+            "$ref" : "#/components/schemas/BinomeDTO"
           }
         }
       },
@@ -130,6 +169,33 @@
                     "type" : "string"
                   },
                   "acceptationDesStatus" : {
+                    "type" : "string"
+                  },
+                  "binomeEnabled" : {
+                    "type" : "string"
+                  },
+                  "binomeNom" : {
+                    "type" : "string"
+                  },
+                  "binomePrenom" : {
+                    "type" : "string"
+                  },
+                  "binomeAdresse" : {
+                    "type" : "string"
+                  },
+                  "binomeVille" : {
+                    "type" : "string"
+                  },
+                  "binomeCodePostal" : {
+                    "type" : "string"
+                  },
+                  "binomeEmail" : {
+                    "type" : "string"
+                  },
+                  "binomeTelephone" : {
+                    "type" : "string"
+                  },
+                  "binomeDateNaissance" : {
                     "type" : "string"
                   }
                 }

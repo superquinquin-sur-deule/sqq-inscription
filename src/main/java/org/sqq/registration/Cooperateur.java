@@ -53,6 +53,7 @@ public class Cooperateur extends PanacheEntity {
         this.etudiantOuMinimasSociaux = etudiantOuMinimasSociaux;
         this.nombreDePersonnesDansLeFoyer = nombreDePersonnesDansLeFoyer;
         this.partsDeSoutien = partsDeSoutien;
+        this.binome = binome;
         this.acceptationDesStatus = acceptationDesStatus;
         this.status = CooperateurStatus.PAYMENT_PENDING;
 

@@ -215,6 +215,15 @@
       <input type="hidden" name="etudiantOuMinimasSociaux" :value="form.parts.p10.checked ? 'true' : 'false'"/>
       <input type="hidden" name="partsDeSoutien" :value="form.parts.soutien.checked ? String(form.parts.soutien.parts || 0) : '0'"/>
       <input type="hidden" name="acceptationDesStatus" :value="form.accepteStatuts ? 'true' : 'false'"/>
+      <input type="hidden" name="binomeEnabled" :value="form.binome.enabled ? 'true' : 'false'"/>
+      <input type="hidden" name="binomeNom" :value="form.binome.nom"/>
+      <input type="hidden" name="binomePrenom" :value="form.binome.prenom"/>
+      <input type="hidden" name="binomeAdresse" :value="form.binome.adresse"/>
+      <input type="hidden" name="binomeVille" :value="form.binome.ville"/>
+      <input type="hidden" name="binomeCodePostal" :value="form.binome.codePostal"/>
+      <input type="hidden" name="binomeEmail" :value="form.binome.email"/>
+      <input type="hidden" name="binomeTelephone" :value="form.binome.telephone"/>
+      <input type="hidden" name="binomeDateNaissance" :value="form.binome.dateNaissance"/>
       <footer class="footer">
         <div class="total">
           <span>Total à payer</span>

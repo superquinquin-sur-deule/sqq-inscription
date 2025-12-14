@@ -20,6 +20,7 @@ public class CooperateurDTO {
     public Long partsDeSoutien;
     public boolean acceptationDesStatus;
     public CooperateurStatus status;
+    public BinomeDTO binome;
     
 
     public static CooperateurDTO fromCooperateur(Cooperateur cooperateur) {
@@ -40,7 +41,8 @@ public class CooperateurDTO {
         dto.partsDeSoutien = cooperateur.partsDeSoutien;
         dto.acceptationDesStatus = cooperateur.acceptationDesStatus;
         dto.status = cooperateur.status;
-        
+        dto.binome = BinomeDTO.fromBinome(cooperateur.binome);
+
         return dto;
     }
 }

@@ -53,6 +53,16 @@
               <td>{{ row.partsDeSoutien }}</td>
               <td>{{ yesNo(row.acceptationDesStatus) }}</td>
               <td>
+                <button
+                    v-if="row.binome"
+                    class="binome-btn"
+                    @click="openBinomeModal(row.binome)"
+                >
+                  Oui
+                </button>
+                <span v-else class="no-binome">Non</span>
+              </td>
+              <td>
                 <span class="status" :class="statusClass(row.status)">{{ format(row.status) }}</span>
               </td>
             </tr>
@@ -60,13 +70,62 @@
         </table>
       </div>
     </section>
+
+    <!-- Binome Modal -->
+    <div v-if="selectedBinome" class="modal-overlay" @click.self="closeBinomeModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Information du binôme</h2>
+          <button class="modal-close" @click="closeBinomeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <dl class="binome-details">
+            <div class="detail-row">
+              <dt>Genre</dt>
+              <dd>{{ format(selectedBinome.genre) }}</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Prénom</dt>
+              <dd>{{ selectedBinome.prenom }}</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Nom</dt>
+              <dd>{{ selectedBinome.nom }}</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Date de naissance</dt>
+              <dd>{{ selectedBinome.dateNaissance || '—' }}</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Téléphone</dt>
+              <dd>{{ selectedBinome.telephone || '—' }}</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Email</dt>
+              <dd>{{ selectedBinome.email || '—' }}</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Adresse</dt>
+              <dd>{{ selectedBinome.adresse || '—' }}</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Ville</dt>
+              <dd>{{ selectedBinome.ville || '—' }}</dd>
+            </div>
+            <div class="detail-row">
+              <dt>Code postal</dt>
+              <dd>{{ selectedBinome.codePostal || '—' }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
   </main>
-  
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import type { CooperateurDTO } from '../api/model'
+import type { CooperateurDTO, BinomeDTO } from '../api/model'
 import { getSqqInscriptionAPI } from '../api/service/catalog'
 import type { CooperateurStatus } from '../api/model'
 
@@ -77,8 +136,16 @@ const rows = ref<CooperateurDTO[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
 const query = ref('')
+const selectedBinome = ref<BinomeDTO | null>(null)
 
-// columns definition
+function openBinomeModal(binome: BinomeDTO) {
+  selectedBinome.value = binome
+}
+
+function closeBinomeModal() {
+  selectedBinome.value = null
+}
+
 const columns = [
   { key: 'id', label: 'ID' },
   { key: 'genre', label: 'Genre' },
@@ -94,6 +161,7 @@ const columns = [
   { key: 'parts', label: 'Parts' },
   { key: 'partsDeSoutien', label: 'Parts de soutien' },
   { key: 'acceptationDesStatus', label: 'Statuts acceptés' },
+  { key: 'binome', label: 'Binôme' },
   { key: 'status', label: 'Statut' },
 ] as const
 
@@ -126,7 +194,14 @@ function yesNo(v?: boolean) {
 }
 
 function format(v: unknown) {
-  return safeString(v)
+  switch (safeString(v)) {
+    case 'PAYMENT_PENDING':
+      return 'Paiement en attente'
+    case 'PAID':
+      return 'Payé'
+    case 'PROCESSED':
+      return 'Traitée'
+  }
 }
 
 function statusClass(v?: CooperateurStatus) {
@@ -244,20 +319,104 @@ td { padding: .5rem .5rem; border-bottom: 1px solid #f3f4f6; }
   font-weight: 600;
   line-height: 1.2;
 }
-.status.pending { /* PAYMENT_PENDING → orange */
+.status.pending {
   background: #ffedd5; /* orange-100 */
   color: #9a3412;     /* orange-700 */
 }
-.status.paid { /* PAID → yellow */
-  background: #fef9c3; /* yellow-100 */
-  color: #854d0e;      /* yellow-800 */
+.status.paid {
+  background: #dcfce7; /* green-100 */
+  color: #166534;      /* green-700 */
 }
-.status.processed { /* PROCESSED → green */
+.status.processed {
   background: #dcfce7; /* green-100 */
   color: #166534;      /* green-700 */
 }
 .status.unknown {
   background: #e5e7eb; /* gray-200 */
   color: #374151;      /* gray-700 */
+}
+
+/* Binome column */
+.binome-btn {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: none;
+  padding: .25rem .6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: .85rem;
+  font-weight: 500;
+}
+.binome-btn:hover {
+  background: #bfdbfe;
+}
+.no-binome {
+  color: #9ca3af;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #6b7280;
+  cursor: pointer;
+}
+.modal-close:hover {
+  color: #1f2937;
+}
+.modal-body {
+  padding: 1.25rem;
+}
+.binome-details {
+  margin: 0;
+}
+.detail-row {
+  display: flex;
+  padding: .5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.detail-row:last-child {
+  border-bottom: none;
+}
+.detail-row dt {
+  flex: 0 0 140px;
+  font-weight: 500;
+  color: #6b7280;
+}
+.detail-row dd {
+  margin: 0;
+  color: #1f2937;
 }
 </style>
