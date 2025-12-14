@@ -14,8 +14,8 @@
       <div class="success-icon" aria-hidden="true">✓</div>
       <h2>Inscription finalisée</h2>
       <p>
-        Nous venons de valider votre souscription de parts sociales. Vous recevrez un email de confirmation
-        avec un récapitulatif de votre inscription et de votre paiement.
+        Nous venons de valider ta souscription de parts sociales. Tu recevras un email de confirmation
+        avec un récapitulatif de ton inscription et de ton paiement.
       </p>
 
       <div class="next-steps">
@@ -27,7 +27,7 @@
       </div>
 
       <p class="help">
-        Besoin d’aide ? Écrivez-nous à
+        Besoin d’aide ? Écris nous à
         <a href="mailto:contact@superquinquin.fr">contact@superquinquin.fr</a>.
       </p>
     </section>
