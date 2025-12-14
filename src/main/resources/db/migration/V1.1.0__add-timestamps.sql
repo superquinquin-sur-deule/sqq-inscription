@@ -1,0 +1,2 @@
+ALTER TABLE Cooperateur ADD COLUMN createdAt TIMESTAMP;
+ALTER TABLE Cooperateur ADD COLUMN updatedAt TIMESTAMP;

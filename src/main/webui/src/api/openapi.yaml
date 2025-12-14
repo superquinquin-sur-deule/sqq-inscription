@@ -12,9 +12,16 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/CooperateurDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: List
       tags:
       - Admin Resource
+      security:
+      - SecurityScheme:
+        - admin
   /api/v1/administration/cooperateurs/{id}/process:
     post:
       parameters:
@@ -30,9 +37,16 @@ paths:
           content:
             application/json:
               schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
       summary: Mark As Processed
       tags:
       - Admin Resource
+      security:
+      - SecurityScheme:
+        - admin
   /api/v1/registrations:
     post:
       requestBody:
@@ -200,6 +214,11 @@ components:
       format: date-time
       examples:
       - 2022-03-10T16:15:50Z
+  securitySchemes:
+    SecurityScheme:
+      type: http
+      scheme: basic
+      description: Authentication
 info:
   title: sqq-inscription API
   version: 1.0-SNAPSHOT

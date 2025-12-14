@@ -1,6 +1,7 @@
 package org.sqq.registration.api;
 
 import io.quarkus.logging.Log;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -12,6 +13,7 @@ import org.sqq.registration.api.dto.CooperateurDTO;
 import java.util.List;
 
 @Path("/api/v1/administration")
+@RolesAllowed("admin")
 public class AdminResource {
 
     @Path("/cooperateurs")

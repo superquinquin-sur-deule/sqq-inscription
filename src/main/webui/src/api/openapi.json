@@ -16,10 +16,19 @@
                 }
               }
             }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
           }
         },
         "summary" : "List",
-        "tags" : [ "Admin Resource" ]
+        "tags" : [ "Admin Resource" ],
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
       }
     },
     "/api/v1/administration/cooperateurs/{id}/process" : {
@@ -41,10 +50,19 @@
                 "schema" : { }
               }
             }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
           }
         },
         "summary" : "Mark As Processed",
-        "tags" : [ "Admin Resource" ]
+        "tags" : [ "Admin Resource" ],
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
       }
     },
     "/api/v1/registrations" : {
@@ -283,6 +301,13 @@
         "type" : "string",
         "format" : "date-time",
         "examples" : [ "2022-03-10T16:15:50Z" ]
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "scheme" : "basic",
+        "description" : "Authentication"
       }
     }
   },
