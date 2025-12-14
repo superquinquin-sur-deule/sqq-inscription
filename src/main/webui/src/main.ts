@@ -10,7 +10,7 @@ import AdminCooperateurs from "./views/AdminCooperateurs.vue";
 const routes = [
     { path: '/', component: Registration },
     { path: '/success', component: SuccessfulRegistration },
-    { path: '/admin/cooperateurs', component: AdminCooperateurs },
+    { path: '/admin', component: AdminCooperateurs },
 ]
 
 const router = createRouter({
