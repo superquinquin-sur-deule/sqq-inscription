@@ -45,16 +45,18 @@ public class Stripe {
 
         return URI.create(session.getUrl());
     }
-    
-    public void updatePaymentStatus(Cooperateur cooperateur) throws StripeException {
-        Session session = Session.retrieve(cooperateur.stripeSessionId);
-        if (session.getPaymentStatus().equals("paid")) {
-            Log.infof("Stripe session payment status is paid for cooperateur %d", cooperateur.id);
-            cooperateur.status = CooperateurStatus.PAID;
-        } else {
-            Log.warnf("Stripe session payment status is not paid: %s", session.getPaymentStatus());
+
+    public Boolean hasPaid(Cooperateur cooperateur) {
+        try {
+            Session session = Session.retrieve(cooperateur.stripeSessionId);
+            boolean paid = session.getPaymentStatus().equals("paid");
+            
+            Log.infof("Stripe session payment status is %s for cooperateur %d", paid ? "paid" : "not paid", cooperateur.id);
+            
+            return paid;
+        } catch (StripeException e) {
+            Log.error("Unable to retrieve Stripe session", e);
+            return false;
         }
-        
-        cooperateur.persist();
     }
 }

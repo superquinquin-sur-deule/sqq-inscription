@@ -9,6 +9,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.sqq.registration.Binome;
 import org.sqq.registration.Cooperateur;
+import org.sqq.registration.CooperateurStatus;
 import org.sqq.registration.Genre;
 import org.sqq.registration.stripe.Stripe;
 
@@ -94,10 +95,16 @@ public class RegistrationResource {
     @POST
     @Path("/success/{cooperateurId}")
     @Transactional
-    public Response successfulPayment(@PathParam("cooperateurId") Long cooperateurId) throws StripeException {
+    public Response successfulPayment(@PathParam("cooperateurId") Long cooperateurId) {
         Log.infof("Payment successful for cooperateur %d", cooperateurId);
         Cooperateur cooperateur = Cooperateur.findById(cooperateurId);
-        stripe.updatePaymentStatus(cooperateur);
-        return Response.ok().build();
+        if (stripe.hasPaid(cooperateur)) {
+            cooperateur.status = CooperateurStatus.PAID;
+            cooperateur.persist();
+            return Response.ok().build();
+        } else {
+            Log.errorf("Stripe session payment status is not paid for cooperateur %d", cooperateurId);
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
     }
 }

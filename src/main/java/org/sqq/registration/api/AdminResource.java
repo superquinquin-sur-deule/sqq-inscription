@@ -35,6 +35,13 @@ public class AdminResource {
         if (cooperateur == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        // Business rule: cannot process if not paid
+        if (cooperateur.status != CooperateurStatus.PAID) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Cooperateur must be PAID before processing")
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
         cooperateur.status = CooperateurStatus.PROCESSED;
         return Response.ok(CooperateurDTO.fromCooperateur(cooperateur)).build();
     }

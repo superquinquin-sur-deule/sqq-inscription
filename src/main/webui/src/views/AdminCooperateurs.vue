@@ -69,14 +69,13 @@
               <td>{{ formatDate(row.updatedAt) }}</td>
               <td>
                 <button
-                  v-if="row.status !== 'PROCESSED'"
+                  v-if="row.status === 'PAID'"
                   class="action-btn"
                   @click="markAsProcessed(row)"
                   :disabled="processing === row.id"
                 >
                   {{ processing === row.id ? 'En cours...' : 'Marquer traitée' }}
                 </button>
-                <span v-else class="processed-label">Traitée</span>
               </td>
             </tr>
           </tbody>

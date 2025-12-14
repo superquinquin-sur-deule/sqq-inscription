@@ -22,6 +22,7 @@ class RegistrationResourceTest {
     public static void setup() throws StripeException, URISyntaxException {
         Stripe mockedStripe = Mockito.mock(Stripe.class);
         Mockito.when(mockedStripe.paySouscription(ArgumentMatchers.any())).thenReturn(new URI("https://checkout.stripe.com"));
+        Mockito.when(mockedStripe.hasPaid(ArgumentMatchers.any())).thenReturn(true);
         QuarkusMock.installMockForType(mockedStripe, Stripe.class);
     }
     
@@ -126,6 +127,11 @@ class RegistrationResourceTest {
                 .path("find { it.email == 'lucie.bernard@mailbox.org' }.id");
 
         given()
+                .when().post("/api/v1/registrations/success/" + id)
+                .then()
+                .statusCode(200);
+
+        given()
                 .auth().preemptive().basic("admin", "admin")
                 .when().post("/api/v1/administration/cooperateurs/" + id + "/process")
                 .then()
@@ -138,5 +144,88 @@ class RegistrationResourceTest {
                 .then()
                 .statusCode(200)
                 .body("find { it.id == " + id + " }.status", equalTo("PROCESSED"));
+    }
+
+    @Test
+    void shouldMarkCooperateurAsPaidAfterSuccess() {
+        given().redirects().follow(false)
+                .formParam("genre", "MONSIEUR")
+                .formParam("prenom", "Louis")
+                .formParam("nom", "Martin")
+                .formParam("telephone", "0600000002")
+                .formParam("email", "louis.martin@mailbox.org")
+                .formParam("adresse", "5 rue des Jardins")
+                .formParam("ville", "Lille")
+                .formParam("codePostal", "59000")
+                .formParam("etudiantOuMinimasSociaux", "false")
+                .formParam("nombreDePersonnesDansLeFoyer", "2")
+                .formParam("partsDeSoutien", "0")
+                .formParam("acceptationDesStatus", "true")
+                .formParam("binomeEnabled", "false")
+                .contentType("application/x-www-form-urlencoded")
+                .when().post("/api/v1/registrations")
+                .then().statusCode(303);
+
+        Number id = given()
+                .auth().preemptive().basic("admin", "admin")
+                .when().get("/api/v1/administration/cooperateurs")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("find { it.email == 'louis.martin@mailbox.org' }.id");
+
+        given()
+                .when().post("/api/v1/registrations/success/" + id)
+                .then()
+                .statusCode(200);
+
+        given()
+                .auth().preemptive().basic("admin", "admin")
+                .when().get("/api/v1/administration/cooperateurs")
+                .then()
+                .statusCode(200)
+                .body("find { it.id == " + id + " }.status", equalTo("PAID"));
+    }
+
+    @Test
+    void shouldNotProcessCooperateurIfNotPaid() {
+        given().redirects().follow(false)
+                .formParam("genre", "MONSIEUR")
+                .formParam("prenom", "Nicolas")
+                .formParam("nom", "Durand")
+                .formParam("telephone", "0600000003")
+                .formParam("email", "nicolas.durand@mailbox.org")
+                .formParam("adresse", "10 rue de Paris")
+                .formParam("ville", "Lille")
+                .formParam("codePostal", "59000")
+                .formParam("etudiantOuMinimasSociaux", "false")
+                .formParam("nombreDePersonnesDansLeFoyer", "2")
+                .formParam("partsDeSoutien", "0")
+                .formParam("acceptationDesStatus", "true")
+                .formParam("binomeEnabled", "false")
+                .contentType("application/x-www-form-urlencoded")
+                .when().post("/api/v1/registrations")
+                .then().statusCode(303);
+
+        Number id = given()
+                .auth().preemptive().basic("admin", "admin")
+                .when().get("/api/v1/administration/cooperateurs")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("find { it.email == 'nicolas.durand@mailbox.org' }.id");
+
+        given()
+                .auth().preemptive().basic("admin", "admin")
+                .when().post("/api/v1/administration/cooperateurs/" + id + "/process")
+                .then()
+                .statusCode(400);
+
+        given()
+                .auth().preemptive().basic("admin", "admin")
+                .when().get("/api/v1/administration/cooperateurs")
+                .then()
+                .statusCode(200)
+                .body("find { it.id == " + id + " }.status", equalTo("PAYMENT_PENDING"));
     }
 }
