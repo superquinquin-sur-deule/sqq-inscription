@@ -28,13 +28,13 @@
           </div>
 
           <div class="field">
-            <label for="nom">Nom <span class="req">*</span></label>
-            <input id="nom" name="nom" v-model.trim="form.nom" required/>
-          </div>
-
-          <div class="field">
             <label for="prenom">Prénom <span class="req">*</span></label>
             <input id="prenom" name="prenom" v-model.trim="form.prenom" required/>
+          </div>
+          
+          <div class="field">
+            <label for="nom">Nom <span class="req">*</span></label>
+            <input id="nom" name="nom" v-model.trim="form.nom" required/>
           </div>
 
           <div class="field full">
@@ -124,6 +124,18 @@
           </label>
           <p class="details">Si vous ajoutez un binôme, 20€ seront automatiquement ajoutés à votre souscription.</p>
           <div class="subgrid" v-if="form.binome.enabled">
+            <div class="field full">
+              <div class="inline">
+                <label class="radio">
+                  <input type="radio" name="binomeGenre" value="MADAME" v-model="form.binome.genre"/>
+                  <span>Madame</span>
+                </label>
+                <label class="radio">
+                  <input type="radio" name="binomeGenre" value="MONSIEUR" v-model="form.binome.genre"/>
+                  <span>Monsieur</span>
+                </label>
+              </div>
+            </div>
             <div class="field">
               <label for="bNom">Nom du binôme <span class="req">*</span></label>
               <input id="bNom" v-model.trim="form.binome.nom"/>
@@ -216,6 +228,7 @@
       <input type="hidden" name="partsDeSoutien" :value="form.parts.soutien.checked ? String(form.parts.soutien.parts || 0) : '0'"/>
       <input type="hidden" name="acceptationDesStatus" :value="form.accepteStatuts ? 'true' : 'false'"/>
       <input type="hidden" name="binomeEnabled" :value="form.binome.enabled ? 'true' : 'false'"/>
+      <input type="hidden" name="binomeGenre" :value="form.binome.genre"/>
       <input type="hidden" name="binomeNom" :value="form.binome.nom"/>
       <input type="hidden" name="binomePrenom" :value="form.binome.prenom"/>
       <input type="hidden" name="binomeAdresse" :value="form.binome.adresse"/>
@@ -266,6 +279,7 @@ const form = reactive({
   },
   binome: {
     enabled: false,
+    genre: '' as '' | Genre,
     nom: '',
     prenom: '',
     adresse: '',
@@ -328,6 +342,7 @@ const isFormValid = computed(() => {
   if (!form.binome.enabled) return true
 
   return (
+      !!form.binome.genre &&
       form.binome.nom.trim().length > 0 &&
       form.binome.prenom.trim().length > 0 &&
       form.binome.adresse.trim().length > 0 &&

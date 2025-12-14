@@ -125,6 +125,8 @@ paths:
                   type: string
                 binomeEnabled:
                   type: string
+                binomeGenre:
+                  type: string
                 binomeNom:
                   type: string
                 binomePrenom:

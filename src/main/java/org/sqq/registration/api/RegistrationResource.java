@@ -41,6 +41,7 @@ public class RegistrationResource {
             @FormParam("partsDeSoutien") String partsDeSoutien,
             @FormParam("acceptationDesStatus") String acceptation,
             @FormParam("binomeEnabled") String binomeEnabled,
+            @FormParam("binomeGenre") String binomeGenre,
             @FormParam("binomeNom") String binomeNom,
             @FormParam("binomePrenom") String binomePrenom,
             @FormParam("binomeAdresse") String binomeAdresse,
@@ -55,6 +56,7 @@ public class RegistrationResource {
         Binome binome = null;
         if (Boolean.parseBoolean(binomeEnabled)) {
             binome = new Binome();
+            binome.genre = binomeGenre != null && !binomeGenre.isBlank() ? Genre.valueOf(binomeGenre) : null;
             binome.nom = binomeNom;
             binome.prenom = binomePrenom;
             binome.adresse = binomeAdresse;
