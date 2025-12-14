@@ -1,4 +1,4 @@
-package org.sqq.registration.api;
+package org.sqq.registration;
 
 import com.stripe.exception.StripeException;
 import io.quarkus.test.junit.QuarkusMock;

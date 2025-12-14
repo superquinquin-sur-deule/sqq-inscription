@@ -100,6 +100,12 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-elytron-security-properties-file</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.quarkiverse.quinoa</groupId>
+            <artifactId>quarkus-quinoa-testing</artifactId>
+            <version>2.7.1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
