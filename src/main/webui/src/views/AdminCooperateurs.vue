@@ -201,6 +201,12 @@ function format(v: unknown) {
       return 'Payé'
     case 'PROCESSED':
       return 'Traitée'
+    case 'MADAME':
+      return 'Madame'
+    case 'MONSIEUR':
+      return 'Monsieur'
+    default:
+      return safeString(v)
   }
 }
 
