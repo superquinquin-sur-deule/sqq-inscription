@@ -65,6 +65,10 @@ components:
           $ref: "#/components/schemas/CooperateurStatus"
         binome:
           $ref: "#/components/schemas/BinomeDTO"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
     CooperateurStatus:
       type: string
       enum:
@@ -76,6 +80,11 @@ components:
       enum:
       - MADAME
       - MONSIEUR
+    Instant:
+      type: string
+      format: date-time
+      examples:
+      - 2022-03-10T16:15:50Z
 paths:
   /api/v1/administration/cooperateurs:
     get:

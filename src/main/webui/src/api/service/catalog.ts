@@ -86,6 +86,12 @@ export const getSqqInscriptionAPI = () => {
         postApiV1RegistrationsBody.binomeEnabled,
       );
     }
+    if (postApiV1RegistrationsBody.binomeGenre !== undefined) {
+      formUrlEncoded.append(
+        `binomeGenre`,
+        postApiV1RegistrationsBody.binomeGenre,
+      );
+    }
     if (postApiV1RegistrationsBody.binomeNom !== undefined) {
       formUrlEncoded.append(`binomeNom`, postApiV1RegistrationsBody.binomeNom);
     }

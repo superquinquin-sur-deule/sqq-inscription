@@ -19,6 +19,7 @@ export type PostApiV1RegistrationsBody = {
   partsDeSoutien?: string;
   acceptationDesStatus?: string;
   binomeEnabled?: string;
+  binomeGenre?: string;
   binomeNom?: string;
   binomePrenom?: string;
   binomeAdresse?: string;

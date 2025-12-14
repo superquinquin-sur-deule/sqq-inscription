@@ -7,6 +7,7 @@
 import type { Genre } from "./genre";
 import type { CooperateurStatus } from "./cooperateurStatus";
 import type { BinomeDTO } from "./binomeDTO";
+import type { Instant } from "./instant";
 
 export interface CooperateurDTO {
   id?: number;
@@ -25,4 +26,6 @@ export interface CooperateurDTO {
   acceptationDesStatus?: boolean;
   status?: CooperateurStatus;
   binome?: BinomeDTO;
+  createdAt?: Instant;
+  updatedAt?: Instant;
 }

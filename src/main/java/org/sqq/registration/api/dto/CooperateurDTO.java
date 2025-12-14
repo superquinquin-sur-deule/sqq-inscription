@@ -4,6 +4,8 @@ import org.sqq.registration.Cooperateur;
 import org.sqq.registration.CooperateurStatus;
 import org.sqq.registration.Genre;
 
+import java.time.Instant;
+
 public class CooperateurDTO {
     public Long id;
     public Genre genre;
@@ -21,7 +23,8 @@ public class CooperateurDTO {
     public boolean acceptationDesStatus;
     public CooperateurStatus status;
     public BinomeDTO binome;
-    
+    public Instant createdAt;
+    public Instant updatedAt;
 
     public static CooperateurDTO fromCooperateur(Cooperateur cooperateur) {
         var dto = new CooperateurDTO();
@@ -42,6 +45,8 @@ public class CooperateurDTO {
         dto.acceptationDesStatus = cooperateur.acceptationDesStatus;
         dto.status = cooperateur.status;
         dto.binome = BinomeDTO.fromBinome(cooperateur.binome);
+        dto.createdAt = cooperateur.createdAt;
+        dto.updatedAt = cooperateur.updatedAt;
 
         return dto;
     }

@@ -5,9 +5,10 @@
  * OpenAPI spec version: 1.0-SNAPSHOT
  */
 
+export * from "./binomeDTO";
 export * from "./cooperateurDTO";
 export * from "./cooperateurStatus";
 export * from "./createCooperateurDTO";
 export * from "./genre";
 export * from "./postApiV1RegistrationsBody";
-export * from "./binomeDTO";
+export * from "./instant";

@@ -92,6 +92,12 @@
           },
           "binome" : {
             "$ref" : "#/components/schemas/BinomeDTO"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
           }
         }
       },
@@ -102,6 +108,11 @@
       "Genre" : {
         "type" : "string",
         "enum" : [ "MADAME", "MONSIEUR" ]
+      },
+      "Instant" : {
+        "type" : "string",
+        "format" : "date-time",
+        "examples" : [ "2022-03-10T16:15:50Z" ]
       }
     }
   },

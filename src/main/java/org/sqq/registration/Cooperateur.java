@@ -6,6 +6,10 @@ import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.Instant;
 
 @Entity
 public class Cooperateur extends PanacheEntity {
@@ -37,6 +41,10 @@ public class Cooperateur extends PanacheEntity {
     public boolean acceptationDesStatus;
     public CooperateurStatus status;
     public String stripeSessionId;
+    @CreationTimestamp
+    public Instant createdAt;
+    @UpdateTimestamp
+    public Instant updatedAt;
 
     public Cooperateur() {
     }

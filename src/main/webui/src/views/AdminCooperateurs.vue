@@ -65,6 +65,8 @@
               <td>
                 <span class="status" :class="statusClass(row.status)">{{ format(row.status) }}</span>
               </td>
+              <td>{{ formatDate(row.createdAt) }}</td>
+              <td>{{ formatDate(row.updatedAt) }}</td>
             </tr>
           </tbody>
         </table>
@@ -163,12 +165,14 @@ const columns = [
   { key: 'acceptationDesStatus', label: 'Statuts acceptés' },
   { key: 'binome', label: 'Binôme' },
   { key: 'status', label: 'Statut' },
+  { key: 'createdAt', label: 'Créé le' },
+  { key: 'updatedAt', label: 'Modifié le' },
 ] as const
 
 type ColumnKey = typeof columns[number]['key']
 
-const sortKey = ref<ColumnKey>('id')
-const sortDir = ref<SortDir>('asc')
+const sortKey = ref<ColumnKey>('updatedAt')
+const sortDir = ref<SortDir>('desc')
 
 function sortableClass(key: ColumnKey) {
   return sortKey.value === key ? (sortDir.value === 'asc' ? 'sorted-asc' : 'sorted-desc') : 'sortable'
@@ -191,6 +195,18 @@ function safeString(v: unknown): string {
 
 function yesNo(v?: boolean) {
   return v ? 'Oui' : 'Non'
+}
+
+function formatDate(v?: string) {
+  if (!v) return '—'
+  const date = new Date(v)
+  return date.toLocaleDateString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 function format(v: unknown) {
