@@ -22,6 +22,22 @@ export const getSqqInscriptionAPI = () => {
   };
 
   /**
+   * @summary Mark As Processed
+   */
+  const postApiV1AdministrationCooperateursIdProcess = <
+    TData = AxiosResponse<unknown>,
+  >(
+    id: number,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    return axios.default.post(
+      `/api/v1/administration/cooperateurs/${id}/process`,
+      undefined,
+      options,
+    );
+  };
+
+  /**
    * @summary Register Form
    */
   const postApiV1Registrations = <TData = AxiosResponse<unknown>>(
@@ -159,6 +175,7 @@ export const getSqqInscriptionAPI = () => {
 
   return {
     getApiV1AdministrationCooperateurs,
+    postApiV1AdministrationCooperateursIdProcess,
     postApiV1Registrations,
     postApiV1RegistrationsSuccessCooperateurId,
   };
@@ -166,6 +183,8 @@ export const getSqqInscriptionAPI = () => {
 export type GetApiV1AdministrationCooperateursResult = AxiosResponse<
   CooperateurDTO[]
 >;
+export type PostApiV1AdministrationCooperateursIdProcessResult =
+  AxiosResponse<unknown>;
 export type PostApiV1RegistrationsResult = AxiosResponse<unknown>;
 export type PostApiV1RegistrationsSuccessCooperateurIdResult =
   AxiosResponse<unknown>;

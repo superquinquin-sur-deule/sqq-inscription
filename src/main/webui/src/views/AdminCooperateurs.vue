@@ -67,6 +67,17 @@
               </td>
               <td>{{ formatDate(row.createdAt) }}</td>
               <td>{{ formatDate(row.updatedAt) }}</td>
+              <td>
+                <button
+                  v-if="row.status !== 'PROCESSED'"
+                  class="action-btn"
+                  @click="markAsProcessed(row)"
+                  :disabled="processing === row.id"
+                >
+                  {{ processing === row.id ? 'En cours...' : 'Marquer traitée' }}
+                </button>
+                <span v-else class="processed-label">Traitée</span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -139,6 +150,7 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 const query = ref('')
 const selectedBinome = ref<BinomeDTO | null>(null)
+const processing = ref<number | null>(null)
 
 function openBinomeModal(binome: BinomeDTO) {
   selectedBinome.value = binome
@@ -146,6 +158,23 @@ function openBinomeModal(binome: BinomeDTO) {
 
 function closeBinomeModal() {
   selectedBinome.value = null
+}
+
+async function markAsProcessed(row: CooperateurDTO) {
+  if (!row.id) return
+  processing.value = row.id
+  try {
+    const resp = await api.postApiV1AdministrationCooperateursIdProcess(row.id)
+    const updated = (resp as any).data ?? resp
+    const index = rows.value.findIndex(r => r.id === row.id)
+    if (index !== -1) {
+      rows.value[index] = updated
+    }
+  } catch (e: any) {
+    alert('Erreur: ' + (e?.message ?? 'Une erreur est survenue'))
+  } finally {
+    processing.value = null
+  }
 }
 
 const columns = [
@@ -167,6 +196,7 @@ const columns = [
   { key: 'status', label: 'Statut' },
   { key: 'createdAt', label: 'Créé le' },
   { key: 'updatedAt', label: 'Modifié le' },
+  { key: 'actions', label: 'Actions' },
 ] as const
 
 type ColumnKey = typeof columns[number]['key']
@@ -346,8 +376,8 @@ td { padding: .5rem .5rem; border-bottom: 1px solid #f3f4f6; }
   color: #9a3412;     /* orange-700 */
 }
 .status.paid {
-  background: #dcfce7; /* green-100 */
-  color: #166534;      /* green-700 */
+  background: #fef9c3; /* yellow-100 */
+  color: #854d0e;      /* yellow-800 */
 }
 .status.processed {
   background: #dcfce7; /* green-100 */
@@ -440,5 +470,29 @@ td { padding: .5rem .5rem; border-bottom: 1px solid #f3f4f6; }
 .detail-row dd {
   margin: 0;
   color: #1f2937;
+}
+
+/* Action button */
+.action-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: .35rem .75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: .8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.action-btn:hover:not(:disabled) {
+  background: #059669;
+}
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.processed-label {
+  color: #166534;
+  font-size: .85rem;
 }
 </style>

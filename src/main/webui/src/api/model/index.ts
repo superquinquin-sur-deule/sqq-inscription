@@ -10,5 +10,5 @@ export * from "./cooperateurDTO";
 export * from "./cooperateurStatus";
 export * from "./createCooperateurDTO";
 export * from "./genre";
-export * from "./postApiV1RegistrationsBody";
 export * from "./instant";
+export * from "./postApiV1RegistrationsBody";

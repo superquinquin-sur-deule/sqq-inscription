@@ -1,121 +1,5 @@
 {
   "openapi" : "3.1.0",
-  "components" : {
-    "schemas" : {
-      "BinomeDTO" : {
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "genre" : {
-            "$ref" : "#/components/schemas/Genre"
-          },
-          "nom" : {
-            "type" : "string"
-          },
-          "prenom" : {
-            "type" : "string"
-          },
-          "adresse" : {
-            "type" : "string"
-          },
-          "ville" : {
-            "type" : "string"
-          },
-          "codePostal" : {
-            "type" : "string"
-          },
-          "email" : {
-            "type" : "string"
-          },
-          "telephone" : {
-            "type" : "string"
-          },
-          "dateNaissance" : {
-            "type" : "string"
-          }
-        }
-      },
-      "CooperateurDTO" : {
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "genre" : {
-            "$ref" : "#/components/schemas/Genre"
-          },
-          "prenom" : {
-            "type" : "string"
-          },
-          "nom" : {
-            "type" : "string"
-          },
-          "telephone" : {
-            "type" : "string"
-          },
-          "email" : {
-            "type" : "string"
-          },
-          "adresse" : {
-            "type" : "string"
-          },
-          "ville" : {
-            "type" : "string"
-          },
-          "codePostal" : {
-            "type" : "string"
-          },
-          "etudiantOuMinimasSociaux" : {
-            "type" : "boolean"
-          },
-          "nombreDePersonnesDansLeFoyer" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "parts" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "partsDeSoutien" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "acceptationDesStatus" : {
-            "type" : "boolean"
-          },
-          "status" : {
-            "$ref" : "#/components/schemas/CooperateurStatus"
-          },
-          "binome" : {
-            "$ref" : "#/components/schemas/BinomeDTO"
-          },
-          "createdAt" : {
-            "$ref" : "#/components/schemas/Instant"
-          },
-          "updatedAt" : {
-            "$ref" : "#/components/schemas/Instant"
-          }
-        }
-      },
-      "CooperateurStatus" : {
-        "type" : "string",
-        "enum" : [ "PAYMENT_PENDING", "PAID", "PROCESSED" ]
-      },
-      "Genre" : {
-        "type" : "string",
-        "enum" : [ "MADAME", "MONSIEUR" ]
-      },
-      "Instant" : {
-        "type" : "string",
-        "format" : "date-time",
-        "examples" : [ "2022-03-10T16:15:50Z" ]
-      }
-    }
-  },
   "paths" : {
     "/api/v1/administration/cooperateurs" : {
       "get" : {
@@ -135,6 +19,31 @@
           }
         },
         "summary" : "List",
+        "tags" : [ "Admin Resource" ]
+      }
+    },
+    "/api/v1/administration/cooperateurs/{id}/process" : {
+      "post" : {
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        },
+        "summary" : "Mark As Processed",
         "tags" : [ "Admin Resource" ]
       }
     },
@@ -258,6 +167,122 @@
         },
         "summary" : "Successful Payment",
         "tags" : [ "Registration Resource" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "BinomeDTO" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "genre" : {
+            "$ref" : "#/components/schemas/Genre"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          },
+          "ville" : {
+            "type" : "string"
+          },
+          "codePostal" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string"
+          },
+          "dateNaissance" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CooperateurDTO" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "genre" : {
+            "$ref" : "#/components/schemas/Genre"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          },
+          "ville" : {
+            "type" : "string"
+          },
+          "codePostal" : {
+            "type" : "string"
+          },
+          "etudiantOuMinimasSociaux" : {
+            "type" : "boolean"
+          },
+          "nombreDePersonnesDansLeFoyer" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "parts" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "partsDeSoutien" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "acceptationDesStatus" : {
+            "type" : "boolean"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/CooperateurStatus"
+          },
+          "binome" : {
+            "$ref" : "#/components/schemas/BinomeDTO"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      },
+      "CooperateurStatus" : {
+        "type" : "string",
+        "enum" : [ "PAYMENT_PENDING", "PAID", "PROCESSED" ]
+      },
+      "Genre" : {
+        "type" : "string",
+        "enum" : [ "MADAME", "MONSIEUR" ]
+      },
+      "Instant" : {
+        "type" : "string",
+        "format" : "date-time",
+        "examples" : [ "2022-03-10T16:15:50Z" ]
       }
     }
   },

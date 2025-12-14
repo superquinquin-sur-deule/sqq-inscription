@@ -1,5 +1,120 @@
 ---
 openapi: 3.1.0
+paths:
+  /api/v1/administration/cooperateurs:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CooperateurDTO"
+      summary: List
+      tags:
+      - Admin Resource
+  /api/v1/administration/cooperateurs/{id}/process:
+    post:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Mark As Processed
+      tags:
+      - Admin Resource
+  /api/v1/registrations:
+    post:
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                genre:
+                  type: string
+                prenom:
+                  type: string
+                nom:
+                  type: string
+                telephone:
+                  type: string
+                email:
+                  type: string
+                adresse:
+                  type: string
+                ville:
+                  type: string
+                codePostal:
+                  type: string
+                etudiantOuMinimasSociaux:
+                  type: string
+                nombreDePersonnesDansLeFoyer:
+                  type: string
+                partsDeSoutien:
+                  type: string
+                acceptationDesStatus:
+                  type: string
+                binomeEnabled:
+                  type: string
+                binomeGenre:
+                  type: string
+                binomeNom:
+                  type: string
+                binomePrenom:
+                  type: string
+                binomeAdresse:
+                  type: string
+                binomeVille:
+                  type: string
+                binomeCodePostal:
+                  type: string
+                binomeEmail:
+                  type: string
+                binomeTelephone:
+                  type: string
+                binomeDateNaissance:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Register Form
+      tags:
+      - Registration Resource
+  /api/v1/registrations/success/{cooperateurId}:
+    post:
+      parameters:
+      - name: cooperateurId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Successful Payment
+      tags:
+      - Registration Resource
 components:
   schemas:
     BinomeDTO:
@@ -85,103 +200,6 @@ components:
       format: date-time
       examples:
       - 2022-03-10T16:15:50Z
-paths:
-  /api/v1/administration/cooperateurs:
-    get:
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/CooperateurDTO"
-      summary: List
-      tags:
-      - Admin Resource
-  /api/v1/registrations:
-    post:
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                genre:
-                  type: string
-                prenom:
-                  type: string
-                nom:
-                  type: string
-                telephone:
-                  type: string
-                email:
-                  type: string
-                adresse:
-                  type: string
-                ville:
-                  type: string
-                codePostal:
-                  type: string
-                etudiantOuMinimasSociaux:
-                  type: string
-                nombreDePersonnesDansLeFoyer:
-                  type: string
-                partsDeSoutien:
-                  type: string
-                acceptationDesStatus:
-                  type: string
-                binomeEnabled:
-                  type: string
-                binomeGenre:
-                  type: string
-                binomeNom:
-                  type: string
-                binomePrenom:
-                  type: string
-                binomeAdresse:
-                  type: string
-                binomeVille:
-                  type: string
-                binomeCodePostal:
-                  type: string
-                binomeEmail:
-                  type: string
-                binomeTelephone:
-                  type: string
-                binomeDateNaissance:
-                  type: string
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {}
-        "400":
-          description: Bad Request
-      summary: Register Form
-      tags:
-      - Registration Resource
-  /api/v1/registrations/success/{cooperateurId}:
-    post:
-      parameters:
-      - name: cooperateurId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema: {}
-      summary: Successful Payment
-      tags:
-      - Registration Resource
 info:
   title: sqq-inscription API
   version: 1.0-SNAPSHOT
