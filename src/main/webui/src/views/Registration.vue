@@ -196,7 +196,7 @@
         <label class="checkbox accept">
           <input type="checkbox" v-model="form.accepteStatuts"/>
           <span>
-            Je déclare avoir pris connaissance et accepter les Statuts provisoires de la coopérative SuperQuinquin sur Deûle. Je déclare avoir bien compris que mes parts sociales sont un investissement soumis à un risque de perte en capital en cas de déficit de la coopérative. Je déclare ne violer aucune norme ou réglementation en souscrivant les parts sociales de la Coopérative.
+            Je déclare avoir pris connaissance et accepter les <a class="statuts-link" href="https://www.superquinquin.fr/wp-content/uploads/2025/12/Statuts_signes_superQuinquinsurDeule.pdf" target="_blank">Statuts de la coopérative SuperQuinquin sur Deûle.</a> Je déclare avoir bien compris que mes parts sociales sont un investissement soumis à un risque de perte en capital en cas de déficit de la coopérative. Je déclare ne violer aucune norme ou réglementation en souscrivant les parts sociales de la Coopérative.
           </span>
         </label>
       </section>
@@ -719,6 +719,10 @@ input[type="radio"], input[type="checkbox"] {
   width: 120px;
   text-align: center;
   appearance: textfield;
+}
+
+.statuts-link {
+  text-decoration: underline;
 }
 
 #nbParts {
