@@ -5,7 +5,7 @@
         <img src="/superquinquin_logo_deule.svg" alt="SuperQuinquin sur Deûle" class="logo" />
         <div class="brand-text">
           <h1>Inscription à la Coopérative SuperQuinquin sur Deûle</h1>
-          <p class="subtitle">Devenez sociétaire et réglez vos parts sociales en quelques minutes.</p>
+          <p class="subtitle">Deviens sociétaire et règle tes parts sociales en quelques minutes.</p>
         </div>
       </div>
     </header>
@@ -55,7 +55,7 @@
 
           <div class="field">
             <label for="email">Email <span class="req">*</span></label>
-            <input id="email" name="email" v-model.trim="form.email" type="email" placeholder="vous@exemple.fr"/>
+            <input id="email" name="email" v-model.trim="form.email" type="email" placeholder="toi@exemple.fr"/>
             <small v-if="form.email && !isEmail(form.email)" class="error">Email invalide</small>
           </div>
 
@@ -83,7 +83,7 @@
 
       <section class="section">
         <h2>Parts sociales <span class="req">*</span></h2>
-        <p class="hint">Vous pouvez sélectionner une ou plusieurs options.</p>
+        <p class="hint">Tu peux sélectionner une ou plusieurs options.</p>
 
         <div class="option">
           <label class="checkbox">
@@ -122,7 +122,7 @@
             <input type="checkbox" v-model="form.binome.enabled"/>
             <span class="title">Ajouter un binôme</span>
           </label>
-          <p class="details">Si vous ajoutez un binôme, 20€ seront automatiquement ajoutés à votre souscription.</p>
+          <p class="details">Si tu ajoutes un binôme, 20€ seront automatiquement ajoutés à ta souscription.</p>
           <div class="subgrid" v-if="form.binome.enabled">
             <div class="field full">
               <div class="inline">
