@@ -10,7 +10,26 @@
       </div>
     </header>
 
-    <section class="section">
+    <div class="tabs">
+      <button
+        class="tab"
+        :class="{ active: activeTab === 'inscriptions' }"
+        @click="activeTab = 'inscriptions'"
+      >
+        Souscriptions
+        <span class="tab-count">{{ rows.length }}</span>
+      </button>
+      <button
+        class="tab"
+        :class="{ active: activeTab === 'supplementaires' }"
+        @click="activeTab = 'supplementaires'"
+      >
+        Parts supplémentaires
+        <span class="tab-count">{{ rowsSupp.length }}</span>
+      </button>
+    </div>
+
+    <section class="section" v-show="activeTab === 'inscriptions'">
       <div class="toolbar">
         <input
           v-model="query"
@@ -83,6 +102,61 @@
       </div>
     </section>
 
+    <section class="section" v-show="activeTab === 'supplementaires'">
+      <div class="toolbar">
+        <input
+          v-model="querySupp"
+          type="search"
+          placeholder="Rechercher (tous champs)"
+          class="search"
+        />
+        <span class="meta" v-if="!loadingSupp && !errorSupp">{{ filteredRowsSupp.length }} résultat(s)</span>
+      </div>
+
+      <div v-if="loadingSupp" class="state">Chargement…</div>
+      <div v-else-if="errorSupp" class="state error">{{ errorSupp }}</div>
+
+      <div v-else class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th v-for="col in columnsSupp" :key="col.key" @click="toggleSortSupp(col.key)" :class="['th', sortableClassSupp(col.key)]">
+                <span>{{ col.label }}</span>
+                <span class="sort-icon" aria-hidden="true" v-if="sortKeySupp === col.key">
+                  {{ sortDirSupp === 'asc' ? '▲' : '▼' }}
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in sortedRowsSupp" :key="row.id">
+              <td>{{ row.id }}</td>
+              <td>{{ row.prenom }}</td>
+              <td>{{ row.nom }}</td>
+              <td>{{ row.email }}</td>
+              <td>{{ row.partsSupplementaires }}</td>
+              <td>{{ (row.partsSupplementaires || 0) * 10 }} €</td>
+              <td>
+                <span class="status" :class="statusClass(row.status)">{{ format(row.status) }}</span>
+              </td>
+              <td>{{ formatDate(row.createdAt) }}</td>
+              <td>{{ formatDate(row.updatedAt) }}</td>
+              <td>
+                <button
+                  v-if="row.status === 'PAID'"
+                  class="action-btn"
+                  @click="markSuppAsProcessed(row)"
+                  :disabled="processingSupp === row.id"
+                >
+                  {{ processingSupp === row.id ? 'En cours...' : 'Marquer traitée' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Binome Modal -->
     <div v-if="selectedBinome" class="modal-overlay" @click.self="closeBinomeModal">
       <div class="modal">
@@ -137,7 +211,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import type { CooperateurDTO, BinomeDTO } from '../api/model'
+import type { CooperateurDTO, BinomeDTO, SouscriptionSupplementaireDTO } from '../api/model'
 import { getSqqInscriptionAPI } from '../api/service/catalog'
 import type { CooperateurStatus } from '../api/model'
 
@@ -150,6 +224,15 @@ const error = ref<string | null>(null)
 const query = ref('')
 const selectedBinome = ref<BinomeDTO | null>(null)
 const processing = ref<number | null>(null)
+
+const rowsSupp = ref<SouscriptionSupplementaireDTO[]>([])
+const loadingSupp = ref(true)
+const errorSupp = ref<string | null>(null)
+const querySupp = ref('')
+const processingSupp = ref<number | null>(null)
+
+// Tabs
+const activeTab = ref<'inscriptions' | 'supplementaires'>('inscriptions')
 
 function openBinomeModal(binome: BinomeDTO) {
   selectedBinome.value = binome
@@ -176,6 +259,23 @@ async function markAsProcessed(row: CooperateurDTO) {
   }
 }
 
+async function markSuppAsProcessed(row: SouscriptionSupplementaireDTO) {
+  if (!row.id) return
+  processingSupp.value = row.id
+  try {
+    const resp = await api.postApiV1AdministrationPartsAdditionnellesIdProcess(row.id)
+    const updated = (resp as any).data ?? resp
+    const index = rowsSupp.value.findIndex(r => r.id === row.id)
+    if (index !== -1) {
+      rowsSupp.value[index] = updated
+    }
+  } catch (e: any) {
+    alert('Erreur: ' + (e?.message ?? 'Une erreur est survenue'))
+  } finally {
+    processingSupp.value = null
+  }
+}
+
 const columns = [
   { key: 'id', label: 'ID' },
   { key: 'genre', label: 'Genre' },
@@ -198,13 +298,34 @@ const columns = [
   { key: 'actions', label: 'Actions' },
 ] as const
 
+const columnsSupp = [
+  { key: 'id', label: 'ID' },
+  { key: 'prenom', label: 'Prénom' },
+  { key: 'nom', label: 'Nom' },
+  { key: 'email', label: 'Email' },
+  { key: 'partsSupplementaires', label: 'Parts' },
+  { key: 'montant', label: 'Montant' },
+  { key: 'status', label: 'Statut' },
+  { key: 'createdAt', label: 'Créé le' },
+  { key: 'updatedAt', label: 'Modifié le' },
+  { key: 'actions', label: 'Actions' },
+] as const
+
 type ColumnKey = typeof columns[number]['key']
+type ColumnKeySupp = typeof columnsSupp[number]['key']
 
 const sortKey = ref<ColumnKey>('updatedAt')
 const sortDir = ref<SortDir>('desc')
 
+const sortKeySupp = ref<ColumnKeySupp>('updatedAt')
+const sortDirSupp = ref<SortDir>('desc')
+
 function sortableClass(key: ColumnKey) {
   return sortKey.value === key ? (sortDir.value === 'asc' ? 'sorted-asc' : 'sorted-desc') : 'sortable'
+}
+
+function sortableClassSupp(key: ColumnKeySupp) {
+  return sortKeySupp.value === key ? (sortDirSupp.value === 'asc' ? 'sorted-asc' : 'sorted-desc') : 'sortable'
 }
 
 function toggleSort(key: ColumnKey) {
@@ -213,6 +334,15 @@ function toggleSort(key: ColumnKey) {
   } else {
     sortKey.value = key
     sortDir.value = 'asc'
+  }
+}
+
+function toggleSortSupp(key: ColumnKeySupp) {
+  if (sortKeySupp.value === key) {
+    sortDirSupp.value = sortDirSupp.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortKeySupp.value = key
+    sortDirSupp.value = 'asc'
   }
 }
 
@@ -296,6 +426,25 @@ const filteredRows = computed(() => {
   })
 })
 
+const filteredRowsSupp = computed(() => {
+  const q = querySupp.value.trim().toLowerCase()
+  if (!q) return rowsSupp.value
+  return rowsSupp.value.filter((r) => {
+    const values = [
+      r.id,
+      r.prenom,
+      r.nom,
+      r.email,
+      r.partsSupplementaires,
+      r.status,
+    ]
+      .map(safeString)
+      .join(' ')
+      .toLowerCase()
+    return values.includes(q)
+  })
+})
+
 const sortedRows = computed(() => {
   const key = sortKey.value
   const dir = sortDir.value
@@ -312,17 +461,44 @@ const sortedRows = computed(() => {
   return arr
 })
 
+const sortedRowsSupp = computed(() => {
+  const key = sortKeySupp.value
+  const dir = sortDirSupp.value
+  const arr = [...filteredRowsSupp.value]
+  arr.sort((a: any, b: any) => {
+    const va = a?.[key]
+    const vb = b?.[key]
+    const sa = safeString(va)
+    const sb = safeString(vb)
+    if (sa < sb) return dir === 'asc' ? -1 : 1
+    if (sa > sb) return dir === 'asc' ? 1 : -1
+    return 0
+  })
+  return arr
+})
+
 onMounted(async () => {
+  // Load cooperateurs
   try {
     loading.value = true
     const resp = await api.getApiV1AdministrationCooperateurs()
-    // The generated client returns AxiosResponse by default; unwrap data if present
     const data = (resp as any).data ?? (resp as any)
     rows.value = Array.isArray(data) ? data : []
   } catch (e: any) {
     error.value = e?.message ?? 'Une erreur est survenue lors du chargement.'
   } finally {
     loading.value = false
+  }
+
+  try {
+    loadingSupp.value = true
+    const resp = await api.getApiV1AdministrationPartsAdditionnelles()
+    const data = (resp as any).data ?? (resp as any)
+    rowsSupp.value = Array.isArray(data) ? data : []
+  } catch (e: any) {
+    errorSupp.value = e?.message ?? 'Une erreur est survenue lors du chargement.'
+  } finally {
+    loadingSupp.value = false
   }
 })
 </script>
@@ -493,5 +669,54 @@ td { padding: .5rem .5rem; border-bottom: 1px solid #f3f4f6; }
 .processed-label {
   color: #166534;
   font-size: .85rem;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  background: #e5e7eb;
+  color: #374151;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 8px 8px 8px 8px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tab:hover {
+  background: #d1d5db;
+}
+
+.tab.active {
+  background: #fff;
+  color: #1f2937;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.4rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.tab.active .tab-count {
+  background: rgba(0, 0, 0, 0.08);
 }
 </style>

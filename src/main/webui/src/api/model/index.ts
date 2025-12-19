@@ -11,4 +11,8 @@ export * from "./cooperateurStatus";
 export * from "./createCooperateurDTO";
 export * from "./genre";
 export * from "./instant";
+export * from "./postApiV1PartsAdditionnellesBody";
 export * from "./postApiV1RegistrationsBody";
+export * from "./postApiV1SouscriptionsSupplementairesBody";
+export * from "./souscriptionSupplementaireDTO";
+export * from "./postApiV1PartsSupplementairesBody";

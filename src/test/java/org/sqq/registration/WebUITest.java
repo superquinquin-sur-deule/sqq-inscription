@@ -38,6 +38,9 @@ public class WebUITest {
         Stripe mockedStripe = Mockito.mock(Stripe.class);
         Mockito.when(mockedStripe.paySouscription(ArgumentMatchers.any())).thenReturn(new URI("http://localhost:8081/success"));
         Mockito.when(mockedStripe.hasPaid(ArgumentMatchers.any())).thenReturn(true);
+        Mockito.when(mockedStripe.paySouscriptionSupplementaire(ArgumentMatchers.any())).thenReturn(new URI("http://localhost:8081/parts-supplementaires-success"));
+    
+        Mockito.when(mockedStripe.hasPaidSouscriptionSupplementaire(ArgumentMatchers.any())).thenReturn(true);
         QuarkusMock.installMockForType(mockedStripe, Stripe.class);
     }
 
@@ -69,5 +72,25 @@ public class WebUITest {
 
         page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Merci pour ta souscription !")).waitFor();
 
+    }
+
+    @Test
+    void shouldSubscribeAdditionalShares() {
+        final Page page = context.newPage();
+        
+        Response response = page.navigate(url.toString() + "parts-supplementaires");
+        Assertions.assertEquals("OK", response.statusText());
+
+        page.locator("#prenom").fill("Marie");
+        page.locator("#nom").fill("Dupont");
+        page.locator("#email").fill("marie.dupont@exemple.fr");
+
+        // Increase additional shares using the stepper button
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+")).click();
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("+")).click();
+
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Payer 30.00 €")).click();
+
+        page.getByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Merci pour ta souscription !")).waitFor();
     }
 }

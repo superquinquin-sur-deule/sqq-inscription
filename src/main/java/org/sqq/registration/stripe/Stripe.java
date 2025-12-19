@@ -50,9 +50,45 @@ public class Stripe {
         try {
             Session session = Session.retrieve(cooperateur.stripeSessionId);
             boolean paid = session.getPaymentStatus().equals("paid");
-            
+
             Log.infof("Stripe session payment status is %s for cooperateur %d", paid ? "paid" : "not paid", cooperateur.id);
-            
+
+            return paid;
+        } catch (StripeException e) {
+            Log.error("Unable to retrieve Stripe session", e);
+            return false;
+        }
+    }
+
+    public URI paySouscriptionSupplementaire(org.sqq.registration.SouscriptionSupplementaire souscription) throws StripeException {
+        SessionCreateParams params =
+                SessionCreateParams.builder()
+                        .setMode(SessionCreateParams.Mode.PAYMENT)
+                        .setSuccessUrl(stripeConfiguration.redirectDomain() + "/parts-supplementaires-success?souscriptionId=" + souscription.id)
+                        .setCustomerEmail(souscription.email)
+                        .setLocale(SessionCreateParams.Locale.FR)
+                        .setCurrency("eur")
+                        .addLineItem(
+                                SessionCreateParams.LineItem.builder()
+                                        .setQuantity(souscription.partsSupplementaires)
+                                        .setPrice(stripeConfiguration.partSocialePriceId())
+                                        .build())
+                        .build();
+
+        Session session = Session.create(params);
+
+        souscription.stripeSessionId = session.getId();
+
+        return URI.create(session.getUrl());
+    }
+
+    public Boolean hasPaidSouscriptionSupplementaire(org.sqq.registration.SouscriptionSupplementaire souscription) {
+        try {
+            Session session = Session.retrieve(souscription.stripeSessionId);
+            boolean paid = session.getPaymentStatus().equals("paid");
+
+            Log.infof("Stripe session payment status is %s for souscription supplementaire %d", paid ? "paid" : "not paid", souscription.id);
+
             return paid;
         } catch (StripeException e) {
             Log.error("Unable to retrieve Stripe session", e);

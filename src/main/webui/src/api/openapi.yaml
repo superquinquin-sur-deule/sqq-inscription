@@ -47,6 +47,98 @@ paths:
       security:
       - SecurityScheme:
         - admin
+  /api/v1/administration/parts-additionnelles:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SouscriptionSupplementaireDTO"
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: List Souscriptions Supplementaires
+      tags:
+      - Admin Resource
+      security:
+      - SecurityScheme:
+        - admin
+  /api/v1/administration/parts-additionnelles/{id}/process:
+    post:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Mark Souscription Supplementaire As Processed
+      tags:
+      - Admin Resource
+      security:
+      - SecurityScheme:
+        - admin
+  /api/v1/parts-supplementaires:
+    post:
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                prenom:
+                  type: string
+                nom:
+                  type: string
+                email:
+                  type: string
+                partsSupplementaires:
+                  type: string
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Bad Request
+      summary: Register Form
+      tags:
+      - Additional Shares Resource
+  /api/v1/parts-supplementaires/success/{souscriptionId}:
+    post:
+      parameters:
+      - name: souscriptionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Successful Payment
+      tags:
+      - Additional Shares Resource
   /api/v1/registrations:
     post:
       requestBody:
@@ -214,6 +306,27 @@ components:
       format: date-time
       examples:
       - 2022-03-10T16:15:50Z
+    SouscriptionSupplementaireDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        prenom:
+          type: string
+        nom:
+          type: string
+        email:
+          type: string
+        partsSupplementaires:
+          type: integer
+          format: int64
+        status:
+          $ref: "#/components/schemas/CooperateurStatus"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
   securitySchemes:
     SecurityScheme:
       type: http

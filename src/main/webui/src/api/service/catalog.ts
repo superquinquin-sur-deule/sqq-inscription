@@ -7,7 +7,12 @@
 import * as axios from "axios";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
-import type { CooperateurDTO, PostApiV1RegistrationsBody } from "../model";
+import type {
+  CooperateurDTO,
+  PostApiV1PartsSupplementairesBody,
+  PostApiV1RegistrationsBody,
+  SouscriptionSupplementaireDTO,
+} from "../model";
 
 export const getSqqInscriptionAPI = () => {
   /**
@@ -32,6 +37,83 @@ export const getSqqInscriptionAPI = () => {
   ): Promise<TData> => {
     return axios.default.post(
       `/api/v1/administration/cooperateurs/${id}/process`,
+      undefined,
+      options,
+    );
+  };
+
+  /**
+   * @summary List Souscriptions Supplementaires
+   */
+  const getApiV1AdministrationPartsAdditionnelles = <
+    TData = AxiosResponse<SouscriptionSupplementaireDTO[]>,
+  >(
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    return axios.default.get(
+      `/api/v1/administration/parts-additionnelles`,
+      options,
+    );
+  };
+
+  /**
+   * @summary Mark Souscription Supplementaire As Processed
+   */
+  const postApiV1AdministrationPartsAdditionnellesIdProcess = <
+    TData = AxiosResponse<unknown>,
+  >(
+    id: number,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    return axios.default.post(
+      `/api/v1/administration/parts-additionnelles/${id}/process`,
+      undefined,
+      options,
+    );
+  };
+
+  /**
+   * @summary Register Form
+   */
+  const postApiV1PartsSupplementaires = <TData = AxiosResponse<unknown>>(
+    postApiV1PartsSupplementairesBody: PostApiV1PartsSupplementairesBody,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    const formUrlEncoded = new URLSearchParams();
+    if (postApiV1PartsSupplementairesBody.prenom !== undefined) {
+      formUrlEncoded.append(`prenom`, postApiV1PartsSupplementairesBody.prenom);
+    }
+    if (postApiV1PartsSupplementairesBody.nom !== undefined) {
+      formUrlEncoded.append(`nom`, postApiV1PartsSupplementairesBody.nom);
+    }
+    if (postApiV1PartsSupplementairesBody.email !== undefined) {
+      formUrlEncoded.append(`email`, postApiV1PartsSupplementairesBody.email);
+    }
+    if (postApiV1PartsSupplementairesBody.partsSupplementaires !== undefined) {
+      formUrlEncoded.append(
+        `partsSupplementaires`,
+        postApiV1PartsSupplementairesBody.partsSupplementaires,
+      );
+    }
+
+    return axios.default.post(
+      `/api/v1/parts-supplementaires`,
+      formUrlEncoded,
+      options,
+    );
+  };
+
+  /**
+   * @summary Successful Payment
+   */
+  const postApiV1PartsSupplementairesSuccessSouscriptionId = <
+    TData = AxiosResponse<unknown>,
+  >(
+    souscriptionId: number,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    return axios.default.post(
+      `/api/v1/parts-supplementaires/success/${souscriptionId}`,
       undefined,
       options,
     );
@@ -176,6 +258,10 @@ export const getSqqInscriptionAPI = () => {
   return {
     getApiV1AdministrationCooperateurs,
     postApiV1AdministrationCooperateursIdProcess,
+    getApiV1AdministrationPartsAdditionnelles,
+    postApiV1AdministrationPartsAdditionnellesIdProcess,
+    postApiV1PartsSupplementaires,
+    postApiV1PartsSupplementairesSuccessSouscriptionId,
     postApiV1Registrations,
     postApiV1RegistrationsSuccessCooperateurId,
   };
@@ -184,6 +270,14 @@ export type GetApiV1AdministrationCooperateursResult = AxiosResponse<
   CooperateurDTO[]
 >;
 export type PostApiV1AdministrationCooperateursIdProcessResult =
+  AxiosResponse<unknown>;
+export type GetApiV1AdministrationPartsAdditionnellesResult = AxiosResponse<
+  SouscriptionSupplementaireDTO[]
+>;
+export type PostApiV1AdministrationPartsAdditionnellesIdProcessResult =
+  AxiosResponse<unknown>;
+export type PostApiV1PartsSupplementairesResult = AxiosResponse<unknown>;
+export type PostApiV1PartsSupplementairesSuccessSouscriptionIdResult =
   AxiosResponse<unknown>;
 export type PostApiV1RegistrationsResult = AxiosResponse<unknown>;
 export type PostApiV1RegistrationsSuccessCooperateurIdResult =
