@@ -7,6 +7,9 @@
       "bump-patch-for-minor-pre-major": true,
       "draft": false,
       "extra-files": [],
+      "always-update": true,
+      "changelog-type": "github",
+      "changelog-path": "CHANGELOG.md",
       "changelog-sections": [
         {
           "type": "feat",
