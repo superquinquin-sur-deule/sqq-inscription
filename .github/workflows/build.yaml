@@ -3,6 +3,8 @@ name: Build Custom Docker images
 on:
   push:
     branches: [main]
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - main
@@ -33,6 +35,24 @@ jobs:
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots package
 
+      - name: Determine image tags
+        id: meta
+        shell: bash
+        run: |
+          IMAGE_BASE="ghcr.io/${{ github.repository_owner }}/sqq-inscription"
+          if [[ "${GITHUB_EVENT_NAME}" == "push" && "${GITHUB_REF_TYPE}" == "branch" && "${GITHUB_REF_NAME}" == "main" ]]; then
+            VERSION=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
+            # For main branch (pre-release / SNAPSHOT builds): push latest and the SNAPSHOT version
+            echo "tags=${IMAGE_BASE}:latest,${IMAGE_BASE}:${VERSION}" >> "$GITHUB_OUTPUT"
+          elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            # For release tags pushed by release-please (e.g., v1.2.3), push only the release tag
+            TAG_NO_V="${GITHUB_REF_NAME#v}"
+            echo "tags=${IMAGE_BASE}:${TAG_NO_V}" >> "$GITHUB_OUTPUT"
+          else
+            # Default to not setting tags (no push on PRs)
+            echo "tags=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3
@@ -56,4 +76,4 @@ jobs:
           file: src/main/docker/Dockerfile.jvm
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ghcr.io/${{ github.repository_owner }}/sqq-inscription:latest
+          tags: ${{ steps.meta.outputs.tags }}
