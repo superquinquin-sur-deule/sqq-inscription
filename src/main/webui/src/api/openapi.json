@@ -31,6 +31,42 @@
         } ]
       }
     },
+    "/api/v1/administration/cooperateurs/{id}" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CooperateurDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Get",
+        "tags" : [ "Admin Resource" ],
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
     "/api/v1/administration/cooperateurs/{id}/process" : {
       "post" : {
         "parameters" : [ {
@@ -476,7 +512,7 @@
   },
   "info" : {
     "title" : "sqq-inscription API",
-    "version" : "1.0-SNAPSHOT"
+    "version" : "1.0.1-SNAPSHOT"
   },
   "servers" : [ {
     "url" : "http://localhost:8080",

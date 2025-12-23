@@ -61,11 +61,11 @@
               <td>{{ format(row.genre) }}</td>
               <td>{{ row.prenom }}</td>
               <td>{{ row.nom }}</td>
-              <td>{{ row.telephone }}</td>
               <td>{{ row.email }}</td>
+              <td>{{ row.telephone }}</td>
               <td>{{ row.adresse }}</td>
-              <td>{{ row.ville }}</td>
               <td>{{ row.codePostal }}</td>
+              <td>{{ row.ville }}</td>
               <td>{{ yesNo(row.etudiantOuMinimasSociaux) }}</td>
               <td>{{ row.nombreDePersonnesDansLeFoyer }}</td>
               <td>{{ row.parts }}</td>
@@ -281,11 +281,11 @@ const columns = [
   { key: 'genre', label: 'Genre' },
   { key: 'prenom', label: 'Prénom' },
   { key: 'nom', label: 'Nom' },
-  { key: 'telephone', label: 'Téléphone' },
   { key: 'email', label: 'Email' },
+  { key: 'telephone', label: 'Téléphone' },
   { key: 'adresse', label: 'Adresse' },
-  { key: 'ville', label: 'Ville' },
   { key: 'codePostal', label: 'Code postal' },
+  { key: 'ville', label: 'Ville' },
   { key: 'etudiantOuMinimasSociaux', label: 'Tarif réduit' },
   { key: 'nombreDePersonnesDansLeFoyer', label: 'Pers. foyer' },
   { key: 'parts', label: 'Parts' },
