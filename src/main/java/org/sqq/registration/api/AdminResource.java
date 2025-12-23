@@ -27,6 +27,14 @@ public class AdminResource {
                 .toList();
     }
 
+    @Path("/cooperateurs/{id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public CooperateurDTO get(@PathParam("id") Long id) {
+        Cooperateur cooperateur = Cooperateur.findById(id);
+        return CooperateurDTO.fromCooperateur(cooperateur);
+    }
+
     @Path("/cooperateurs/{id}/process")
     @POST
     @Transactional
