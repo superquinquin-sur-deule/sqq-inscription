@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.2.0 (2025-12-23)
+
+## What's Changed
+* chore(main): release 1.1.1-SNAPSHOT by @lucas-dclrcq in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/34
+* fix(deps): update quarkus.platform.version to v3.30.4 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/26
+* chore(deps): update dependency maven to v3.9.12 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/25
+* chore(deps): update dependency vite to v7.3.0 - autoclosed by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/23
+* chore(deps): update actions/checkout action to v6 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/22
+* chore(deps): update docker/setup-buildx-action digest to 8d2750c by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/29
+* chore(deps): update registry.access.redhat.com/ubi9/openjdk-21 docker tag to v1.24-2 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/28
+* chore(deps): update dependency vue to v3.5.26 - autoclosed by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/27
+* fix(deps): update dependency com.stripe:stripe-java to v31.1.0 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/24
+
+
+**Full Changelog**: https://github.com/superquinquin-sur-deule/sqq-inscription/compare/v1.1.0...v1.2.0
+
 ## [1.1.0](https://github.com/superquinquin-sur-deule/sqq-inscription/compare/v1.0.0...v1.1.0) (2025-12-23)
 
 
