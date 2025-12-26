@@ -13,6 +13,7 @@ const routes = [
     { path: '/', component: Registration },
     { path: '/success', component: SuccessfulRegistration },
     { path: '/admin', component: AdminCooperateurs },
+    { path: '/v2/admin/cooperateurs', component: () => import('./views/v2/AdminCooperateursV2.vue') },
     { path: '/parts-supplementaires', component: PartsSupplementaires },
     { path: '/parts-supplementaires-success', component: SuccessfulPartsSupplementaires },
 ]
