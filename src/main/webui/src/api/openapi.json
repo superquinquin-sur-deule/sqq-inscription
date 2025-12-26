@@ -1,5 +1,474 @@
 {
   "openapi" : "3.1.0",
+  "components" : {
+    "schemas" : {
+      "BinomeDTO" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "genre" : {
+            "$ref" : "#/components/schemas/Genre"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          },
+          "ville" : {
+            "type" : "string"
+          },
+          "codePostal" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string"
+          },
+          "dateNaissance" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CooperateurDTO" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "genre" : {
+            "$ref" : "#/components/schemas/Genre"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          },
+          "ville" : {
+            "type" : "string"
+          },
+          "codePostal" : {
+            "type" : "string"
+          },
+          "etudiantOuMinimasSociaux" : {
+            "type" : "boolean"
+          },
+          "nombreDePersonnesDansLeFoyer" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "parts" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "partsDeSoutien" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "acceptationDesStatus" : {
+            "type" : "boolean"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/CooperateurStatus"
+          },
+          "binome" : {
+            "$ref" : "#/components/schemas/BinomeDTO"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      },
+      "CooperateurStatus" : {
+        "type" : "string",
+        "enum" : [ "PAYMENT_PENDING", "PAID", "PROCESSED" ]
+      },
+      "CooperateurV2DTO" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "genre" : {
+            "$ref" : "#/components/schemas/Genre"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "dateNaissance" : {
+            "type" : "string"
+          },
+          "telephone" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "adresse" : {
+            "type" : "string"
+          },
+          "ville" : {
+            "type" : "string"
+          },
+          "codePostal" : {
+            "type" : "string"
+          },
+          "etudiantOuMinimasSociaux" : {
+            "type" : "boolean"
+          },
+          "nombreDePersonnesDansLeFoyer" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "paymentStatus" : {
+            "$ref" : "#/components/schemas/PaymentStatus"
+          },
+          "memberStatus" : {
+            "$ref" : "#/components/schemas/MemberStatus"
+          },
+          "source" : {
+            "$ref" : "#/components/schemas/DataSource"
+          },
+          "notes" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "totalParts" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "memberType" : {
+            "type" : "string"
+          },
+          "partnerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "partnerName" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateBinomeV2Request" : {
+        "description" : "Request DTO for binome member data within a pair registration",
+        "type" : "object",
+        "required" : [ "genre", "prenom", "nom", "telephone", "email" ],
+        "properties" : {
+          "genre" : {
+            "description" : "Genre du binôme",
+            "type" : "string",
+            "examples" : [ "MONSIEUR" ],
+            "$ref" : "#/components/schemas/Genre"
+          },
+          "prenom" : {
+            "type" : "string",
+            "description" : "Prénom du binôme",
+            "examples" : [ "Pierre" ],
+            "pattern" : "\\S"
+          },
+          "nom" : {
+            "type" : "string",
+            "description" : "Nom du binôme",
+            "examples" : [ "Dupont" ],
+            "pattern" : "\\S"
+          },
+          "dateNaissance" : {
+            "type" : "string",
+            "description" : "Date de naissance du binôme",
+            "examples" : [ "1983-07-22" ]
+          },
+          "telephone" : {
+            "type" : "string",
+            "description" : "Numéro de téléphone du binôme",
+            "examples" : [ "0698765432" ],
+            "pattern" : "\\S"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "Adresse email du binôme",
+            "examples" : [ "pierre.dupont@email.com" ],
+            "pattern" : "\\S"
+          },
+          "adresse" : {
+            "type" : "string",
+            "description" : "Adresse postale du binôme (si différente du principal)"
+          },
+          "ville" : {
+            "type" : "string",
+            "description" : "Ville du binôme (si différente du principal)"
+          },
+          "codePostal" : {
+            "type" : "string",
+            "description" : "Code postal du binôme (si différent du principal)"
+          },
+          "notes" : {
+            "type" : "string",
+            "description" : "Notes administratives pour le binôme"
+          }
+        }
+      },
+      "CreateCooperateurV2Request" : {
+        "description" : "Request DTO for creating a solo cooperateur",
+        "type" : "object",
+        "required" : [ "genre", "prenom", "nom", "telephone", "email", "adresse", "ville", "codePostal" ],
+        "properties" : {
+          "genre" : {
+            "description" : "Genre du coopérateur",
+            "type" : "string",
+            "examples" : [ "MADAME" ],
+            "$ref" : "#/components/schemas/Genre"
+          },
+          "prenom" : {
+            "type" : "string",
+            "description" : "Prénom du coopérateur",
+            "examples" : [ "Marie" ],
+            "pattern" : "\\S"
+          },
+          "nom" : {
+            "type" : "string",
+            "description" : "Nom du coopérateur",
+            "examples" : [ "Dupont" ],
+            "pattern" : "\\S"
+          },
+          "dateNaissance" : {
+            "type" : "string",
+            "description" : "Date de naissance",
+            "examples" : [ "1985-03-15" ]
+          },
+          "telephone" : {
+            "type" : "string",
+            "description" : "Numéro de téléphone",
+            "examples" : [ "0612345678" ],
+            "pattern" : "\\S"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "Adresse email",
+            "examples" : [ "marie.dupont@email.com" ],
+            "pattern" : "\\S"
+          },
+          "adresse" : {
+            "type" : "string",
+            "description" : "Adresse postale",
+            "examples" : [ "123 rue de la Paix" ],
+            "pattern" : "\\S"
+          },
+          "ville" : {
+            "type" : "string",
+            "description" : "Ville",
+            "examples" : [ "Paris" ],
+            "pattern" : "\\S"
+          },
+          "codePostal" : {
+            "type" : "string",
+            "description" : "Code postal",
+            "examples" : [ "75001" ],
+            "pattern" : "\\S"
+          },
+          "etudiantOuMinimasSociaux" : {
+            "type" : "boolean",
+            "description" : "Étudiant ou bénéficiaire des minimas sociaux (tarif réduit)",
+            "examples" : [ false ]
+          },
+          "nombreDePersonnesDansLeFoyer" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Nombre de personnes dans le foyer",
+            "examples" : [ 2 ],
+            "minimum" : 1
+          },
+          "partsDeSoutien" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Parts de soutien supplémentaires",
+            "examples" : [ 0 ]
+          },
+          "paymentStatus" : {
+            "description" : "Statut de paiement initial",
+            "type" : "string",
+            "examples" : [ "PAID" ],
+            "$ref" : "#/components/schemas/PaymentStatus"
+          },
+          "memberStatus" : {
+            "description" : "Statut de membre initial",
+            "type" : "string",
+            "examples" : [ "ACTIVE" ],
+            "$ref" : "#/components/schemas/MemberStatus"
+          },
+          "notes" : {
+            "type" : "string",
+            "description" : "Notes administratives",
+            "examples" : [ "Inscription manuelle suite à demande par courrier" ]
+          }
+        }
+      },
+      "CreatePairV2Request" : {
+        "description" : "Request DTO for creating a pair (principal + binôme)",
+        "type" : "object",
+        "required" : [ "principal", "binome" ],
+        "properties" : {
+          "principal" : {
+            "description" : "Données du membre principal",
+            "type" : "object",
+            "$ref" : "#/components/schemas/CreateCooperateurV2Request"
+          },
+          "binome" : {
+            "description" : "Données du binôme",
+            "type" : "object",
+            "$ref" : "#/components/schemas/CreateBinomeV2Request"
+          }
+        }
+      },
+      "DataSource" : {
+        "type" : "string",
+        "enum" : [ "ONLINE_REGISTRATION", "CSV_IMPORT", "MANUAL_ENTRY" ]
+      },
+      "Genre" : {
+        "type" : "string",
+        "enum" : [ "MADAME", "MONSIEUR" ]
+      },
+      "Instant" : {
+        "type" : "string",
+        "format" : "date-time",
+        "examples" : [ "2022-03-10T16:15:50Z" ]
+      },
+      "MemberStatus" : {
+        "type" : "string",
+        "enum" : [ "PROSPECT", "ACTIVE", "SUSPENDED", "DEPARTED" ]
+      },
+      "MigrationResult" : {
+        "type" : "object",
+        "properties" : {
+          "totalV1Records" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "migratedMembers" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "skippedMembers" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "createdRelationships" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "createdTransactions" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "PagedResponseCooperateurV2DTO" : {
+        "type" : "object",
+        "properties" : {
+          "content" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CooperateurV2DTO"
+            }
+          },
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "page" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "size" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "first" : {
+            "type" : "boolean"
+          },
+          "last" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "PaymentStatus" : {
+        "type" : "string",
+        "enum" : [ "PENDING", "PAID" ]
+      },
+      "SouscriptionSupplementaireDTO" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "prenom" : {
+            "type" : "string"
+          },
+          "nom" : {
+            "type" : "string"
+          },
+          "email" : {
+            "type" : "string"
+          },
+          "partsSupplementaires" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/CooperateurStatus"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "scheme" : "basic",
+        "description" : "Authentication"
+      }
+    }
+  },
   "paths" : {
     "/api/v1/administration/cooperateurs" : {
       "get" : {
@@ -354,171 +823,213 @@
         "summary" : "Successful Payment",
         "tags" : [ "Registration Resource" ]
       }
-    }
-  },
-  "components" : {
-    "schemas" : {
-      "BinomeDTO" : {
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "genre" : {
-            "$ref" : "#/components/schemas/Genre"
-          },
-          "nom" : {
-            "type" : "string"
-          },
-          "prenom" : {
-            "type" : "string"
-          },
-          "adresse" : {
-            "type" : "string"
-          },
-          "ville" : {
-            "type" : "string"
-          },
-          "codePostal" : {
-            "type" : "string"
-          },
-          "email" : {
-            "type" : "string"
-          },
-          "telephone" : {
-            "type" : "string"
-          },
-          "dateNaissance" : {
+    },
+    "/api/v2/administration/cooperateurs" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "createdFrom",
+          "in" : "query",
+          "schema" : {
             "type" : "string"
           }
-        }
-      },
-      "CooperateurDTO" : {
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "genre" : {
-            "$ref" : "#/components/schemas/Genre"
-          },
-          "prenom" : {
+        }, {
+          "name" : "createdTo",
+          "in" : "query",
+          "schema" : {
             "type" : "string"
-          },
-          "nom" : {
-            "type" : "string"
-          },
-          "telephone" : {
-            "type" : "string"
-          },
-          "email" : {
-            "type" : "string"
-          },
-          "adresse" : {
-            "type" : "string"
-          },
-          "ville" : {
-            "type" : "string"
-          },
-          "codePostal" : {
-            "type" : "string"
-          },
-          "etudiantOuMinimasSociaux" : {
-            "type" : "boolean"
-          },
-          "nombreDePersonnesDansLeFoyer" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "parts" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "partsDeSoutien" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "acceptationDesStatus" : {
-            "type" : "boolean"
-          },
-          "status" : {
-            "$ref" : "#/components/schemas/CooperateurStatus"
-          },
-          "binome" : {
-            "$ref" : "#/components/schemas/BinomeDTO"
-          },
-          "createdAt" : {
-            "$ref" : "#/components/schemas/Instant"
-          },
-          "updatedAt" : {
-            "$ref" : "#/components/schemas/Instant"
           }
-        }
-      },
-      "CooperateurStatus" : {
-        "type" : "string",
-        "enum" : [ "PAYMENT_PENDING", "PAID", "PROCESSED" ]
-      },
-      "Genre" : {
-        "type" : "string",
-        "enum" : [ "MADAME", "MONSIEUR" ]
-      },
-      "Instant" : {
-        "type" : "string",
-        "format" : "date-time",
-        "examples" : [ "2022-03-10T16:15:50Z" ]
-      },
-      "SouscriptionSupplementaireDTO" : {
-        "type" : "object",
-        "properties" : {
-          "id" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "prenom" : {
+        }, {
+          "name" : "memberStatus",
+          "in" : "query",
+          "schema" : {
             "type" : "string"
-          },
-          "nom" : {
-            "type" : "string"
-          },
-          "email" : {
-            "type" : "string"
-          },
-          "partsSupplementaires" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "status" : {
-            "$ref" : "#/components/schemas/CooperateurStatus"
-          },
-          "createdAt" : {
-            "$ref" : "#/components/schemas/Instant"
-          },
-          "updatedAt" : {
-            "$ref" : "#/components/schemas/Instant"
           }
-        }
+        }, {
+          "name" : "page",
+          "in" : "query",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 0
+          }
+        }, {
+          "name" : "paymentStatus",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "search",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 20
+          }
+        }, {
+          "name" : "sort",
+          "in" : "query",
+          "schema" : {
+            "type" : "string",
+            "default" : "createdAt,desc"
+          }
+        }, {
+          "name" : "source",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "type",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PagedResponseCooperateurV2DTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "List",
+        "tags" : [ "Cooperateur V 2 Admin Resource" ],
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
       }
     },
-    "securitySchemes" : {
-      "SecurityScheme" : {
-        "type" : "http",
-        "scheme" : "basic",
-        "description" : "Authentication"
+    "/api/v2/administration/cooperateurs/pair" : {
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreatePairV2Request"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Create Pair",
+        "tags" : [ "Cooperateur V 2 Admin Resource" ],
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/v2/administration/cooperateurs/solo" : {
+      "post" : {
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateCooperateurV2Request"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        },
+        "summary" : "Create Solo",
+        "tags" : [ "Cooperateur V 2 Admin Resource" ],
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
+      }
+    },
+    "/api/v2/migration/from-v1" : {
+      "post" : {
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MigrationResult"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Not Authorized"
+          },
+          "403" : {
+            "description" : "Not Allowed"
+          }
+        },
+        "summary" : "Migrate From V 1",
+        "tags" : [ "Migration Resource" ],
+        "security" : [ {
+          "SecurityScheme" : [ "admin" ]
+        } ]
       }
     }
   },
   "info" : {
     "title" : "sqq-inscription API",
-    "version" : "1.0.1-SNAPSHOT"
+    "version" : "1.2.1-SNAPSHOT"
   },
   "servers" : [ {
-    "url" : "http://localhost:8080",
+    "url" : "http://localhost:8899",
     "description" : "Auto generated value"
   }, {
-    "url" : "http://0.0.0.0:8080",
+    "url" : "http://0.0.0.0:8899",
     "description" : "Auto generated value"
   } ]
 }

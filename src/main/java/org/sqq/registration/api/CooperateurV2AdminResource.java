@@ -6,15 +6,20 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.sqq.registration.CooperateurV2;
 import org.sqq.registration.DataSource;
 import org.sqq.registration.MemberStatus;
 import org.sqq.registration.PaymentStatus;
 import org.sqq.registration.api.dto.CooperateurV2DTO;
 import org.sqq.registration.api.dto.CooperateurV2Mapper;
+import org.sqq.registration.api.dto.CreateCooperateurV2Request;
+import org.sqq.registration.api.dto.CreatePairV2Request;
 import org.sqq.registration.api.dto.PagedResponse;
+import org.sqq.registration.service.CooperateurV2OnboardingService;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -39,6 +44,9 @@ public class CooperateurV2AdminResource {
 
     @Inject
     EntityManager entityManager;
+
+    @Inject
+    CooperateurV2OnboardingService onboardingService;
 
     @Path("/cooperateurs")
     @GET
@@ -188,4 +196,45 @@ public class CooperateurV2AdminResource {
 
         return new PagedResponse<>(dtos, totalElements, page, size);
     }
+
+    @Path("/cooperateurs/solo")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createSolo(@Valid CreateCooperateurV2Request request) {
+        CooperateurV2OnboardingService.OnboardingResult result = onboardingService.createSolo(request);
+
+        if (!result.success()) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity(new ErrorResponse(result.errorMessage()))
+                    .build();
+        }
+
+        CooperateurV2DTO dto = mapper.toDTO(result.primary());
+        return Response.status(Response.Status.CREATED).entity(dto).build();
+    }
+
+    @Path("/cooperateurs/pair")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createPair(@Valid CreatePairV2Request request) {
+        CooperateurV2OnboardingService.OnboardingResult result = onboardingService.createPair(request);
+
+        if (!result.success()) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity(new ErrorResponse(result.errorMessage()))
+                    .build();
+        }
+
+        PairCreatedResponse response = new PairCreatedResponse(
+                mapper.toDTO(result.primary()),
+                mapper.toDTO(result.binome())
+        );
+        return Response.status(Response.Status.CREATED).entity(response).build();
+    }
+
+    public record ErrorResponse(String message) {}
+
+    public record PairCreatedResponse(CooperateurV2DTO principal, CooperateurV2DTO binome) {}
 }

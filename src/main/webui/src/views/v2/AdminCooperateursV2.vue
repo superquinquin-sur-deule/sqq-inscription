@@ -13,6 +13,7 @@
     <section class="section">
       <div class="toolbar">
         <span class="meta" v-if="!loading && !error">{{ totalElements }} résultat(s)</span>
+        <button class="create-btn" @click="openCreateModal">+ Nouveau membre</button>
         <ColumnPicker
           :visible-columns="visibleColumnKeys"
           @update:visible-columns="visibleColumnKeys = $event"
@@ -166,6 +167,13 @@
       @close="closeMemberDetail"
       @navigate-to-partner="handleNavigateToPartner"
     />
+
+    <!-- Create Member Modal -->
+    <CreateMemberModal
+      :is-open="isCreateModalOpen"
+      @close="closeCreateModal"
+      @created="handleMemberCreated"
+    />
   </main>
 </template>
 
@@ -175,6 +183,7 @@ import axios from 'axios'
 import ColumnPicker from '../../components/v2/ColumnPicker.vue'
 import FilterBar, { type FilterState } from '../../components/v2/FilterBar.vue'
 import MemberDetailModal from '../../components/v2/MemberDetailModal.vue'
+import CreateMemberModal from '../../components/v2/CreateMemberModal.vue'
 
 interface ColumnConfig {
   key: string
@@ -228,6 +237,9 @@ const highlightedId = ref<number | null>(null)
 // Member detail modal state
 const selectedMember = ref<CooperateurV2DTO | null>(null)
 const isModalOpen = ref(false)
+
+// Create modal state
+const isCreateModalOpen = ref(false)
 
 // Filter state
 const filters = ref<FilterState>({
@@ -474,6 +486,18 @@ function handleNavigateToPartner(partnerId: number) {
   scrollToPartner(partnerId)
 }
 
+function openCreateModal() {
+  isCreateModalOpen.value = true
+}
+
+function closeCreateModal() {
+  isCreateModalOpen.value = false
+}
+
+function handleMemberCreated() {
+  loadData() // Refresh the list
+}
+
 onMounted(() => {
   loadData()
 })
@@ -500,6 +524,20 @@ onMounted(() => {
 .section { background: #fff; border: 1px solid #e6e8ee; padding: 1rem; border-radius: 8px; }
 .toolbar { display: flex; align-items: center; justify-content: flex-end; gap: .75rem; margin-bottom: .5rem; }
 .meta { color: #6b7280; font-size: .9rem; margin-right: auto; }
+.create-btn {
+  padding: .4rem .85rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: .9rem;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+.create-btn:hover {
+  background: #1d4ed8;
+}
 .state { padding: 1rem; color: #374151; }
 .state.error { color: #b91c1c; display: flex; align-items: center; gap: 1rem; }
 .retry-btn {
