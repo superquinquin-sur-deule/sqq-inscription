@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0 (2025-12-26)
+
+## What's Changed
+* chore(main): release 1.2.1-SNAPSHOT by @lucas-dclrcq in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/36
+* fix(deps): update quarkus.platform.version to v3.30.5 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/38
+
+
+**Full Changelog**: https://github.com/superquinquin-sur-deule/sqq-inscription/compare/v1.2.0...v1.3.0
+
 ## 1.2.0 (2025-12-23)
 
 ## What's Changed
