@@ -12,16 +12,16 @@
 
     <section class="section">
       <div class="toolbar">
-        <input
-          v-model="searchQuery"
-          type="search"
-          placeholder="Rechercher (tous champs)"
-          class="search"
-          @keyup.enter="loadData"
-        />
-        <button class="search-btn" @click="loadData">Rechercher</button>
         <span class="meta" v-if="!loading && !error">{{ totalElements }} résultat(s)</span>
+        <ColumnPicker
+          :visible-columns="visibleColumnKeys"
+          @update:visible-columns="visibleColumnKeys = $event"
+        />
       </div>
+      <FilterBar
+        v-model="filters"
+        @update:model-value="handleFilterChange"
+      />
 
       <div v-if="loading" class="state">Chargement…</div>
       <div v-else-if="error" class="state error">
@@ -52,39 +52,74 @@
               :key="row.id"
               :id="`row-${row.id}`"
               :class="{ 'highlighted': highlightedId === row.id }"
+              class="clickable-row"
+              @click="openMemberDetail(row)"
             >
-              <td>{{ row.id }}</td>
-              <td>{{ row.nom }}</td>
-              <td>{{ row.prenom }}</td>
-              <td>{{ row.email }}</td>
-              <td>{{ row.telephone }}</td>
-              <td>
-                <span class="type-badge" :class="typeClass(row.memberType)">
-                  {{ row.memberType === 'BINOME' ? 'Binôme' : 'Principal' }}
-                </span>
+              <td v-for="col in columns" :key="col.key">
+                <!-- ID -->
+                <template v-if="col.key === 'id'">{{ row.id }}</template>
+                <!-- Nom -->
+                <template v-else-if="col.key === 'nom'">{{ row.nom }}</template>
+                <!-- Prénom -->
+                <template v-else-if="col.key === 'prenom'">{{ row.prenom }}</template>
+                <!-- Email -->
+                <template v-else-if="col.key === 'email'">{{ row.email }}</template>
+                <!-- Téléphone -->
+                <template v-else-if="col.key === 'telephone'">{{ row.telephone }}</template>
+                <!-- Type -->
+                <template v-else-if="col.key === 'memberType'">
+                  <span class="type-badge" :class="typeClass(row.memberType)">
+                    {{ row.memberType === 'BINOME' ? 'Binôme' : 'Principal' }}
+                  </span>
+                </template>
+                <!-- Partner -->
+                <template v-else-if="col.key === 'partnerName'">
+                  <button
+                    v-if="row.partnerId"
+                    class="partner-link"
+                    @click.stop="scrollToPartner(row.partnerId)"
+                  >
+                    {{ row.partnerName }}
+                  </button>
+                  <span v-else class="no-partner">—</span>
+                </template>
+                <!-- Member Status -->
+                <template v-else-if="col.key === 'memberStatus'">
+                  <span class="status-badge" :class="memberStatusClass(row.memberStatus)">
+                    {{ formatMemberStatus(row.memberStatus) }}
+                  </span>
+                </template>
+                <!-- Payment Status -->
+                <template v-else-if="col.key === 'paymentStatus'">
+                  <span class="status-badge" :class="paymentStatusClass(row.paymentStatus)">
+                    {{ formatPaymentStatus(row.paymentStatus) }}
+                  </span>
+                </template>
+                <!-- Total Parts -->
+                <template v-else-if="col.key === 'totalParts'">{{ row.totalParts ?? 0 }}</template>
+                <!-- Created At -->
+                <template v-else-if="col.key === 'createdAt'">{{ formatDate(row.createdAt) }}</template>
+                <!-- Adresse -->
+                <template v-else-if="col.key === 'adresse'">{{ row.adresse || '—' }}</template>
+                <!-- Ville -->
+                <template v-else-if="col.key === 'ville'">{{ row.ville || '—' }}</template>
+                <!-- Code Postal -->
+                <template v-else-if="col.key === 'codePostal'">{{ row.codePostal || '—' }}</template>
+                <!-- Date Naissance -->
+                <template v-else-if="col.key === 'dateNaissance'">{{ formatDate(row.dateNaissance) }}</template>
+                <!-- Tarif réduit -->
+                <template v-else-if="col.key === 'etudiantOuMinimasSociaux'">{{ formatBoolean(row.etudiantOuMinimasSociaux) }}</template>
+                <!-- Personnes foyer -->
+                <template v-else-if="col.key === 'nombreDePersonnesDansLeFoyer'">{{ row.nombreDePersonnesDansLeFoyer ?? '—' }}</template>
+                <!-- Source -->
+                <template v-else-if="col.key === 'source'">{{ formatSource(row.source) }}</template>
+                <!-- Notes -->
+                <template v-else-if="col.key === 'notes'">
+                  <span class="notes-cell">{{ row.notes || '—' }}</span>
+                </template>
+                <!-- Updated At -->
+                <template v-else-if="col.key === 'updatedAt'">{{ formatDate(row.updatedAt) }}</template>
               </td>
-              <td>
-                <button
-                  v-if="row.partnerId"
-                  class="partner-link"
-                  @click="scrollToPartner(row.partnerId)"
-                >
-                  {{ row.partnerName }}
-                </button>
-                <span v-else class="no-partner">—</span>
-              </td>
-              <td>
-                <span class="status-badge" :class="memberStatusClass(row.memberStatus)">
-                  {{ formatMemberStatus(row.memberStatus) }}
-                </span>
-              </td>
-              <td>
-                <span class="status-badge" :class="paymentStatusClass(row.paymentStatus)">
-                  {{ formatPaymentStatus(row.paymentStatus) }}
-                </span>
-              </td>
-              <td>{{ row.totalParts ?? 0 }}</td>
-              <td>{{ formatDate(row.createdAt) }}</td>
             </tr>
           </tbody>
         </table>
@@ -123,12 +158,30 @@
         </button>
       </div>
     </section>
+
+    <!-- Member Detail Modal -->
+    <MemberDetailModal
+      :member="selectedMember"
+      :is-open="isModalOpen"
+      @close="closeMemberDetail"
+      @navigate-to-partner="handleNavigateToPartner"
+    />
   </main>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import axios from 'axios'
+import ColumnPicker from '../../components/v2/ColumnPicker.vue'
+import FilterBar, { type FilterState } from '../../components/v2/FilterBar.vue'
+import MemberDetailModal from '../../components/v2/MemberDetailModal.vue'
+
+interface ColumnConfig {
+  key: string
+  label: string
+  default: boolean
+  sortable: boolean
+}
 
 interface CooperateurV2DTO {
   id: number
@@ -170,8 +223,22 @@ type SortDir = 'asc' | 'desc'
 const rows = ref<CooperateurV2DTO[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
-const searchQuery = ref('')
 const highlightedId = ref<number | null>(null)
+
+// Member detail modal state
+const selectedMember = ref<CooperateurV2DTO | null>(null)
+const isModalOpen = ref(false)
+
+// Filter state
+const filters = ref<FilterState>({
+  search: '',
+  type: null,
+  memberStatus: null,
+  paymentStatus: null,
+  source: null,
+  createdFrom: null,
+  createdTo: null,
+})
 
 // Pagination state
 const page = ref(0)
@@ -183,19 +250,59 @@ const totalPages = ref(0)
 const sortKey = ref('createdAt')
 const sortDir = ref<SortDir>('desc')
 
-const columns = [
-  { key: 'id', label: 'ID', sortable: true },
-  { key: 'nom', label: 'Nom', sortable: true },
-  { key: 'prenom', label: 'Prénom', sortable: true },
-  { key: 'email', label: 'Email', sortable: true },
-  { key: 'telephone', label: 'Téléphone', sortable: false },
-  { key: 'memberType', label: 'Type', sortable: false },
-  { key: 'partnerName', label: 'Lié à', sortable: false },
-  { key: 'memberStatus', label: 'Statut membre', sortable: true },
-  { key: 'paymentStatus', label: 'Statut paiement', sortable: true },
-  { key: 'totalParts', label: 'Parts', sortable: false },
-  { key: 'createdAt', label: 'Créé le', sortable: true },
+// All available columns with their configuration
+const allColumns: ColumnConfig[] = [
+  // Default visible
+  { key: 'id', label: 'ID', default: true, sortable: true },
+  { key: 'nom', label: 'Nom', default: true, sortable: true },
+  { key: 'prenom', label: 'Prénom', default: true, sortable: true },
+  { key: 'email', label: 'Email', default: true, sortable: true },
+  { key: 'telephone', label: 'Téléphone', default: true, sortable: false },
+  { key: 'memberType', label: 'Type', default: true, sortable: true },
+  { key: 'partnerName', label: 'Lié à', default: true, sortable: false },
+  { key: 'memberStatus', label: 'Statut membre', default: true, sortable: true },
+  { key: 'paymentStatus', label: 'Statut paiement', default: true, sortable: true },
+  { key: 'totalParts', label: 'Parts', default: true, sortable: true },
+  { key: 'createdAt', label: 'Créé le', default: true, sortable: true },
+  // Hidden by default
+  { key: 'adresse', label: 'Adresse', default: false, sortable: false },
+  { key: 'ville', label: 'Ville', default: false, sortable: true },
+  { key: 'codePostal', label: 'Code postal', default: false, sortable: true },
+  { key: 'dateNaissance', label: 'Date naissance', default: false, sortable: true },
+  { key: 'etudiantOuMinimasSociaux', label: 'Tarif réduit', default: false, sortable: true },
+  { key: 'nombreDePersonnesDansLeFoyer', label: 'Pers. foyer', default: false, sortable: true },
+  { key: 'source', label: 'Source', default: false, sortable: true },
+  { key: 'notes', label: 'Notes', default: false, sortable: false },
+  { key: 'updatedAt', label: 'Modifié le', default: false, sortable: true },
 ]
+
+const STORAGE_KEY = 'v2-admin-grid-columns'
+
+// Load visible columns from localStorage or use defaults
+function loadVisibleColumns(): string[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) {
+      const parsed = JSON.parse(saved) as string[]
+      // Validate that keys still exist
+      const validKeys = allColumns.map(c => c.key)
+      const validSaved = parsed.filter(k => validKeys.includes(k))
+      if (validSaved.length > 0) {
+        return validSaved
+      }
+    }
+  } catch {
+    // localStorage not available or invalid data
+  }
+  return allColumns.filter(c => c.default).map(c => c.key)
+}
+
+const visibleColumnKeys = ref<string[]>(loadVisibleColumns())
+
+// Computed property for visible columns with their full config
+const columns = computed(() => {
+  return allColumns.filter(col => visibleColumnKeys.value.includes(col.key))
+})
 
 function sortableClass(key: string) {
   return sortKey.value === key ? (sortDir.value === 'asc' ? 'sorted-asc' : 'sorted-desc') : 'sortable'
@@ -226,8 +333,27 @@ async function loadData() {
     params.set('size', String(size.value))
     params.set('sort', `${sortKey.value},${sortDir.value}`)
 
-    if (searchQuery.value.trim()) {
-      params.set('search', searchQuery.value.trim())
+    // Apply filters
+    if (filters.value.search.trim()) {
+      params.set('search', filters.value.search.trim())
+    }
+    if (filters.value.type) {
+      params.set('type', filters.value.type)
+    }
+    if (filters.value.memberStatus) {
+      params.set('memberStatus', filters.value.memberStatus)
+    }
+    if (filters.value.paymentStatus) {
+      params.set('paymentStatus', filters.value.paymentStatus)
+    }
+    if (filters.value.source) {
+      params.set('source', filters.value.source)
+    }
+    if (filters.value.createdFrom) {
+      params.set('createdFrom', filters.value.createdFrom)
+    }
+    if (filters.value.createdTo) {
+      params.set('createdTo', filters.value.createdTo)
     }
 
     const response = await axios.get<PagedResponse>(
@@ -244,6 +370,11 @@ async function loadData() {
   } finally {
     loading.value = false
   }
+}
+
+function handleFilterChange() {
+  page.value = 0 // Reset to first page when filters change
+  loadData()
 }
 
 function scrollToPartner(partnerId: number) {
@@ -314,6 +445,35 @@ function typeClass(type?: string) {
   return type === 'BINOME' ? 'type-binome' : 'type-principal'
 }
 
+function formatSource(source?: string) {
+  switch (source) {
+    case 'ONLINE_REGISTRATION': return 'Inscription en ligne'
+    case 'CSV_IMPORT': return 'Import CSV'
+    case 'MANUAL_ENTRY': return 'Saisie manuelle'
+    default: return source ?? '—'
+  }
+}
+
+function formatBoolean(value?: boolean) {
+  if (value === undefined || value === null) return '—'
+  return value ? 'Oui' : 'Non'
+}
+
+function openMemberDetail(member: CooperateurV2DTO) {
+  selectedMember.value = member
+  isModalOpen.value = true
+}
+
+function closeMemberDetail() {
+  isModalOpen.value = false
+  selectedMember.value = null
+}
+
+function handleNavigateToPartner(partnerId: number) {
+  closeMemberDetail()
+  scrollToPartner(partnerId)
+}
+
 onMounted(() => {
   loadData()
 })
@@ -338,21 +498,8 @@ onMounted(() => {
 .subtitle { color: #6b7280; margin: 0; }
 
 .section { background: #fff; border: 1px solid #e6e8ee; padding: 1rem; border-radius: 8px; }
-.toolbar { display: flex; align-items: center; gap: .75rem; margin-bottom: .75rem; }
-.search { flex: 1; padding: .5rem .75rem; border: 1px solid #e5e7eb; border-radius: 8px; }
-.search-btn {
-  padding: .5rem 1rem;
-  background: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-}
-.search-btn:hover {
-  background: #2563eb;
-}
-.meta { color: #6b7280; font-size: .9rem; }
+.toolbar { display: flex; align-items: center; justify-content: flex-end; gap: .75rem; margin-bottom: .5rem; }
+.meta { color: #6b7280; font-size: .9rem; margin-right: auto; }
 .state { padding: 1rem; color: #374151; }
 .state.error { color: #b91c1c; display: flex; align-items: center; gap: 1rem; }
 .retry-btn {
@@ -380,6 +527,15 @@ td { padding: .5rem .5rem; border-bottom: 1px solid #f3f4f6; }
 /* Row highlight */
 tr.highlighted {
   animation: highlight 2s ease-out;
+}
+
+tr.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+tr.clickable-row:hover {
+  background: #f9fafb;
 }
 @keyframes highlight {
   0% { background: #fef08a; }
@@ -456,6 +612,14 @@ tr.highlighted {
 }
 .no-partner {
   color: #9ca3af;
+}
+
+.notes-cell {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
 }
 
 /* Pagination */
