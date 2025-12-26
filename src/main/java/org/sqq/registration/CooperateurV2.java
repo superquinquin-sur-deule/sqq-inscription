@@ -4,6 +4,9 @@ import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
+
+import java.util.List;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -68,6 +71,12 @@ public class CooperateurV2 extends PanacheEntity {
 
     @UpdateTimestamp
     public Instant updatedAt;
+
+    @OneToMany(mappedBy = "cooperateur1")
+    public List<CooperateurRelationship> relationshipsAsFirst;
+
+    @OneToMany(mappedBy = "cooperateur2")
+    public List<CooperateurRelationship> relationshipsAsSecond;
 
     public CooperateurV2() {
     }
