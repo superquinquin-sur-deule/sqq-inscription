@@ -11,6 +11,7 @@ import org.sqq.registration.Binome;
 import org.sqq.registration.Cooperateur;
 import org.sqq.registration.CooperateurStatus;
 import org.sqq.registration.Genre;
+import org.sqq.registration.matrix.MatrixNotificationService;
 import org.sqq.registration.stripe.Stripe;
 
 import java.net.URI;
@@ -19,10 +20,12 @@ import java.net.URI;
 public class RegistrationResource {
     private final Stripe stripe;
     private final Validator validator;
+    private final MatrixNotificationService matrixNotificationService;
 
-    public RegistrationResource(Stripe stripe, Validator validator) {
+    public RegistrationResource(Stripe stripe, Validator validator, MatrixNotificationService matrixNotificationService) {
         this.stripe = stripe;
         this.validator = validator;
+        this.matrixNotificationService = matrixNotificationService;
     }
 
     @POST
@@ -101,6 +104,7 @@ public class RegistrationResource {
         if (stripe.hasPaid(cooperateur)) {
             cooperateur.status = CooperateurStatus.PAID;
             cooperateur.persist();
+            matrixNotificationService.notifyNewSubscription(cooperateur);
             return Response.ok().build();
         } else {
             Log.errorf("Stripe session payment status is not paid for cooperateur %d", cooperateurId);

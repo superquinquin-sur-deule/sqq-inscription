@@ -9,6 +9,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.sqq.registration.CooperateurStatus;
 import org.sqq.registration.SouscriptionSupplementaire;
+import org.sqq.registration.matrix.MatrixNotificationService;
 import org.sqq.registration.stripe.Stripe;
 
 import java.net.URI;
@@ -17,10 +18,12 @@ import java.net.URI;
 public class AdditionalSharesResource {
     private final Stripe stripe;
     private final Validator validator;
+    private final MatrixNotificationService matrixNotificationService;
 
-    public AdditionalSharesResource(Stripe stripe, Validator validator) {
+    public AdditionalSharesResource(Stripe stripe, Validator validator, MatrixNotificationService matrixNotificationService) {
         this.stripe = stripe;
         this.validator = validator;
+        this.matrixNotificationService = matrixNotificationService;
     }
 
     @POST
@@ -60,6 +63,7 @@ public class AdditionalSharesResource {
         if (stripe.hasPaidSouscriptionSupplementaire(souscription)) {
             souscription.status = CooperateurStatus.PAID;
             souscription.persist();
+            matrixNotificationService.notifyAdditionalShares(souscription);
             return Response.ok().build();
         } else {
             Log.errorf("Stripe session payment status is not paid for souscription supplementaire %d", souscriptionId);
