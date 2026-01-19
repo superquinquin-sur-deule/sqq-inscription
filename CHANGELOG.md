@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.3.0 (2026-01-19)
+
+## What's Changed
+* chore(main): release 1.2.1-SNAPSHOT by @lucas-dclrcq in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/36
+* fix(deps): update quarkus.platform.version to v3.30.5 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/38
+* fix(deps): update quarkus.platform.version to v3.30.6 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/42
+* chore(deps): update dependency vite to v7.3.1 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/41
+* chore(deps): update dependency vue-tsc to v3.2.2 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/40
+* chore(deps): update dependency orval to v7.18.0 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/45
+* fix(deps): update dependency com.stripe:stripe-java to v31.2.0 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/48
+* chore(deps): update dependency prettier to v3.8.0 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/47
+* chore(deps): update dependency org.wiremock:wiremock to v3.13.2 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/49
+* chore(deps): update registry.access.redhat.com/ubi9/openjdk-21 docker tag to v1.24-2.1767878250 by @renovate[bot] in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/43
+
+
+**Full Changelog**: https://github.com/superquinquin-sur-deule/sqq-inscription/compare/v1.2.0...v1.3.0
+
 ## 1.2.0 (2025-12-23)
 
 ## What's Changed
