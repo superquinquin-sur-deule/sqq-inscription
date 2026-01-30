@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.1 (2026-01-30)
+
+## What's Changed
+* chore(main): release 1.3.1-SNAPSHOT by @lucas-dclrcq in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/52
+
+
+**Full Changelog**: https://github.com/superquinquin-sur-deule/sqq-inscription/compare/v1.3.0...v1.3.1
+
 ## 1.3.0 (2026-01-19)
 
 ## What's Changed
