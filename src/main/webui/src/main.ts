@@ -7,6 +7,7 @@ import SuccessfulRegistration from "./views/SuccessfulRegistration.vue";
 import AdminCooperateurs from "./views/AdminCooperateurs.vue";
 import PartsSupplementaires from "./views/PartsSupplementaires.vue";
 import SuccessfulPartsSupplementaires from "./views/SuccessfulPartsSupplementaires.vue";
+import RetryPayment from "./views/RetryPayment.vue";
 
 
 const routes = [
@@ -15,6 +16,7 @@ const routes = [
     { path: '/admin', component: AdminCooperateurs },
     { path: '/parts-supplementaires', component: PartsSupplementaires },
     { path: '/parts-supplementaires-success', component: SuccessfulPartsSupplementaires },
+    { path: '/retry-payment', component: RetryPayment },
 ]
 
 const router = createRouter({

@@ -8,6 +8,7 @@ import java.time.Instant;
 
 public class CooperateurDTO {
     public Long id;
+    public String uuid;
     public Genre genre;
     public String prenom;
     public String nom;
@@ -30,6 +31,7 @@ public class CooperateurDTO {
         var dto = new CooperateurDTO();
         
         dto.id = cooperateur.id;
+        dto.uuid = cooperateur.uuid;
         dto.genre = cooperateur.genre;
         dto.prenom = cooperateur.prenom;
         dto.nom = cooperateur.nom;

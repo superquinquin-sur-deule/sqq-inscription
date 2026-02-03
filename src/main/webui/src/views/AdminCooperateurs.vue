@@ -88,12 +88,19 @@
               <td>{{ formatDate(row.updatedAt) }}</td>
               <td>
                 <button
+                  v-if="row.status === 'PAYMENT_PENDING'"
+                  class="copy-btn"
+                  @click="copyRetryLink(row)"
+                >
+                  {{ copiedId === row.id ? 'Copie !' : 'Copier lien' }}
+                </button>
+                <button
                   v-if="row.status === 'PAID'"
                   class="action-btn"
                   @click="markAsProcessed(row)"
                   :disabled="processing === row.id"
                 >
-                  {{ processing === row.id ? 'En cours...' : 'Marquer traitée' }}
+                  {{ processing === row.id ? 'En cours...' : 'Marquer traitee' }}
                 </button>
               </td>
             </tr>
@@ -143,12 +150,19 @@
               <td>{{ formatDate(row.updatedAt) }}</td>
               <td>
                 <button
+                  v-if="row.status === 'PAYMENT_PENDING'"
+                  class="copy-btn"
+                  @click="copyRetryLinkSupp(row)"
+                >
+                  {{ copiedIdSupp === row.id ? 'Copie !' : 'Copier lien' }}
+                </button>
+                <button
                   v-if="row.status === 'PAID'"
                   class="action-btn"
                   @click="markSuppAsProcessed(row)"
                   :disabled="processingSupp === row.id"
                 >
-                  {{ processingSupp === row.id ? 'En cours...' : 'Marquer traitée' }}
+                  {{ processingSupp === row.id ? 'En cours...' : 'Marquer traitee' }}
                 </button>
               </td>
             </tr>
@@ -230,6 +244,8 @@ const loadingSupp = ref(true)
 const errorSupp = ref<string | null>(null)
 const querySupp = ref('')
 const processingSupp = ref<number | null>(null)
+const copiedId = ref<number | null>(null)
+const copiedIdSupp = ref<number | null>(null)
 
 // Tabs
 const activeTab = ref<'inscriptions' | 'supplementaires'>('inscriptions')
@@ -274,6 +290,22 @@ async function markSuppAsProcessed(row: SouscriptionSupplementaireDTO) {
   } finally {
     processingSupp.value = null
   }
+}
+
+function copyRetryLink(row: CooperateurDTO) {
+  if (!row.uuid) return
+  const url = `${window.location.origin}/retry-payment?uuid=${row.uuid}`
+  navigator.clipboard.writeText(url)
+  copiedId.value = row.id ?? null
+  setTimeout(() => { copiedId.value = null }, 2000)
+}
+
+function copyRetryLinkSupp(row: SouscriptionSupplementaireDTO) {
+  if (!row.uuid) return
+  const url = `${window.location.origin}/retry-payment?uuid=${row.uuid}&type=supplementaire`
+  navigator.clipboard.writeText(url)
+  copiedIdSupp.value = row.id ?? null
+  setTimeout(() => { copiedIdSupp.value = null }, 2000)
 }
 
 const columns = [
@@ -669,6 +701,22 @@ td { padding: .5rem .5rem; border-bottom: 1px solid #f3f4f6; }
 .processed-label {
   color: #166534;
   font-size: .85rem;
+}
+
+/* Copy link button */
+.copy-btn {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: .35rem .75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: .8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.copy-btn:hover {
+  background: #d97706;
 }
 
 /* Tabs */

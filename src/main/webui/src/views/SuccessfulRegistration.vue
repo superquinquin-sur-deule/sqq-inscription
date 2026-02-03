@@ -36,13 +36,13 @@
 
 <script setup lang="ts">
 import {onMounted} from "vue";
-import {getSqqInscriptionAPI} from "../api/service/catalog.ts";
 
 onMounted(() => {
-  let urlParams = new URLSearchParams(window.location.search);
-  const sqqInscriptionAPI = getSqqInscriptionAPI();
-  const cooperateurId = parseInt(urlParams.get("cooperateurId")!);
-  sqqInscriptionAPI.postApiV1RegistrationsSuccessCooperateurId(cooperateurId)
+  const urlParams = new URLSearchParams(window.location.search);
+  const uuid = urlParams.get("uuid");
+  if (uuid) {
+    fetch(`/api/v1/registrations/success/${uuid}`, { method: 'POST' });
+  }
 })
 </script>
 

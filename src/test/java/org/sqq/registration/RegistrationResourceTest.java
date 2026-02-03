@@ -118,6 +118,14 @@ class RegistrationResourceTest {
                 .when().post("/api/v1/registrations")
                 .then().statusCode(303);
 
+        String uuid = given()
+                .auth().preemptive().basic("admin", "password")
+                .when().get("/api/v1/administration/cooperateurs")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("find { it.email == 'lucie.bernard@mailbox.org' }.uuid");
+
         Number id = given()
                 .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
@@ -127,7 +135,7 @@ class RegistrationResourceTest {
                 .path("find { it.email == 'lucie.bernard@mailbox.org' }.id");
 
         given()
-                .when().post("/api/v1/registrations/success/" + id)
+                .when().post("/api/v1/registrations/success/" + uuid)
                 .then()
                 .statusCode(200);
 
@@ -166,16 +174,16 @@ class RegistrationResourceTest {
                 .when().post("/api/v1/registrations")
                 .then().statusCode(303);
 
-        Number id = given()
+        String uuid = given()
                 .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
                 .extract()
-                .path("find { it.email == 'louis.martin@mailbox.org' }.id");
+                .path("find { it.email == 'louis.martin@mailbox.org' }.uuid");
 
         given()
-                .when().post("/api/v1/registrations/success/" + id)
+                .when().post("/api/v1/registrations/success/" + uuid)
                 .then()
                 .statusCode(200);
 
@@ -184,7 +192,7 @@ class RegistrationResourceTest {
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
-                .body("find { it.id == " + id + " }.status", equalTo("PAID"));
+                .body("find { it.email == 'louis.martin@mailbox.org' }.status", equalTo("PAID"));
     }
 
     @Test
