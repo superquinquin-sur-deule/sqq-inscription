@@ -208,15 +208,14 @@
         "tags" : [ "Additional Shares Resource" ]
       }
     },
-    "/api/v1/parts-supplementaires/success/{souscriptionId}" : {
+    "/api/v1/parts-supplementaires/success/{uuid}" : {
       "post" : {
         "parameters" : [ {
-          "name" : "souscriptionId",
+          "name" : "uuid",
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "integer",
-            "format" : "int64"
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -330,15 +329,14 @@
         "tags" : [ "Registration Resource" ]
       }
     },
-    "/api/v1/registrations/success/{cooperateurId}" : {
+    "/api/v1/registrations/success/{uuid}" : {
       "post" : {
         "parameters" : [ {
-          "name" : "cooperateurId",
+          "name" : "uuid",
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "integer",
-            "format" : "int64"
+            "type" : "string"
           }
         } ],
         "responses" : {
@@ -353,6 +351,98 @@
         },
         "summary" : "Successful Payment",
         "tags" : [ "Registration Resource" ]
+      }
+    },
+    "/api/v1/retry-payment/cooperateur/{uuid}" : {
+      "post" : {
+        "parameters" : [ {
+          "name" : "uuid",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        },
+        "summary" : "Retry Cooperateur Payment",
+        "tags" : [ "Retry Payment Resource" ]
+      },
+      "get" : {
+        "parameters" : [ {
+          "name" : "uuid",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        },
+        "summary" : "Get Cooperateur Payment Info",
+        "tags" : [ "Retry Payment Resource" ]
+      }
+    },
+    "/api/v1/retry-payment/souscription/{uuid}" : {
+      "post" : {
+        "parameters" : [ {
+          "name" : "uuid",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        },
+        "summary" : "Retry Souscription Payment",
+        "tags" : [ "Retry Payment Resource" ]
+      },
+      "get" : {
+        "parameters" : [ {
+          "name" : "uuid",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : { }
+              }
+            }
+          }
+        },
+        "summary" : "Get Souscription Payment Info",
+        "tags" : [ "Retry Payment Resource" ]
       }
     }
   },
@@ -400,6 +490,9 @@
           "id" : {
             "type" : "integer",
             "format" : "int64"
+          },
+          "uuid" : {
+            "type" : "string"
           },
           "genre" : {
             "$ref" : "#/components/schemas/Genre"
@@ -476,6 +569,9 @@
           "id" : {
             "type" : "integer",
             "format" : "int64"
+          },
+          "uuid" : {
+            "type" : "string"
           },
           "prenom" : {
             "type" : "string"

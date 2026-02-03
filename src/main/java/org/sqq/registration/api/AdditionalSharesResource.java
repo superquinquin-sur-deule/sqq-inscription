@@ -52,12 +52,13 @@ public class AdditionalSharesResource {
     }
 
     @POST
-    @Path("/success/{souscriptionId}")
+    @Path("/success/{uuid}")
     @Transactional
-    public Response successfulPayment(@PathParam("souscriptionId") Long souscriptionId) {
-        Log.infof("Payment successful for souscription supplementaire %d", souscriptionId);
-        SouscriptionSupplementaire souscription = SouscriptionSupplementaire.findById(souscriptionId);
+    public Response successfulPayment(@PathParam("uuid") String uuid) {
+        Log.infof("Payment successful for souscription supplementaire uuid=%s", uuid);
+        SouscriptionSupplementaire souscription = SouscriptionSupplementaire.find("uuid", uuid).firstResult();
         if (souscription == null) {
+            Log.errorf("Souscription supplementaire not found for uuid=%s", uuid);
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         if (stripe.hasPaidSouscriptionSupplementaire(souscription)) {
@@ -66,7 +67,7 @@ public class AdditionalSharesResource {
             matrixNotificationService.notifyAdditionalShares(souscription);
             return Response.ok().build();
         } else {
-            Log.errorf("Stripe session payment status is not paid for souscription supplementaire %d", souscriptionId);
+            Log.errorf("Stripe session payment status is not paid for souscription supplementaire uuid=%s", uuid);
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }

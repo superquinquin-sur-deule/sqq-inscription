@@ -84,18 +84,18 @@ class MatrixNotificationTest {
                 .when().post("/api/v1/registrations")
                 .then().statusCode(303);
 
-        // Get the cooperateur ID
-        Number id = given()
+        // Get the cooperateur UUID
+        String uuid = given()
                 .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/cooperateurs")
                 .then()
                 .statusCode(200)
                 .extract()
-                .path("find { it.email == 'matrix.test@mailbox.org' }.id");
+                .path("find { it.email == 'matrix.test@mailbox.org' }.uuid");
 
         // Trigger payment success
         given()
-                .when().post("/api/v1/registrations/success/" + id)
+                .when().post("/api/v1/registrations/success/" + uuid)
                 .then()
                 .statusCode(200);
 
@@ -128,18 +128,18 @@ class MatrixNotificationTest {
                 .when().post("/api/v1/parts-supplementaires")
                 .then().statusCode(303);
 
-        // Get the souscription ID
-        Number id = given()
+        // Get the souscription UUID
+        String uuid = given()
                 .auth().preemptive().basic("admin", "password")
                 .when().get("/api/v1/administration/parts-additionnelles")
                 .then()
                 .statusCode(200)
                 .extract()
-                .path("find { it.email == 'additional.test@mailbox.org' }.id");
+                .path("find { it.email == 'additional.test@mailbox.org' }.uuid");
 
         // Trigger payment success
         given()
-                .when().post("/api/v1/parts-supplementaires/success/" + id)
+                .when().post("/api/v1/parts-supplementaires/success/" + uuid)
                 .then()
                 .statusCode(200);
 

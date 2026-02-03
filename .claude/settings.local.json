@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./mvnw test:*)"
+      "Bash(./mvnw test:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(xargs ls:*)",
+      "Bash(./mvnw compile:*)",
+      "Bash(npm run generate:*)",
+      "Bash(cat:*)",
+      "Bash(npm run generate-api:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

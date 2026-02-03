@@ -96,18 +96,22 @@ public class RegistrationResource {
     }
     
     @POST
-    @Path("/success/{cooperateurId}")
+    @Path("/success/{uuid}")
     @Transactional
-    public Response successfulPayment(@PathParam("cooperateurId") Long cooperateurId) {
-        Log.infof("Payment successful for cooperateur %d", cooperateurId);
-        Cooperateur cooperateur = Cooperateur.findById(cooperateurId);
+    public Response successfulPayment(@PathParam("uuid") String uuid) {
+        Log.infof("Payment successful for cooperateur uuid=%s", uuid);
+        Cooperateur cooperateur = Cooperateur.find("uuid", uuid).firstResult();
+        if (cooperateur == null) {
+            Log.errorf("Cooperateur not found for uuid=%s", uuid);
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         if (stripe.hasPaid(cooperateur)) {
             cooperateur.status = CooperateurStatus.PAID;
             cooperateur.persist();
             matrixNotificationService.notifyNewSubscription(cooperateur);
             return Response.ok().build();
         } else {
-            Log.errorf("Stripe session payment status is not paid for cooperateur %d", cooperateurId);
+            Log.errorf("Stripe session payment status is not paid for cooperateur uuid=%s", uuid);
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }

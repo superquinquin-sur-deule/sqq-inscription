@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 public class Cooperateur extends PanacheEntity {
@@ -41,6 +42,7 @@ public class Cooperateur extends PanacheEntity {
     public boolean acceptationDesStatus;
     public CooperateurStatus status;
     public String stripeSessionId;
+    public String uuid;
     @CreationTimestamp
     public Instant createdAt;
     @UpdateTimestamp
@@ -64,6 +66,7 @@ public class Cooperateur extends PanacheEntity {
         this.binome = binome;
         this.acceptationDesStatus = acceptationDesStatus;
         this.status = CooperateurStatus.PAYMENT_PENDING;
+        this.uuid = UUID.randomUUID().toString();
 
         this.computeParts(etudiantOuMinimasSociaux, partsDeSoutien, binome);
     }

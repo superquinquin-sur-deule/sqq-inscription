@@ -7,6 +7,7 @@ import java.time.Instant;
 
 public class SouscriptionSupplementaireDTO {
     public Long id;
+    public String uuid;
     public String prenom;
     public String nom;
     public String email;
@@ -19,6 +20,7 @@ public class SouscriptionSupplementaireDTO {
         var dto = new SouscriptionSupplementaireDTO();
 
         dto.id = souscription.id;
+        dto.uuid = souscription.uuid;
         dto.prenom = souscription.prenom;
         dto.nom = souscription.nom;
         dto.email = souscription.email;
