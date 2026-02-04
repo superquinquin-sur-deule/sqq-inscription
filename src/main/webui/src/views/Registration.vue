@@ -1,224 +1,224 @@
 <template>
-  <main class="container">
-    <header class="header">
-      <div class="brand">
-        <img src="/superquinquin_logo_deule.svg" alt="SuperQuinquin sur Deûle" class="logo" />
-        <div class="brand-text">
-          <h1>Inscription à la Coopérative SuperQuinquin sur Deûle</h1>
-          <p class="subtitle">Deviens sociétaire et règle tes parts sociales en quelques minutes.</p>
+  <main class="bg-bg-alt max-w-[980px] mx-auto py-10 px-4 pb-[3.25rem] text-text rounded-[10px]">
+    <header class="bg-transparent rounded-[10px] py-6 px-5 mb-4 relative overflow-hidden">
+      <div class="flex md:flex-row flex-col md:items-center items-start md:gap-4 gap-2">
+        <img src="/superquinquin_logo_deule.svg" alt="SuperQuinquin sur Deûle" class="block h-24" />
+        <div class="flex flex-col">
+          <h1 class="m-0 mb-[0.35rem] text-[1.7rem] font-bold">Inscription à la Coopérative SuperQuinquin sur Deûle</h1>
+          <p class="text-sm m-0">Deviens sociétaire et règle tes parts sociales en quelques minutes.</p>
         </div>
       </div>
     </header>
 
-    <form class="form" method="post" action="/api/v1/registrations">
-      <section class="section">
-        <h2>Informations personnelles</h2>
-        <div class="grid">
-          <div class="field full">
-            <div class="inline">
-              <label class="radio">
+    <form class="p-5" method="post" action="/api/v1/registrations">
+      <section>
+        <h2 class="m-0 mb-[0.9rem] text-text font-bold inline-flex items-center gap-2 section-title-bar">Informations personnelles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-[1.15rem] gap-x-4">
+          <div class="flex flex-col col-span-full">
+            <div class="flex gap-4 items-center flex-wrap">
+              <label class="inline-flex gap-[0.6rem] font-semibold items-center cursor-pointer">
                 <input type="radio" name="genre" value="MADAME" v-model="form.genre"/>
                 <span>Madame</span>
               </label>
-              <label class="radio">
+              <label class="inline-flex gap-[0.6rem] font-semibold items-center cursor-pointer">
                 <input type="radio" name="genre" value="MONSIEUR" v-model="form.genre"/>
                 <span>Monsieur</span>
               </label>
             </div>
           </div>
 
-          <div class="field">
-            <label for="prenom">Prénom <span class="req">*</span></label>
-            <input id="prenom" name="prenom" v-model.trim="form.prenom" required/>
-          </div>
-          
-          <div class="field">
-            <label for="nom">Nom <span class="req">*</span></label>
-            <input id="nom" name="nom" v-model.trim="form.nom" required/>
+          <div class="flex flex-col">
+            <label for="prenom" class="font-semibold mb-[0.35rem] text-text-dark">Prénom <span class="text-req">*</span></label>
+            <input id="prenom" name="prenom" v-model.trim="form.prenom" required class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
           </div>
 
-          <div class="field full">
-            <label for="adresse">Adresse <span class="req">*</span></label>
-            <input id="adresse" name="adresse" v-model.trim="form.adresse" required/>
+          <div class="flex flex-col">
+            <label for="nom" class=" font-semibold mb-[0.35rem] text-text-dark">Nom <span class="text-req">*</span></label>
+            <input id="nom" name="nom" v-model.trim="form.nom" required class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
           </div>
 
-          <div class="field">
-            <label for="ville">Ville <span class="req">*</span></label>
-            <input id="ville" name="ville" v-model.trim="form.ville" required/>
+          <div class="flex flex-col col-span-full">
+            <label for="adresse" class=" font-semibold mb-[0.35rem] text-text-dark">Adresse <span class="text-req">*</span></label>
+            <input id="adresse" name="adresse" v-model.trim="form.adresse" required class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
           </div>
 
-          <div class="field">
-            <label for="cp">Code postal <span class="req">*</span></label>
-            <input id="cp" name="codePostal" v-model.trim="form.codePostal" inputmode="numeric" maxlength="5" placeholder="59000"/>
-            <small v-if="form.codePostal && !/^\d{5}$/.test(form.codePostal)" class="error">Code postal invalide</small>
+          <div class="flex flex-col">
+            <label for="ville" class=" font-semibold mb-[0.35rem] text-text-dark">Ville <span class="text-req">*</span></label>
+            <input id="ville" name="ville" v-model.trim="form.ville" required class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
           </div>
 
-          <div class="field">
-            <label for="email">Email <span class="req">*</span></label>
-            <input id="email" name="email" v-model.trim="form.email" type="email" placeholder="toi@exemple.fr"/>
-            <small v-if="form.email && !isEmail(form.email)" class="error">Email invalide</small>
+          <div class="flex flex-col">
+            <label for="cp" class=" font-semibold mb-[0.35rem] text-text-dark">Code postal <span class="text-req">*</span></label>
+            <input id="cp" name="codePostal" v-model.trim="form.codePostal" inputmode="numeric" maxlength="5" placeholder="59000" class="max-w-[180px] bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
+            <small v-if="form.codePostal && !/^\d{5}$/.test(form.codePostal)" class="text-error font-semibold">Code postal invalide</small>
           </div>
 
-          <div class="field">
-            <label for="tel">Téléphone <span class="req">*</span></label>
-            <input id="tel" name="telephone" v-model.trim="form.telephone" placeholder="06 00 00 00 00"/>
-            <small v-if="form.telephone && !isPhone(form.telephone)" class="error">Téléphone invalide</small>
+          <div class="flex flex-col">
+            <label for="email" class=" font-semibold mb-[0.35rem] text-text-dark">Email <span class="text-req">*</span></label>
+            <input id="email" name="email" v-model.trim="form.email" type="email" placeholder="toi@exemple.fr" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
+            <small v-if="form.email && !isEmail(form.email)" class="text-error font-semibold">Email invalide</small>
           </div>
 
-          <div class="field">
-            <label for="dob">Date de naissance <span class="req">*</span></label>
-            <input id="dob" v-model="form.dateNaissance" type="date"/>
+          <div class="flex flex-col">
+            <label for="tel" class=" font-semibold mb-[0.35rem] text-text-dark">Téléphone <span class="text-req">*</span></label>
+            <input id="tel" name="telephone" v-model.trim="form.telephone" placeholder="06 00 00 00 00" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
+            <small v-if="form.telephone && !isPhone(form.telephone)" class="text-error font-semibold">Téléphone invalide</small>
           </div>
 
-          <div class="field">
-            <label for="foyer">Nombre de personnes au foyer <span class="req">*</span></label>
-            <div class="stepper">
-              <button type="button" class="stepper-btn" @click="decFoyer()">−</button>
-              <input id="foyer" name="nombreDePersonnesDansLeFoyer" v-model.number="form.nbFoyer" type="number" min="1" step="1"/>
-              <button type="button" class="stepper-btn" @click="incFoyer()">+</button>
+          <div class="flex flex-col">
+            <label for="dob" class=" font-semibold mb-[0.35rem] text-text-dark">Date de naissance <span class="text-req">*</span></label>
+            <input id="dob" v-model="form.dateNaissance" type="date" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="foyer" class=" font-semibold mb-[0.35rem] text-text-dark">Nombre de personnes au foyer <span class="text-req">*</span></label>
+            <div class="inline-flex items-center gap-2">
+              <button type="button" class="w-[38px] h-[38px] min-w-[38px] min-h-[38px] rounded-full border-none bg-accent text-accent-contrast font-extrabold leading-none inline-flex items-center justify-center cursor-pointer shadow-stepper transition-all duration-200 hover:bg-accent-dark hover:-translate-y-px hover:shadow-stepper-hover active:translate-y-0" @click="decFoyer()">−</button>
+              <input id="foyer" name="nombreDePersonnesDansLeFoyer" v-model.number="form.nbFoyer" type="number" min="1" step="1" class="w-[120px] text-center stepper-input bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
+              <button type="button" class="w-[38px] h-[38px] min-w-[38px] min-h-[38px] rounded-full border-none bg-accent text-accent-contrast font-extrabold leading-none inline-flex items-center justify-center cursor-pointer shadow-stepper transition-all duration-200 hover:bg-accent-dark hover:-translate-y-px hover:shadow-stepper-hover active:translate-y-0" @click="incFoyer()">+</button>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="section">
-        <h2>Parts sociales <span class="req">*</span></h2>
-        <p class="hint">Tu peux sélectionner une ou plusieurs options.</p>
+      <section class="mt-5">
+        <h2 class=" m-0 mb-[0.9rem] text-text font-bold  inline-flex items-center gap-2 section-title-bar">Parts sociales <span class="text-req">*</span></h2>
+        <p class="text-sm mb-5">Tu peux sélectionner une ou plusieurs options.</p>
 
-        <div class="option">
-          <label class="checkbox">
+        <div class="relative p-[0.9rem] border border-border mb-[0.85rem] option-gradient shadow-option option-accent-bar">
+          <label class="inline-flex gap-[0.6rem] items-center cursor-pointer">
             <input type="checkbox" v-model="form.parts.p100.checked"/>
-            <span class="title">100€ et plus</span>
+            <span class=" font-bold">100€ et plus</span>
           </label>
-          <p class="details">
+          <p class="text-sm my-1 mb-[0.6rem] leading-[1.45]">
             Je déclare vouloir devenir sociétaire et souscrire des parts sociales pour un montant minimum de 100 euros
             (au moins 10 parts à 10 euros).
           </p>
-          <div class="subgrid" v-if="form.parts.p100.checked">
-            <div class="field full">
-              <small class="hint">Cette option ajoute automatiquement 10 parts (soit 100€) au minimum requis.</small>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-[0.85rem]" v-if="form.parts.p100.checked">
+            <div class="flex flex-col col-span-full">
+              <small class="text-muted">Cette option ajoute automatiquement 10 parts (soit 100€) au minimum requis.</small>
             </div>
           </div>
         </div>
 
-        <div class="option">
-          <label class="checkbox">
+        <div class="relative p-[0.9rem] border border-border mb-[0.85rem] option-gradient shadow-option option-accent-bar">
+          <label class="inline-flex gap-[0.6rem] items-center cursor-pointer">
             <input type="checkbox" v-model="form.parts.p10.checked"/>
-            <span class="title">À partir de 10€</span>
+            <span class=" font-bold">À partir de 10€</span>
           </label>
-          <p class="details">
+          <p class="text-sm my-1 mb-[0.6rem]  leading-[1.45]">
             Je déclare vouloir devenir sociétaire de la Coopérative SuperQuinquin sur Deûle et souscrire des parts pour
             un montant minimum de 10 euros. Ouvert aux étudiants et aux bénéficiaires des minimas sociaux. *
           </p>
-          <div class="subgrid" v-if="form.parts.p10.checked">
-            <div class="field full">
-              <small class="hint">Cette option ajoute automatiquement 1 part (soit 10€) au minimum requis.</small>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-[0.85rem]" v-if="form.parts.p10.checked">
+            <div class="flex flex-col col-span-full">
+              <small class="text-muted">Cette option ajoute automatiquement 1 part (soit 10€) au minimum requis.</small>
             </div>
           </div>
         </div>
 
-        <div class="option">
-          <label class="checkbox">
+        <div class="relative p-[0.9rem] border border-border mb-[0.85rem] option-gradient shadow-option option-accent-bar">
+          <label class="inline-flex gap-[0.6rem] items-center cursor-pointer">
             <input type="checkbox" v-model="form.binome.enabled"/>
-            <span class="title">Ajouter un binôme</span>
+            <span class=" font-bold">Ajouter un binôme</span>
           </label>
-          <p class="details">Si tu ajoutes un binôme, 20€ seront automatiquement ajoutés à ta souscription.</p>
-          <div class="subgrid" v-if="form.binome.enabled">
-            <div class="field full">
-              <div class="inline">
-                <label class="radio">
+          <p class="text-sm my-1 mb-[0.6rem]  leading-[1.45]">Si tu ajoutes un binôme, 20€ seront automatiquement ajoutés à ta souscription.</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-[0.85rem]" v-if="form.binome.enabled">
+            <div class="flex flex-col col-span-full">
+              <div class="flex gap-4 items-center flex-wrap">
+                <label class="text-sm font-semibold inline-flex gap-[0.6rem] items-center cursor-pointer">
                   <input type="radio" name="binomeGenre" value="MADAME" v-model="form.binome.genre"/>
                   <span>Madame</span>
                 </label>
-                <label class="radio">
+                <label class="text-sm font-semibold inline-flex gap-[0.6rem] items-center cursor-pointer">
                   <input type="radio" name="binomeGenre" value="MONSIEUR" v-model="form.binome.genre"/>
                   <span>Monsieur</span>
                 </label>
               </div>
             </div>
-            <div class="field">
-              <label for="bNom">Nom du binôme <span class="req">*</span></label>
-              <input id="bNom" v-model.trim="form.binome.nom"/>
+            <div class="flex flex-col">
+              <label for="bNom" class="text-sm font-semibold mb-[0.35rem] text-text-dark">Nom du binôme <span class="text-req">*</span></label>
+              <input id="bNom" v-model.trim="form.binome.nom" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
             </div>
-            <div class="field">
-              <label for="bPrenom">Prénom du binôme <span class="req">*</span></label>
-              <input id="bPrenom" v-model.trim="form.binome.prenom"/>
+            <div class="flex flex-col">
+              <label for="bPrenom" class="text-sm font-semibold mb-[0.35rem] text-text-dark">Prénom du binôme <span class="text-req">*</span></label>
+              <input id="bPrenom" v-model.trim="form.binome.prenom" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
             </div>
-            <div class="field full">
-              <label for="bAdresse">Adresse du binôme <span class="req">*</span></label>
-              <input id="bAdresse" v-model.trim="form.binome.adresse"/>
+            <div class="flex flex-col col-span-full">
+              <label for="bAdresse" class="text-sm font-semibold mb-[0.35rem] text-text-dark">Adresse du binôme <span class="text-req">*</span></label>
+              <input id="bAdresse" v-model.trim="form.binome.adresse" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
             </div>
-            <div class="field">
-              <label for="bVille">Ville du binôme <span class="req">*</span></label>
-              <input id="bVille" v-model.trim="form.binome.ville"/>
+            <div class="flex flex-col">
+              <label for="bVille" class="text-sm font-semibold mb-[0.35rem] text-text-dark">Ville du binôme <span class="text-req">*</span></label>
+              <input id="bVille" v-model.trim="form.binome.ville" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
             </div>
-            <div class="field">
-              <label for="bCp">Code postal du binôme <span class="req">*</span></label>
-              <input id="bCp" v-model.trim="form.binome.codePostal" inputmode="numeric" maxlength="5" placeholder="59000"/>
-              <small v-if="form.binome.codePostal && !/^\d{5}$/.test(form.binome.codePostal)" class="error">Code postal invalide</small>
+            <div class="flex flex-col">
+              <label for="bCp" class="text-sm font-semibold mb-[0.35rem] text-text-dark">Code postal du binôme <span class="text-req">*</span></label>
+              <input id="bCp" v-model.trim="form.binome.codePostal" inputmode="numeric" maxlength="5" placeholder="59000" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
+              <small v-if="form.binome.codePostal && !/^\d{5}$/.test(form.binome.codePostal)" class="text-error font-semibold">Code postal invalide</small>
             </div>
-            <div class="field full">
-              <label for="bEmail">Email du binôme <span class="req">*</span></label>
-              <input id="bEmail" v-model.trim="form.binome.email" type="email" placeholder="binome@exemple.fr"/>
-              <small v-if="form.binome.email && !isEmail(form.binome.email)" class="error">Email invalide</small>
+            <div class="flex flex-col col-span-full">
+              <label for="bEmail" class="text-sm font-semibold mb-[0.35rem] text-text-dark">Email du binôme <span class="text-req">*</span></label>
+              <input id="bEmail" v-model.trim="form.binome.email" type="email" placeholder="binome@exemple.fr" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
+              <small v-if="form.binome.email && !isEmail(form.binome.email)" class="text-error font-semibold">Email invalide</small>
             </div>
-            <div class="field">
-              <label for="bTel">Téléphone du binôme <span class="req">*</span></label>
-              <input id="bTel" v-model.trim="form.binome.telephone" placeholder="06 00 00 00 00"/>
-              <small v-if="form.binome.telephone && !isPhone(form.binome.telephone)" class="error">Téléphone invalide</small>
+            <div class="flex flex-col">
+              <label for="bTel" class="text-sm font-semibold mb-[0.35rem] text-text-dark">Téléphone du binôme <span class="text-req">*</span></label>
+              <input id="bTel" v-model.trim="form.binome.telephone" placeholder="06 00 00 00 00" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
+              <small v-if="form.binome.telephone && !isPhone(form.binome.telephone)" class="text-error font-semibold">Téléphone invalide</small>
             </div>
-            <div class="field">
-              <label for="bDob">Date de naissance du binôme <span class="req">*</span></label>
-              <input id="bDob" v-model="form.binome.dateNaissance" type="date"/>
+            <div class="flex flex-col">
+              <label for="bDob" class="text-sm font-semibold mb-[0.35rem] text-text-dark">Date de naissance du binôme <span class="text-req">*</span></label>
+              <input id="bDob" v-model="form.binome.dateNaissance" type="date" class="bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
             </div>
-            <div class="field full">
-              <small class="hint">L’option binôme ajoute automatiquement 2 parts (soit 20€) au minimum requis.</small>
+            <div class="flex flex-col col-span-full">
+              <small class="text-muted">L'option binôme ajoute automatiquement 2 parts (soit 20€) au minimum requis.</small>
             </div>
           </div>
         </div>
-        <div class="subgrid recap">
-          <div class="field">
-            <label for="nbParts">Nombre total de parts à 10€</label>
-            <input id="nbParts" type="number" :value="totalParts" readonly/>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-[0.85rem]">
+          <div class="flex flex-col">
+            <label for="nbParts" class="font-semibold mb-[0.35rem]  text-text-dark">Nombre total de parts à 10€</label>
+            <input id="nbParts" type="number" :value="totalParts" readonly class="stepper-input bg-surface-light border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
           </div>
-          <div class="field">
-            <label for="mtTotal">Montant total en euros</label>
-            <input id="mtTotal" :value="totalAmount.toFixed(2) + ' €'" readonly/>
+          <div class="flex flex-col">
+            <label for="mtTotal" class="font-semibold mb-[0.35rem]  text-text-dark">Montant total en euros</label>
+            <input id="mtTotal" :value="totalAmount.toFixed(2) + ' €'" readonly class="bg-surface-light border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
           </div>
         </div>
       </section>
 
-      <section class="section">
-        <span>En devenant membre, je m’engage à participer au fonctionnement de la coopérative (coopérateurs actifs) à hauteur de 2h45 toutes les 4 semaines.</span>
+      <section class="text-sm mt-5">
+        <span>En devenant membre, je m'engage à participer au fonctionnement de la coopérative (coopérateurs actifs) à hauteur de 2h45 toutes les 4 semaines.</span>
       </section>
 
-      <section class="section">
-        <label class="checkbox accept">
-          <input type="checkbox" v-model="form.accepteStatuts"/>
+      <section class="mt-5">
+        <label class="text-sm inline-flex gap-3 items-start cursor-pointer">
+          <input type="checkbox" v-model="form.accepteStatuts" class="mt-[0.35rem]"/>
           <span>
-            Je déclare avoir pris connaissance et accepter les <a class="statuts-link" href="https://www.superquinquin.fr/wp-content/uploads/2025/12/Statuts_signes_superQuinquinsurDeule.pdf" target="_blank">Statuts de la coopérative SuperQuinquin sur Deûle.</a> Je déclare avoir bien compris que mes parts sociales sont un investissement soumis à un risque de perte en capital en cas de déficit de la coopérative. Je déclare ne violer aucune norme ou réglementation en souscrivant les parts sociales de la Coopérative.
+            Je déclare avoir pris connaissance et accepter les <a class="underline" href="https://www.superquinquin.fr/wp-content/uploads/2025/12/Statuts_signes_superQuinquinsurDeule.pdf" target="_blank">Statuts de la coopérative SuperQuinquin sur Deûle.</a> Je déclare avoir bien compris que mes parts sociales sont un investissement soumis à un risque de perte en capital en cas de déficit de la coopérative. Je déclare ne violer aucune norme ou réglementation en souscrivant les parts sociales de la Coopérative.
           </span>
         </label>
       </section>
 
-      <section class="section">
-        <div class="soutien">
-          <label class="checkbox">
+      <section class="mt-5">
+        <div class="bg-transparent border-4 border-accent rounded-section p-[0.9rem]">
+          <label class="inline-flex gap-[0.6rem] items-center cursor-pointer">
             <input type="checkbox" v-model="form.parts.soutien.checked"/>
-            <span class="title">Soutenir SuperQuinQuin</span>
+            <span class="font-bold">Soutenir SuperQuinQuin</span>
           </label>
-          <p class="details">
+          <p class="text-sm my-1 mb-[0.6rem] leading-[1.45]">
             Je veux soutenir SuperQuinquin en souscrivant des parts supplémentaires
           </p>
-          <div class="subgrid" v-if="form.parts.soutien.checked">
-            <div class="field">
-              <label for="soutienParts">Nombre de parts supplémentaires</label>
-              <div class="stepper">
-                <button type="button" class="stepper-btn stepper-btn-white" @click="decSoutien()">−</button>
-                <input id="soutienParts" type="number" min="0" step="1" v-model.number="form.parts.soutien.parts"/>
-                <button type="button" class="stepper-btn stepper-btn-white" @click="incSoutien()">+</button>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-[0.85rem]" v-if="form.parts.soutien.checked">
+            <div class="flex flex-col">
+              <label for="soutienParts" class="font-semibold mb-[0.35rem] text-text-dark">Nombre de parts supplémentaires</label>
+              <div class="inline-flex items-center gap-2">
+                <button type="button" class="w-[38px] h-[38px] min-w-[38px] min-h-[38px] rounded-full border-none bg-white text-accent-contrast font-extrabold leading-none inline-flex items-center justify-center cursor-pointer shadow-stepper transition-all duration-200 hover:bg-white hover:-translate-y-px hover:shadow-stepper-hover active:translate-y-0" @click="decSoutien()">−</button>
+                <input id="soutienParts" type="number" min="0" step="1" v-model.number="form.parts.soutien.parts" class="w-[120px] text-center stepper-input bg-surface-hover border border-border rounded-input py-2.5 px-[0.9rem] text-base transition-all duration-200 hover:bg-white input-focus-accent"/>
+                <button type="button" class="w-[38px] h-[38px] min-w-[38px] min-h-[38px] rounded-full border-none bg-white text-accent-contrast font-extrabold leading-none inline-flex items-center justify-center cursor-pointer shadow-stepper transition-all duration-200 hover:bg-white hover:-translate-y-px hover:shadow-stepper-hover active:translate-y-0" @click="incSoutien()">+</button>
               </div>
-              <small class="hint">Soit {{ (form.parts.soutien.parts || 0) * 10 }} € supplémentaires</small>
+              <small class="text-muted">Soit {{ (form.parts.soutien.parts || 0) * 10 }} € supplémentaires</small>
             </div>
           </div>
         </div>
@@ -237,12 +237,12 @@
       <input type="hidden" name="binomeEmail" :value="form.binome.email"/>
       <input type="hidden" name="binomeTelephone" :value="form.binome.telephone"/>
       <input type="hidden" name="binomeDateNaissance" :value="form.binome.dateNaissance"/>
-      <footer class="footer">
-        <div class="total">
-          <span>Total à payer</span>
-          <strong>{{ totalAmount.toFixed(2) }} €</strong>
+      <footer class="flex justify-between gap-4 mt-5 pt-4 border-t border-border md:flex-row flex-col md:items-center items-stretch">
+        <div class="flex flex-col gap-[0.125rem] md:order-none order-2 md:items-start items-center">
+          <span class="text-sm font-semibold">Total à payer</span>
+          <strong class=" text-text">{{ totalAmount.toFixed(2) }} €</strong>
         </div>
-        <button type="submit" class="btn" :disabled="!isFormValid">Payer {{ totalAmount.toFixed(2) }} €</button>
+        <button type="submit" class="bg-accent text-accent-contrast border-none rounded-btn py-3 px-4 font-extrabold shadow-btn transition-all duration-200 hover:bg-accent-dark hover:-translate-y-px hover:shadow-btn-hover active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:shadow-none md:order-none order-1 md:w-auto w-full" :disabled="!isFormValid">Payer {{ totalAmount.toFixed(2) }} €</button>
       </footer>
     </form>
   </main>
@@ -379,404 +379,3 @@ function decFoyer() {
   form.nbFoyer = next < 1 ? 1 : next
 }
 </script>
-
-<style scoped>
-:root {
-  --text: #1f2937;
-  --muted: #6b7280;
-  --error: #b3261e;
-  --bg: #f6f7fb;
-  --surface: #ffffff;
-  --border: #e6e8ee;
-  --shadow: 0 10px 30px rgba(16, 24, 40, 0.06);
-  --accent: #f1dc43;
-  --accent-dark: #d8c237;
-  --accent-contrast: #111827; /* texte sombre sur jaune */
-}
-
-.container {
-  background: #efefee;
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 2.5rem 1rem 3.25rem;
-  color: var(--text);
-  border-radius: 10px;
-}
-
-.header {
-  background: transparent;
-  border-radius: 10px;
-  padding: 1.5rem 1.25rem;
-  margin-bottom: 1rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.header::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.header h1 {
-  margin: 0 0 .35rem;
-  font-size: 1.9rem;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.logo {
-  display: block;
-  height: 96px; /* bigger logo */
-}
-
-/* Ensure title aligns well next to the taller logo */
-.brand h1 {
-  margin: 0 0 .35rem;
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.subtitle {
-  color: var(--muted);
-  margin: 0;
-}
-
-.form {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 1.25rem;
-  box-shadow: var(--shadow);
-}
-
-.section + .section {
-  margin-top: 1.25rem;
-}
-
-.section h2 {
-  font-size: 1.05rem;
-  margin: 0 0 .9rem;
-  color: var(--text);
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-}
-
-.section h2::after {
-  content: '';
-  display: inline-block;
-  width: 44px;
-  height: 6px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--accent), #ffe66b);
-}
-
-.hint {
-  color: var(--muted);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.15rem 1rem;
-}
-
-.subgrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .85rem;
-}
-
-.full {
-  grid-column: 1 / -1;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-}
-
-.field label {
-  font-weight: 600;
-  margin-bottom: .35rem;
-  color: #111827;
-}
-
-.field input {
-  background: #fcfcfe;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: .75rem .9rem;
-  font-size: 1rem;
-  transition: box-shadow .2s ease, border-color .2s ease, background .2s ease;
-}
-
-.field input:hover {
-  background: #ffffff;
-}
-
-.field input:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(241, 220, 67, .35);
-}
-
-#cp {
-  max-width: 180px;
-}
-
-#foyer {
-  width: 120px;
-  text-align: center;
-  appearance: textfield;
-}
-
-.inline {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.radio, .checkbox {
-  display: inline-flex;
-  gap: .6rem;
-  align-items: center;
-  cursor: pointer;
-}
-
-input[type="radio"], input[type="checkbox"] {
-  accent-color: var(--accent);
-}
-
-.title {
-  font-weight: 700;
-}
-
-.details {
-  margin: .25rem 0 .6rem;
-  color: var(--muted);
-  line-height: 1.45;
-}
-
-.req {
-  color: #8a7a00;
-}
-
-.error {
-  color: var(--error);
-  font-weight: 600;
-}
-
-.option {
-  padding: .9rem;
-  border: 1px solid var(--border);
-  margin-bottom: .85rem;
-  background: linear-gradient(180deg, #ffffff, #fdfdfd);
-  position: relative;
-  box-shadow: 0 4px 18px rgba(16, 24, 40, 0.04);
-}
-
-.option::before {
-  content: '';
-  position: absolute;
-  left: -1px;
-  top: -1px;
-  bottom: -1px;
-  width: 5px;
-  background: linear-gradient(180deg, var(--accent), #ffe873);
-}
-
-.soutien {
-  background: none;
-  border: var(--accent) 4px solid;
-  border-radius: 8px;
-  padding: .9rem;
-}
-
-.recap .field input {
-  background: #fbfbfe;
-}
-
-.accept {
-  align-items: flex-start;
-  gap: .75rem;
-}
-
-.accept input {
-  margin-top: .35rem;
-}
-
-.footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.total {
-  display: flex;
-  flex-direction: column;
-  gap: .125rem;
-}
-
-.total span {
-  color: var(--muted);
-  font-weight: 600;
-  font-size: .9rem;
-}
-
-.total strong {
-  font-size: 1.35rem;
-  color: var(--text);
-}
-
-.btn {
-  background: var(--accent);
-  color: var(--accent-contrast);
-  border: none;
-  border-radius: 12px;
-  padding: .9rem 1.35rem;
-  font-size: 1.05rem;
-  font-weight: 800;
-  box-shadow: 0 8px 24px rgba(241, 220, 67, .35);
-  transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
-}
-
-.btn:disabled {
-  opacity: .6;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.btn:not(:disabled):hover {
-  background: var(--accent-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 10px 28px rgba(241, 220, 67, .45);
-}
-
-.btn:not(:disabled):active {
-  transform: translateY(0);
-}
-
-/* Soutien stepper styles */
-.stepper {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-}
-
-.stepper-btn {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
-  min-height: 38px;
-  border-radius: 999px; /* round */
-  border: none;
-  background: var(--accent); /* yellow accent */
-  color: var(--accent-contrast);
-  font-weight: 800;
-  font-size: 1.1rem;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(241, 220, 67, .35);
-  transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
-}
-
-.stepper-btn-white {
-  background: white;
-}
-
-.stepper-btn-white:hover {
-  background: white !important;
-}
-
-.stepper-btn:hover {
-  background: var(--accent-dark);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 22px rgba(241, 220, 67, .45);
-}
-
-.stepper-btn:active {
-  transform: translateY(0);
-}
-
-#soutienParts {
-  width: 120px;
-  text-align: center;
-  appearance: textfield;
-}
-
-.statuts-link {
-  text-decoration: underline;
-}
-
-#nbParts {
-  appearance: textfield;
-}
-
-#soutienParts::-webkit-outer-spin-button,
-#soutienParts::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-#foyer::-webkit-outer-spin-button,
-#foyer::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-#nbParts::-webkit-outer-spin-button,
-#nbParts::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-@media (max-width: 720px) {
-  .brand {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: .5rem;
-  }
-
-  .grid, .subgrid {
-    grid-template-columns: 1fr;
-  }
-
-  .footer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .total {
-    order: 2;
-    align-items: center;
-  }
-
-  .btn {
-    width: 100%;
-    order: 1;
-  }
-}
-
-:host, :global(body) {
-  background: radial-gradient(800px 200px at -10% -20%, rgba(241, 220, 67, 0.18), transparent),
-  radial-gradient(800px 200px at 110% -30%, rgba(241, 220, 67, 0.12), transparent),
-  var(--bg);
-}
-</style>
