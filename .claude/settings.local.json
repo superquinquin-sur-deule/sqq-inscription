@@ -11,7 +11,9 @@
       "Bash(npm run generate-api:*)",
       "Bash(npm run build:*)",
       "Bash(ls:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm test:*)",
+      "Bash(mvn test:*)"
     ],
     "deny": [],
     "ask": []

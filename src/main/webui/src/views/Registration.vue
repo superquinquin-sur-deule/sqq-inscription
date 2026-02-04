@@ -249,8 +249,11 @@
 </template>
 
 <script setup lang="ts">
-import {computed, reactive} from 'vue'
-import type {Genre} from "../api/model";
+import { computed, reactive } from 'vue'
+import type { Genre } from '../api/model'
+import { useFormValidation, usePartsCalculation } from '../composables'
+
+const { isEmail, isPhone, isPostalCode } = useFormValidation()
 
 const form = reactive({
   genre: '' as '' | Genre,
@@ -293,48 +296,29 @@ const form = reactive({
   accepteStatuts: false,
 })
 
-function partsCount() {
-  const p100parts = form.parts.p100.checked ? form.parts.p100.parts : 0
-  const p10parts = form.parts.p10.checked ? form.parts.p10.parts : 0
-  const binomeparts = form.binome.enabled ? form.binome.parts : 0
-  const soutienparts = form.parts.soutien.checked ? form.parts.soutien.parts : 0
-
-
-  return p100parts + p10parts + binomeparts + soutienparts;
-}
-
-const totalParts = computed(() => partsCount())
-
-const totalAmount = computed(() => partsCount() * 10)
-
-function isEmail(v: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
-}
-
-function isPhone(v: string) {
-  return /^[+]?([0-9]?[\s\-.]?){6,15}[0-9]$/.test(v)
-}
-
-function isPostalCode(v: string) {
-  return /^\d{5}$/.test(v)
-}
+const { totalParts, totalAmount } = usePartsCalculation({
+  p100: form.parts.p100,
+  p10: form.parts.p10,
+  soutien: form.parts.soutien,
+  binome: form.binome
+})
 
 const isPartsValid = computed(() => form.parts.p100.checked || form.parts.p10.checked)
 
 const isFormValid = computed(() => {
   const baseValid = (
-      !!form.genre &&
-      form.nom.trim().length > 0 &&
-      form.prenom.trim().length > 0 &&
-      form.adresse.trim().length > 0 &&
-      form.ville.trim().length > 0 &&
-      isPostalCode(form.codePostal) &&
-      isEmail(form.email) &&
-      isPhone(form.telephone) &&
-      !!form.dateNaissance &&
-      !!form.nbFoyer && form.nbFoyer > 0 &&
-      isPartsValid.value &&
-      form.accepteStatuts
+    !!form.genre &&
+    form.nom.trim().length > 0 &&
+    form.prenom.trim().length > 0 &&
+    form.adresse.trim().length > 0 &&
+    form.ville.trim().length > 0 &&
+    isPostalCode(form.codePostal) &&
+    isEmail(form.email) &&
+    isPhone(form.telephone) &&
+    !!form.dateNaissance &&
+    !!form.nbFoyer && form.nbFoyer > 0 &&
+    isPartsValid.value &&
+    form.accepteStatuts
   )
 
   if (!baseValid) return false
@@ -342,18 +326,17 @@ const isFormValid = computed(() => {
   if (!form.binome.enabled) return true
 
   return (
-      !!form.binome.genre &&
-      form.binome.nom.trim().length > 0 &&
-      form.binome.prenom.trim().length > 0 &&
-      form.binome.adresse.trim().length > 0 &&
-      form.binome.ville.trim().length > 0 &&
-      isPostalCode(form.binome.codePostal) &&
-      isEmail(form.binome.email) &&
-      isPhone(form.binome.telephone) &&
-      !!form.binome.dateNaissance
+    !!form.binome.genre &&
+    form.binome.nom.trim().length > 0 &&
+    form.binome.prenom.trim().length > 0 &&
+    form.binome.adresse.trim().length > 0 &&
+    form.binome.ville.trim().length > 0 &&
+    isPostalCode(form.binome.codePostal) &&
+    isEmail(form.binome.email) &&
+    isPhone(form.binome.telephone) &&
+    !!form.binome.dateNaissance
   )
 })
-
 
 function incSoutien() {
   if (!form.parts.soutien.checked) form.parts.soutien.checked = true

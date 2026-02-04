@@ -71,7 +71,10 @@
 </template>
 
 <script setup lang="ts">
-import {computed, reactive} from 'vue'
+import { computed, reactive, toRef } from 'vue'
+import { useFormValidation, useSimplePartsCalculation } from '../composables'
+
+const { isEmail } = useFormValidation()
 
 const form = reactive({
   prenom: '',
@@ -80,18 +83,14 @@ const form = reactive({
   partsSupplementaires: 1 as number,
 })
 
-const totalAmount = computed(() => form.partsSupplementaires * 10)
-
-function isEmail(v: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
-}
+const { totalAmount } = useSimplePartsCalculation(toRef(form, 'partsSupplementaires'))
 
 const isFormValid = computed(() => {
   return (
-      form.nom.trim().length > 0 &&
-      form.prenom.trim().length > 0 &&
-      isEmail(form.email) &&
-      form.partsSupplementaires >= 1
+    form.nom.trim().length > 0 &&
+    form.prenom.trim().length > 0 &&
+    isEmail(form.email) &&
+    form.partsSupplementaires >= 1
   )
 })
 
