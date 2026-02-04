@@ -9,9 +9,12 @@ import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
 import type {
   CooperateurDTO,
+  GetApiV1AdministrationCooperateursParams,
+  GetApiV1AdministrationPartsAdditionnellesParams,
+  PageDTOCooperateurDTO,
+  PageDTOSouscriptionSupplementaireDTO,
   PostApiV1PartsSupplementairesBody,
   PostApiV1RegistrationsBody,
-  SouscriptionSupplementaireDTO,
 } from "../model";
 
 export const getSqqInscriptionAPI = () => {
@@ -19,11 +22,15 @@ export const getSqqInscriptionAPI = () => {
    * @summary List
    */
   const getApiV1AdministrationCooperateurs = <
-    TData = AxiosResponse<CooperateurDTO[]>,
+    TData = AxiosResponse<PageDTOCooperateurDTO>,
   >(
+    params?: GetApiV1AdministrationCooperateursParams,
     options?: AxiosRequestConfig,
   ): Promise<TData> => {
-    return axios.default.get(`/api/v1/administration/cooperateurs`, options);
+    return axios.default.get(`/api/v1/administration/cooperateurs`, {
+      ...options,
+      params: { ...params, ...options?.params },
+    });
   };
 
   /**
@@ -61,14 +68,15 @@ export const getSqqInscriptionAPI = () => {
    * @summary List Souscriptions Supplementaires
    */
   const getApiV1AdministrationPartsAdditionnelles = <
-    TData = AxiosResponse<SouscriptionSupplementaireDTO[]>,
+    TData = AxiosResponse<PageDTOSouscriptionSupplementaireDTO>,
   >(
+    params?: GetApiV1AdministrationPartsAdditionnellesParams,
     options?: AxiosRequestConfig,
   ): Promise<TData> => {
-    return axios.default.get(
-      `/api/v1/administration/parts-additionnelles`,
-      options,
-    );
+    return axios.default.get(`/api/v1/administration/parts-additionnelles`, {
+      ...options,
+      params: { ...params, ...options?.params },
+    });
   };
 
   /**
@@ -340,16 +348,14 @@ export const getSqqInscriptionAPI = () => {
     getApiV1RetryPaymentSouscriptionUuid,
   };
 };
-export type GetApiV1AdministrationCooperateursResult = AxiosResponse<
-  CooperateurDTO[]
->;
+export type GetApiV1AdministrationCooperateursResult =
+  AxiosResponse<PageDTOCooperateurDTO>;
 export type GetApiV1AdministrationCooperateursIdResult =
   AxiosResponse<CooperateurDTO>;
 export type PostApiV1AdministrationCooperateursIdProcessResult =
   AxiosResponse<unknown>;
-export type GetApiV1AdministrationPartsAdditionnellesResult = AxiosResponse<
-  SouscriptionSupplementaireDTO[]
->;
+export type GetApiV1AdministrationPartsAdditionnellesResult =
+  AxiosResponse<PageDTOSouscriptionSupplementaireDTO>;
 export type PostApiV1AdministrationPartsAdditionnellesIdProcessResult =
   AxiosResponse<unknown>;
 export type PostApiV1PartsSupplementairesResult = AxiosResponse<unknown>;
