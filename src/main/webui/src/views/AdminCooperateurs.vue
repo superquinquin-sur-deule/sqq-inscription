@@ -37,6 +37,18 @@
           placeholder="Rechercher (nom, prénom, email)"
           class="search"
         />
+        <div class="status-filter">
+          <span class="filter-label">Statut:</span>
+          <label v-for="status in allStatuses" :key="status" class="status-checkbox">
+            <input
+              type="checkbox"
+              :value="status"
+              v-model="selectedStatuses"
+              @change="loadCooperateurs(0, pageSize)"
+            />
+            <span class="status" :class="statusClass(status)">{{ format(status) }}</span>
+          </label>
+        </div>
         <span class="meta" v-if="!loading && !error">{{ totalElements }} résultat(s)</span>
       </div>
 
@@ -95,6 +107,14 @@
                   {{ copiedId === row.id ? 'Copie !' : 'Copier lien' }}
                 </button>
                 <button
+                  v-if="row.status === 'PAYMENT_PENDING'"
+                  class="archive-btn"
+                  @click="archiveCooperateur(row)"
+                  :disabled="archiving === row.id"
+                >
+                  {{ archiving === row.id ? 'En cours...' : 'Archiver' }}
+                </button>
+                <button
                   v-if="row.status === 'PAID'"
                   class="action-btn"
                   @click="markAsProcessed(row)"
@@ -142,6 +162,18 @@
           placeholder="Rechercher (nom, prénom, email)"
           class="search"
         />
+        <div class="status-filter">
+          <span class="filter-label">Statut:</span>
+          <label v-for="status in allStatuses" :key="status" class="status-checkbox">
+            <input
+              type="checkbox"
+              :value="status"
+              v-model="selectedStatusesSupp"
+              @change="loadSouscriptionsSupplementaires(0, pageSizeSupp)"
+            />
+            <span class="status" :class="statusClass(status)">{{ format(status) }}</span>
+          </label>
+        </div>
         <span class="meta" v-if="!loadingSupp && !errorSupp">{{ totalElementsSupp }} résultat(s)</span>
       </div>
 
@@ -180,6 +212,14 @@
                   @click="copyRetryLinkSupp(row)"
                 >
                   {{ copiedIdSupp === row.id ? 'Copie !' : 'Copier lien' }}
+                </button>
+                <button
+                  v-if="row.status === 'PAYMENT_PENDING'"
+                  class="archive-btn"
+                  @click="archiveSouscriptionSupplementaire(row)"
+                  :disabled="archivingSupp === row.id"
+                >
+                  {{ archivingSupp === row.id ? 'En cours...' : 'Archiver' }}
                 </button>
                 <button
                   v-if="row.status === 'PAID'"
@@ -282,58 +322,86 @@ import type { CooperateurStatus } from '../api/model'
 type SortDir = 'asc' | 'desc'
 
 const api = getSqqInscriptionAPI()
-const rows = ref<CooperateurDTO[]>([])
+const allRows = ref<CooperateurDTO[]>([])
+const rows = computed(() => {
+  let filtered = allRows.value
+  // Client-side search
+  if (query.value) {
+    const q = query.value.toLowerCase()
+    filtered = filtered.filter(r =>
+      r.nom?.toLowerCase().includes(q) ||
+      r.prenom?.toLowerCase().includes(q) ||
+      r.email?.toLowerCase().includes(q)
+    )
+  }
+  // Update total elements based on filtered results
+  return filtered
+})
 const loading = ref(true)
 const error = ref<string | null>(null)
 const query = ref('')
 const selectedBinome = ref<BinomeDTO | null>(null)
 const processing = ref<number | null>(null)
+const archiving = ref<number | null>(null)
+
+// Status filter state
+const allStatuses: CooperateurStatus[] = ['PAYMENT_PENDING', 'PAID', 'PROCESSED', 'ARCHIVED']
+const defaultStatuses: CooperateurStatus[] = ['PAYMENT_PENDING', 'PAID', 'PROCESSED']
+const selectedStatuses = ref<CooperateurStatus[]>([...defaultStatuses])
 
 // Pagination state for cooperateurs
 const currentPage = ref(0)
 const pageSize = ref(20)
-const totalElements = ref(0)
-const totalPages = ref(0)
+const totalElements = computed(() => rows.value.length)
+const totalPages = computed(() => Math.ceil(rows.value.length / pageSize.value) || 1)
 
-const rowsSupp = ref<SouscriptionSupplementaireDTO[]>([])
+const allRowsSupp = ref<SouscriptionSupplementaireDTO[]>([])
+const rowsSupp = computed(() => {
+  let filtered = allRowsSupp.value
+  // Client-side search
+  if (querySupp.value) {
+    const q = querySupp.value.toLowerCase()
+    filtered = filtered.filter(r =>
+      r.nom?.toLowerCase().includes(q) ||
+      r.prenom?.toLowerCase().includes(q) ||
+      r.email?.toLowerCase().includes(q)
+    )
+  }
+  return filtered
+})
 const loadingSupp = ref(true)
 const errorSupp = ref<string | null>(null)
 const querySupp = ref('')
 const processingSupp = ref<number | null>(null)
+const archivingSupp = ref<number | null>(null)
 const copiedId = ref<number | null>(null)
 const copiedIdSupp = ref<number | null>(null)
+const selectedStatusesSupp = ref<CooperateurStatus[]>([...defaultStatuses])
 
 // Pagination state for parts supplementaires
 const currentPageSupp = ref(0)
 const pageSizeSupp = ref(20)
-const totalElementsSupp = ref(0)
-const totalPagesSupp = ref(0)
+const totalElementsSupp = computed(() => rowsSupp.value.length)
+const totalPagesSupp = computed(() => Math.ceil(rowsSupp.value.length / pageSizeSupp.value) || 1)
 
 // Tabs
 const activeTab = ref<'inscriptions' | 'supplementaires'>('inscriptions')
 
-// Debounce helper
-function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
-  let timeoutId: ReturnType<typeof setTimeout>
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeoutId)
-    timeoutId = setTimeout(() => fn(...args), delay)
-  }
-}
-
-// Load cooperateurs with pagination and search
-async function loadCooperateurs(page = 0, size = 20, search?: string) {
+// Load cooperateurs with status filter
+async function loadCooperateurs(page = 0, size = 20) {
   try {
     loading.value = true
     error.value = null
-    const resp = await api.getApiV1AdministrationCooperateurs({ page, size, search: search || undefined })
+    const resp = await api.getApiV1AdministrationCooperateurs({
+      statuses: selectedStatuses.value.length > 0 ? selectedStatuses.value : undefined
+    })
     const data = (resp as any).data ?? (resp as any)
 
-    rows.value = Array.isArray(data.content) ? data.content : []
-    currentPage.value = data.page ?? 0
-    pageSize.value = data.size ?? 20
-    totalElements.value = data.totalElements ?? 0
-    totalPages.value = data.totalPages ?? 0
+    // Backend returns array, store all items
+    const allItems = Array.isArray(data) ? data : (Array.isArray(data.content) ? data.content : [])
+    allRows.value = allItems
+    currentPage.value = Math.min(page, Math.max(0, Math.ceil(allItems.length / size) - 1))
+    pageSize.value = size
   } catch (e: any) {
     error.value = e?.message ?? 'Une erreur est survenue lors du chargement.'
   } finally {
@@ -341,19 +409,21 @@ async function loadCooperateurs(page = 0, size = 20, search?: string) {
   }
 }
 
-// Load souscriptions supplementaires with pagination and search
-async function loadSouscriptionsSupplementaires(page = 0, size = 20, search?: string) {
+// Load souscriptions supplementaires with status filter
+async function loadSouscriptionsSupplementaires(page = 0, size = 20) {
   try {
     loadingSupp.value = true
     errorSupp.value = null
-    const resp = await api.getApiV1AdministrationPartsAdditionnelles({ page, size, search: search || undefined })
+    const resp = await api.getApiV1AdministrationPartsAdditionnelles({
+      statuses: selectedStatusesSupp.value.length > 0 ? selectedStatusesSupp.value : undefined
+    })
     const data = (resp as any).data ?? (resp as any)
 
-    rowsSupp.value = Array.isArray(data.content) ? data.content : []
-    currentPageSupp.value = data.page ?? 0
-    pageSizeSupp.value = data.size ?? 20
-    totalElementsSupp.value = data.totalElements ?? 0
-    totalPagesSupp.value = data.totalPages ?? 0
+    // Backend returns array, store all items
+    const allItems = Array.isArray(data) ? data : (Array.isArray(data.content) ? data.content : [])
+    allRowsSupp.value = allItems
+    currentPageSupp.value = Math.min(page, Math.max(0, Math.ceil(allItems.length / size) - 1))
+    pageSizeSupp.value = size
   } catch (e: any) {
     errorSupp.value = e?.message ?? 'Une erreur est survenue lors du chargement.'
   } finally {
@@ -364,43 +434,34 @@ async function loadSouscriptionsSupplementaires(page = 0, size = 20, search?: st
 // Pagination navigation for cooperateurs
 function goToPage(page: number) {
   if (page >= 0 && page < totalPages.value) {
-    loadCooperateurs(page, pageSize.value, query.value)
+    currentPage.value = page
   }
 }
 
 function changePageSize(size: number) {
   pageSize.value = size
-  loadCooperateurs(0, size, query.value)
+  currentPage.value = 0
 }
 
 // Pagination navigation for parts supplementaires
 function goToPageSupp(page: number) {
   if (page >= 0 && page < totalPagesSupp.value) {
-    loadSouscriptionsSupplementaires(page, pageSizeSupp.value, querySupp.value)
+    currentPageSupp.value = page
   }
 }
 
 function changePageSizeSupp(size: number) {
   pageSizeSupp.value = size
-  loadSouscriptionsSupplementaires(0, size, querySupp.value)
+  currentPageSupp.value = 0
 }
 
-// Debounced search handlers
-const debouncedSearchCooperateurs = debounce(() => {
-  loadCooperateurs(0, pageSize.value, query.value)
-}, 300)
-
-const debouncedSearchSupp = debounce(() => {
-  loadSouscriptionsSupplementaires(0, pageSizeSupp.value, querySupp.value)
-}, 300)
-
-// Watch search queries for debounced search
+// Watch search queries to reset pagination (search is client-side)
 watch(query, () => {
-  debouncedSearchCooperateurs()
+  currentPage.value = 0
 })
 
 watch(querySupp, () => {
-  debouncedSearchSupp()
+  currentPageSupp.value = 0
 })
 
 function openBinomeModal(binome: BinomeDTO) {
@@ -417,9 +478,9 @@ async function markAsProcessed(row: CooperateurDTO) {
   try {
     const resp = await api.postApiV1AdministrationCooperateursIdProcess(row.id)
     const updated = (resp as any).data ?? resp
-    const index = rows.value.findIndex(r => r.id === row.id)
+    const index = allRows.value.findIndex(r => r.id === row.id)
     if (index !== -1) {
-      rows.value[index] = updated
+      allRows.value[index] = updated
     }
   } catch (e: any) {
     alert('Erreur: ' + (e?.message ?? 'Une erreur est survenue'))
@@ -434,14 +495,52 @@ async function markSuppAsProcessed(row: SouscriptionSupplementaireDTO) {
   try {
     const resp = await api.postApiV1AdministrationPartsAdditionnellesIdProcess(row.id)
     const updated = (resp as any).data ?? resp
-    const index = rowsSupp.value.findIndex(r => r.id === row.id)
+    const index = allRowsSupp.value.findIndex(r => r.id === row.id)
     if (index !== -1) {
-      rowsSupp.value[index] = updated
+      allRowsSupp.value[index] = updated
     }
   } catch (e: any) {
     alert('Erreur: ' + (e?.message ?? 'Une erreur est survenue'))
   } finally {
     processingSupp.value = null
+  }
+}
+
+async function archiveCooperateur(row: CooperateurDTO) {
+  if (!row.id || !confirm('Archiver cette souscription ?')) return
+  archiving.value = row.id
+  try {
+    await api.postApiV1AdministrationCooperateursIdArchive(row.id)
+    if (!selectedStatuses.value.includes('ARCHIVED')) {
+      // Remove from allRows since ARCHIVED is not in filter
+      allRows.value = allRows.value.filter(r => r.id !== row.id)
+    } else {
+      // Reload to get updated status
+      await loadCooperateurs(currentPage.value, pageSize.value)
+    }
+  } catch (e: any) {
+    alert('Erreur: ' + (e?.message ?? 'Une erreur est survenue'))
+  } finally {
+    archiving.value = null
+  }
+}
+
+async function archiveSouscriptionSupplementaire(row: SouscriptionSupplementaireDTO) {
+  if (!row.id || !confirm('Archiver cette souscription ?')) return
+  archivingSupp.value = row.id
+  try {
+    await api.postApiV1AdministrationPartsAdditionnellesIdArchive(row.id)
+    if (!selectedStatusesSupp.value.includes('ARCHIVED')) {
+      // Remove from allRowsSupp since ARCHIVED is not in filter
+      allRowsSupp.value = allRowsSupp.value.filter(r => r.id !== row.id)
+    } else {
+      // Reload to get updated status
+      await loadSouscriptionsSupplementaires(currentPageSupp.value, pageSizeSupp.value)
+    }
+  } catch (e: any) {
+    alert('Erreur: ' + (e?.message ?? 'Une erreur est survenue'))
+  } finally {
+    archivingSupp.value = null
   }
 }
 
@@ -561,6 +660,8 @@ function format(v: unknown) {
       return 'Payé'
     case 'PROCESSED':
       return 'Traitée'
+    case 'ARCHIVED':
+      return 'Archivée'
     case 'MADAME':
       return 'Madame'
     case 'MONSIEUR':
@@ -578,12 +679,14 @@ function statusClass(v?: CooperateurStatus) {
       return 'paid'
     case 'PROCESSED':
       return 'processed'
+    case 'ARCHIVED':
+      return 'archived'
     default:
       return 'unknown'
   }
 }
 
-// Client-side sorting (server already filters and paginates)
+// Client-side sorting and pagination
 const sortedRows = computed(() => {
   const key = sortKey.value
   const dir = sortDir.value
@@ -597,7 +700,10 @@ const sortedRows = computed(() => {
     if (sa > sb) return dir === 'asc' ? 1 : -1
     return 0
   })
-  return arr
+  // Client-side pagination
+  const start = currentPage.value * pageSize.value
+  const end = start + pageSize.value
+  return arr.slice(start, end)
 })
 
 const sortedRowsSupp = computed(() => {
@@ -613,7 +719,10 @@ const sortedRowsSupp = computed(() => {
     if (sa > sb) return dir === 'asc' ? 1 : -1
     return 0
   })
-  return arr
+  // Client-side pagination
+  const start = currentPageSupp.value * pageSizeSupp.value
+  const end = start + pageSizeSupp.value
+  return arr.slice(start, end)
 })
 
 onMounted(async () => {
@@ -853,6 +962,60 @@ td { padding: .5rem .5rem; border-bottom: 1px solid #f3f4f6; }
 
 .tab.active .tab-count {
   background: rgba(0, 0, 0, 0.08);
+}
+
+/* Status filter */
+.status-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.status-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+}
+
+.status-checkbox input {
+  cursor: pointer;
+}
+
+/* Archived status badge */
+.status.archived {
+  background: #e5e7eb;
+  color: #6b7280;
+}
+
+/* Archive button */
+.archive-btn {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: .35rem .75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: .8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-left: 0.25rem;
+}
+
+.archive-btn:hover:not(:disabled) {
+  background: #4b5563;
+}
+
+.archive-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Pagination controls */

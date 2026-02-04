@@ -13,4 +13,5 @@ export const CooperateurStatus = {
   PAYMENT_PENDING: "PAYMENT_PENDING",
   PAID: "PAID",
   PROCESSED: "PROCESSED",
+  ARCHIVED: "ARCHIVED",
 } as const;

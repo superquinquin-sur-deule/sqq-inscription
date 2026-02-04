@@ -3,7 +3,8 @@ package org.sqq.registration;
 public enum CooperateurStatus {
     PAYMENT_PENDING("Paiement en cours"),
     PAID("Payé"),
-    PROCESSED("Traité");
+    PROCESSED("Traité"),
+    ARCHIVED("Archivé");
 
     private final String label;
     

@@ -3,6 +3,13 @@ openapi: 3.1.0
 paths:
   /api/v1/administration/cooperateurs:
     get:
+      parameters:
+      - name: statuses
+        in: query
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/CooperateurStatus"
       responses:
         "200":
           description: OK
@@ -48,6 +55,31 @@ paths:
       security:
       - SecurityScheme:
         - admin
+  /api/v1/administration/cooperateurs/{id}/archive:
+    post:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Archive Cooperateur
+      tags:
+      - Admin Resource
+      security:
+      - SecurityScheme:
+        - admin
   /api/v1/administration/cooperateurs/{id}/process:
     post:
       parameters:
@@ -75,6 +107,13 @@ paths:
         - admin
   /api/v1/administration/parts-additionnelles:
     get:
+      parameters:
+      - name: statuses
+        in: query
+        schema:
+          type: array
+          items:
+            $ref: "#/components/schemas/CooperateurStatus"
       responses:
         "200":
           description: OK
@@ -89,6 +128,31 @@ paths:
         "403":
           description: Not Allowed
       summary: List Souscriptions Supplementaires
+      tags:
+      - Admin Resource
+      security:
+      - SecurityScheme:
+        - admin
+  /api/v1/administration/parts-additionnelles/{id}/archive:
+    post:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Not Authorized
+        "403":
+          description: Not Allowed
+      summary: Archive Souscription Supplementaire
       tags:
       - Admin Resource
       security:
@@ -388,6 +452,7 @@ components:
       - PAYMENT_PENDING
       - PAID
       - PROCESSED
+      - ARCHIVED
     Genre:
       type: string
       enum:
