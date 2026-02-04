@@ -598,10 +598,10 @@ const columnsSupp = [
 type ColumnKey = typeof columns[number]['key']
 type ColumnKeySupp = typeof columnsSupp[number]['key']
 
-const sortKey = ref<ColumnKey>('updatedAt')
+const sortKey = ref<ColumnKey>('createdAt')
 const sortDir = ref<SortDir>('desc')
 
-const sortKeySupp = ref<ColumnKeySupp>('updatedAt')
+const sortKeySupp = ref<ColumnKeySupp>('createdAt')
 const sortDirSupp = ref<SortDir>('desc')
 
 function sortableClass(key: ColumnKey) {
