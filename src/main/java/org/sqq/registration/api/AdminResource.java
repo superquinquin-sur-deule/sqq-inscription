@@ -25,9 +25,9 @@ public class AdminResource {
     public List<CooperateurDTO> list(@QueryParam("statuses") List<CooperateurStatus> statuses) {
         Stream<Cooperateur> stream;
         if (statuses != null && !statuses.isEmpty()) {
-            stream = Cooperateur.<Cooperateur>stream("status in ?1", statuses);
+            stream = Cooperateur.<Cooperateur>stream("status in ?1 order by createdAt desc", statuses);
         } else {
-            stream = Cooperateur.<Cooperateur>stream("status != ?1", CooperateurStatus.ARCHIVED);
+            stream = Cooperateur.<Cooperateur>stream("status != ?1 order by createdAt desc", CooperateurStatus.ARCHIVED);
         }
         return stream.map(CooperateurDTO::fromCooperateur).toList();
     }
@@ -66,9 +66,9 @@ public class AdminResource {
     public List<SouscriptionSupplementaireDTO> listSouscriptionsSupplementaires(@QueryParam("statuses") List<CooperateurStatus> statuses) {
         Stream<SouscriptionSupplementaire> stream;
         if (statuses != null && !statuses.isEmpty()) {
-            stream = SouscriptionSupplementaire.<SouscriptionSupplementaire>stream("status in ?1", statuses);
+            stream = SouscriptionSupplementaire.<SouscriptionSupplementaire>stream("status in ?1 order by createdAt desc", statuses);
         } else {
-            stream = SouscriptionSupplementaire.<SouscriptionSupplementaire>stream("status != ?1", CooperateurStatus.ARCHIVED);
+            stream = SouscriptionSupplementaire.<SouscriptionSupplementaire>stream("status != ?1 order by createdAt desc", CooperateurStatus.ARCHIVED);
         }
         return stream.map(SouscriptionSupplementaireDTO::fromSouscriptionSupplementaire).toList();
     }
