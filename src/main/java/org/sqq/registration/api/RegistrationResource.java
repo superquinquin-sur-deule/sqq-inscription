@@ -11,7 +11,6 @@ import org.sqq.registration.Binome;
 import org.sqq.registration.Cooperateur;
 import org.sqq.registration.CooperateurStatus;
 import org.sqq.registration.Genre;
-import org.sqq.registration.matrix.MatrixNotificationService;
 import org.sqq.registration.stripe.Stripe;
 
 import java.net.URI;
@@ -20,12 +19,10 @@ import java.net.URI;
 public class RegistrationResource {
     private final Stripe stripe;
     private final Validator validator;
-    private final MatrixNotificationService matrixNotificationService;
 
-    public RegistrationResource(Stripe stripe, Validator validator, MatrixNotificationService matrixNotificationService) {
+    public RegistrationResource(Stripe stripe, Validator validator) {
         this.stripe = stripe;
         this.validator = validator;
-        this.matrixNotificationService = matrixNotificationService;
     }
 
     @POST
@@ -101,14 +98,25 @@ public class RegistrationResource {
     public Response successfulPayment(@PathParam("uuid") String uuid) {
         Log.infof("Payment successful for cooperateur uuid=%s", uuid);
         Cooperateur cooperateur = Cooperateur.find("uuid", uuid).firstResult();
+        
         if (cooperateur == null) {
             Log.errorf("Cooperateur not found for uuid=%s", uuid);
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        
+        if (cooperateur.status == CooperateurStatus.PAID) {
+            Log.warnf("Cooperateur %s is already PAID", cooperateur.email);
+            return Response.status(Response.Status.OK).build();
+        }
+        
+        if (cooperateur.status != CooperateurStatus.PAYMENT_PENDING) {
+            Log.errorf("Cooperateur status is not PAYMENT_PENDING for uuid=%s", uuid);
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        
         if (stripe.hasPaid(cooperateur)) {
             cooperateur.status = CooperateurStatus.PAID;
             cooperateur.persist();
-            matrixNotificationService.notifyNewSubscription(cooperateur);
             return Response.ok().build();
         } else {
             Log.errorf("Stripe session payment status is not paid for cooperateur uuid=%s", uuid);
