@@ -4,16 +4,57 @@
       <div class="brand">
         <img src="/superquinquin_logo_deule.svg" alt="SuperQuinquin sur Deule" class="logo"/>
         <div class="brand-text">
-          <h1>Finaliser ton paiement</h1>
-          <p class="subtitle">Ton paiement n'a pas abouti. Tu peux le relancer ici.</p>
+          <h1 v-if="loading">Verification en cours...</h1>
+          <template v-else-if="paymentSuccess">
+            <h1>Merci pour ta souscription !</h1>
+            <p class="subtitle">{{ isSupplementaire
+              ? 'Ton paiement a bien ete confirme, tes parts additionnelles ont ete ajoutees.'
+              : 'Ton paiement a bien ete confirme, tu es maintenant officiellement un.e cooperateur.rice de SuperQuinquin sur Deule.'
+            }}</p>
+          </template>
+          <template v-else>
+            <h1>Finaliser ton paiement</h1>
+            <p class="subtitle">Ton paiement n'a pas abouti. Tu peux le relancer ici.</p>
+          </template>
         </div>
       </div>
     </header>
 
     <section class="section" v-if="loading">
-      <p class="state">Chargement...</p>
+      <p class="state">Verification du paiement en cours...</p>
     </section>
 
+    <section class="section success" v-else-if="paymentSuccess">
+      <div class="success-icon" aria-hidden="true">✓</div>
+      <h2>{{ isSupplementaire ? 'Souscription finalisee' : 'Inscription finalisee' }}</h2>
+      <p v-if="isSupplementaire">
+        Nous venons de valider ta souscription de parts additionnelles. Tu recevras un email de confirmation
+        avec un recapitulatif de ta souscription et de ton paiement.
+      </p>
+      <p v-else>
+        Nous venons de valider ta souscription de parts sociales. Tu recevras un email de confirmation
+        avec un recapitulatif de ton inscription et de ton paiement.
+      </p>
+
+      <div class="next-steps">
+        <h3>Et maintenant ?</h3>
+        <ul v-if="isSupplementaire">
+          <li>Surveille ta boite mail pour le recapitulatif</li>
+          <li>Continue a soutenir SuperQuinquin sur Deule !</li>
+        </ul>
+        <ul v-else>
+          <li>Surveille ta boite mail, tu vas recevoir ton mail d'accueil parmi les coop'</li>
+          <li>Rejoins le mouvement en construisant avec nous ton futur magasin</li>
+        </ul>
+      </div>
+
+      <p class="help">
+        Besoin d'aide ? Ecris nous a
+        <a href="mailto:contact@superquinquin.fr">contact@superquinquin.fr</a>.
+      </p>
+    </section>
+
+    <!-- Etat: Erreur fatale -->
     <section class="section error-section" v-else-if="error">
       <div class="error-icon" aria-hidden="true">!</div>
       <h2>{{ errorTitle }}</h2>
@@ -73,6 +114,7 @@ interface PaymentInfo {
 }
 
 const loading = ref(true)
+const paymentSuccess = ref(false)
 const error = ref(false)
 const errorTitle = ref('')
 const errorMessage = ref('')
@@ -96,19 +138,33 @@ onMounted(async () => {
   if (!uuid) {
     error.value = true
     errorTitle.value = 'Lien invalide'
-    errorMessage.value = 'Le lien de relance de paiement est invalide ou incomplet.'
+    errorMessage.value = 'Le lien est invalide ou incomplet.'
     loading.value = false
     return
   }
 
   try {
-    const apiUrl = isSupplementaire
+    // Etape 1: Verifier le statut du paiement
+    const successUrl = isSupplementaire
+      ? `/api/v1/parts-supplementaires/success/${uuid}`
+      : `/api/v1/registrations/success/${uuid}`
+
+    const successResponse = await fetch(successUrl, { method: 'POST' })
+
+    if (successResponse.ok) {
+      // Paiement confirme
+      paymentSuccess.value = true
+      loading.value = false
+      return
+    }
+
+    const retryInfoUrl = isSupplementaire
       ? `/api/v1/retry-payment/souscription/${uuid}`
       : `/api/v1/retry-payment/cooperateur/${uuid}`
 
-    const response = await fetch(apiUrl)
+    const retryResponse = await fetch(retryInfoUrl)
 
-    if (response.status === 404) {
+    if (retryResponse.status === 404) {
       error.value = true
       errorTitle.value = 'Souscription non trouvee'
       errorMessage.value = 'Nous n\'avons pas trouve de souscription correspondant a ce lien.'
@@ -116,7 +172,7 @@ onMounted(async () => {
       return
     }
 
-    if (response.status === 400) {
+    if (retryResponse.status === 400) {
       error.value = true
       errorTitle.value = 'Paiement deja effectue'
       errorMessage.value = 'Cette souscription a deja ete payee ou traitee. Aucune action n\'est necessaire.'
@@ -124,11 +180,11 @@ onMounted(async () => {
       return
     }
 
-    if (!response.ok) {
+    if (!retryResponse.ok) {
       throw new Error('Erreur serveur')
     }
 
-    paymentInfo.value = await response.json()
+    paymentInfo.value = await retryResponse.json()
   } catch (e) {
     error.value = true
     errorTitle.value = 'Erreur'
@@ -205,6 +261,45 @@ onMounted(async () => {
   color: var(--muted);
 }
 
+/* Succes */
+.success {
+  text-align: left;
+}
+
+.success h2 {
+  font-size: 1.25rem;
+  margin: 0 0 .75rem;
+}
+
+.success-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 700;
+  margin-bottom: .75rem;
+}
+
+.next-steps {
+  margin-top: 1rem;
+}
+
+.next-steps h3 {
+  margin: 0 0 .5rem;
+  font-size: 1rem;
+}
+
+.next-steps ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text);
+}
+
+/* Erreur */
 .error-section {
   text-align: center;
 }
@@ -229,6 +324,7 @@ onMounted(async () => {
   color: var(--error);
 }
 
+/* Recap */
 .recap {
   margin: 1rem 0;
   border: 1px solid var(--border);

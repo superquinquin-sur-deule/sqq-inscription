@@ -17,7 +17,7 @@
         @click="activeTab = 'inscriptions'"
       >
         Souscriptions
-        <span class="tab-count">{{ rows.length }}</span>
+        <span class="tab-count">{{ totalElements }}</span>
       </button>
       <button
         class="tab"
@@ -25,7 +25,7 @@
         @click="activeTab = 'supplementaires'"
       >
         Parts supplémentaires
-        <span class="tab-count">{{ rowsSupp.length }}</span>
+        <span class="tab-count">{{ totalElementsSupp }}</span>
       </button>
     </div>
 
@@ -34,10 +34,10 @@
         <input
           v-model="query"
           type="search"
-          placeholder="Rechercher (tous champs)"
+          placeholder="Rechercher (nom, prénom, email)"
           class="search"
         />
-        <span class="meta" v-if="!loading && !error">{{ filteredRows.length }} résultat(s)</span>
+        <span class="meta" v-if="!loading && !error">{{ totalElements }} résultat(s)</span>
       </div>
 
       <div v-if="loading" class="state">Chargement…</div>
@@ -106,6 +106,31 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Pagination controls -->
+        <div class="pagination" v-if="totalPages > 1">
+          <button class="pagination-btn" @click="goToPage(0)" :disabled="currentPage === 0">
+            &laquo;
+          </button>
+          <button class="pagination-btn" @click="goToPage(currentPage - 1)" :disabled="currentPage === 0">
+            &lsaquo;
+          </button>
+          <span class="pagination-info">
+            Page {{ currentPage + 1 }} sur {{ totalPages }}
+          </span>
+          <button class="pagination-btn" @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages - 1">
+            &rsaquo;
+          </button>
+          <button class="pagination-btn" @click="goToPage(totalPages - 1)" :disabled="currentPage >= totalPages - 1">
+            &raquo;
+          </button>
+          <select :value="pageSize" @change="changePageSize(Number(($event.target as HTMLSelectElement).value))" class="page-size-select">
+            <option :value="10">10 / page</option>
+            <option :value="20">20 / page</option>
+            <option :value="50">50 / page</option>
+            <option :value="100">100 / page</option>
+          </select>
+        </div>
       </div>
     </section>
 
@@ -114,10 +139,10 @@
         <input
           v-model="querySupp"
           type="search"
-          placeholder="Rechercher (tous champs)"
+          placeholder="Rechercher (nom, prénom, email)"
           class="search"
         />
-        <span class="meta" v-if="!loadingSupp && !errorSupp">{{ filteredRowsSupp.length }} résultat(s)</span>
+        <span class="meta" v-if="!loadingSupp && !errorSupp">{{ totalElementsSupp }} résultat(s)</span>
       </div>
 
       <div v-if="loadingSupp" class="state">Chargement…</div>
@@ -168,6 +193,31 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Pagination controls -->
+        <div class="pagination" v-if="totalPagesSupp > 1">
+          <button class="pagination-btn" @click="goToPageSupp(0)" :disabled="currentPageSupp === 0">
+            &laquo;
+          </button>
+          <button class="pagination-btn" @click="goToPageSupp(currentPageSupp - 1)" :disabled="currentPageSupp === 0">
+            &lsaquo;
+          </button>
+          <span class="pagination-info">
+            Page {{ currentPageSupp + 1 }} sur {{ totalPagesSupp }}
+          </span>
+          <button class="pagination-btn" @click="goToPageSupp(currentPageSupp + 1)" :disabled="currentPageSupp >= totalPagesSupp - 1">
+            &rsaquo;
+          </button>
+          <button class="pagination-btn" @click="goToPageSupp(totalPagesSupp - 1)" :disabled="currentPageSupp >= totalPagesSupp - 1">
+            &raquo;
+          </button>
+          <select :value="pageSizeSupp" @change="changePageSizeSupp(Number(($event.target as HTMLSelectElement).value))" class="page-size-select">
+            <option :value="10">10 / page</option>
+            <option :value="20">20 / page</option>
+            <option :value="50">50 / page</option>
+            <option :value="100">100 / page</option>
+          </select>
+        </div>
       </div>
     </section>
 
@@ -224,7 +274,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import type { CooperateurDTO, BinomeDTO, SouscriptionSupplementaireDTO } from '../api/model'
 import { getSqqInscriptionAPI } from '../api/service/catalog'
 import type { CooperateurStatus } from '../api/model'
@@ -239,6 +289,12 @@ const query = ref('')
 const selectedBinome = ref<BinomeDTO | null>(null)
 const processing = ref<number | null>(null)
 
+// Pagination state for cooperateurs
+const currentPage = ref(0)
+const pageSize = ref(20)
+const totalElements = ref(0)
+const totalPages = ref(0)
+
 const rowsSupp = ref<SouscriptionSupplementaireDTO[]>([])
 const loadingSupp = ref(true)
 const errorSupp = ref<string | null>(null)
@@ -247,8 +303,105 @@ const processingSupp = ref<number | null>(null)
 const copiedId = ref<number | null>(null)
 const copiedIdSupp = ref<number | null>(null)
 
+// Pagination state for parts supplementaires
+const currentPageSupp = ref(0)
+const pageSizeSupp = ref(20)
+const totalElementsSupp = ref(0)
+const totalPagesSupp = ref(0)
+
 // Tabs
 const activeTab = ref<'inscriptions' | 'supplementaires'>('inscriptions')
+
+// Debounce helper
+function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
+  let timeoutId: ReturnType<typeof setTimeout>
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => fn(...args), delay)
+  }
+}
+
+// Load cooperateurs with pagination and search
+async function loadCooperateurs(page = 0, size = 20, search?: string) {
+  try {
+    loading.value = true
+    error.value = null
+    const resp = await api.getApiV1AdministrationCooperateurs({ page, size, search: search || undefined })
+    const data = (resp as any).data ?? (resp as any)
+
+    rows.value = Array.isArray(data.content) ? data.content : []
+    currentPage.value = data.page ?? 0
+    pageSize.value = data.size ?? 20
+    totalElements.value = data.totalElements ?? 0
+    totalPages.value = data.totalPages ?? 0
+  } catch (e: any) {
+    error.value = e?.message ?? 'Une erreur est survenue lors du chargement.'
+  } finally {
+    loading.value = false
+  }
+}
+
+// Load souscriptions supplementaires with pagination and search
+async function loadSouscriptionsSupplementaires(page = 0, size = 20, search?: string) {
+  try {
+    loadingSupp.value = true
+    errorSupp.value = null
+    const resp = await api.getApiV1AdministrationPartsAdditionnelles({ page, size, search: search || undefined })
+    const data = (resp as any).data ?? (resp as any)
+
+    rowsSupp.value = Array.isArray(data.content) ? data.content : []
+    currentPageSupp.value = data.page ?? 0
+    pageSizeSupp.value = data.size ?? 20
+    totalElementsSupp.value = data.totalElements ?? 0
+    totalPagesSupp.value = data.totalPages ?? 0
+  } catch (e: any) {
+    errorSupp.value = e?.message ?? 'Une erreur est survenue lors du chargement.'
+  } finally {
+    loadingSupp.value = false
+  }
+}
+
+// Pagination navigation for cooperateurs
+function goToPage(page: number) {
+  if (page >= 0 && page < totalPages.value) {
+    loadCooperateurs(page, pageSize.value, query.value)
+  }
+}
+
+function changePageSize(size: number) {
+  pageSize.value = size
+  loadCooperateurs(0, size, query.value)
+}
+
+// Pagination navigation for parts supplementaires
+function goToPageSupp(page: number) {
+  if (page >= 0 && page < totalPagesSupp.value) {
+    loadSouscriptionsSupplementaires(page, pageSizeSupp.value, querySupp.value)
+  }
+}
+
+function changePageSizeSupp(size: number) {
+  pageSizeSupp.value = size
+  loadSouscriptionsSupplementaires(0, size, querySupp.value)
+}
+
+// Debounced search handlers
+const debouncedSearchCooperateurs = debounce(() => {
+  loadCooperateurs(0, pageSize.value, query.value)
+}, 300)
+
+const debouncedSearchSupp = debounce(() => {
+  loadSouscriptionsSupplementaires(0, pageSizeSupp.value, querySupp.value)
+}, 300)
+
+// Watch search queries for debounced search
+watch(query, () => {
+  debouncedSearchCooperateurs()
+})
+
+watch(querySupp, () => {
+  debouncedSearchSupp()
+})
 
 function openBinomeModal(binome: BinomeDTO) {
   selectedBinome.value = binome
@@ -430,57 +583,11 @@ function statusClass(v?: CooperateurStatus) {
   }
 }
 
-const filteredRows = computed(() => {
-  const q = query.value.trim().toLowerCase()
-  if (!q) return rows.value
-  return rows.value.filter((r) => {
-    const values = [
-      r.id,
-      r.genre,
-      r.prenom,
-      r.nom,
-      r.telephone,
-      r.email,
-      r.adresse,
-      r.ville,
-      r.codePostal,
-      r.etudiantOuMinimasSociaux,
-      r.nombreDePersonnesDansLeFoyer,
-      r.parts,
-      r.partsDeSoutien,
-      r.acceptationDesStatus,
-      r.status,
-    ]
-      .map(safeString)
-      .join(' ') // space separated tokens
-      .toLowerCase()
-    return values.includes(q)
-  })
-})
-
-const filteredRowsSupp = computed(() => {
-  const q = querySupp.value.trim().toLowerCase()
-  if (!q) return rowsSupp.value
-  return rowsSupp.value.filter((r) => {
-    const values = [
-      r.id,
-      r.prenom,
-      r.nom,
-      r.email,
-      r.partsSupplementaires,
-      r.status,
-    ]
-      .map(safeString)
-      .join(' ')
-      .toLowerCase()
-    return values.includes(q)
-  })
-})
-
+// Client-side sorting (server already filters and paginates)
 const sortedRows = computed(() => {
   const key = sortKey.value
   const dir = sortDir.value
-  const arr = [...filteredRows.value]
+  const arr = [...rows.value]
   arr.sort((a: any, b: any) => {
     const va = a?.[key]
     const vb = b?.[key]
@@ -496,7 +603,7 @@ const sortedRows = computed(() => {
 const sortedRowsSupp = computed(() => {
   const key = sortKeySupp.value
   const dir = sortDirSupp.value
-  const arr = [...filteredRowsSupp.value]
+  const arr = [...rowsSupp.value]
   arr.sort((a: any, b: any) => {
     const va = a?.[key]
     const vb = b?.[key]
@@ -510,28 +617,8 @@ const sortedRowsSupp = computed(() => {
 })
 
 onMounted(async () => {
-  // Load cooperateurs
-  try {
-    loading.value = true
-    const resp = await api.getApiV1AdministrationCooperateurs()
-    const data = (resp as any).data ?? (resp as any)
-    rows.value = Array.isArray(data) ? data : []
-  } catch (e: any) {
-    error.value = e?.message ?? 'Une erreur est survenue lors du chargement.'
-  } finally {
-    loading.value = false
-  }
-
-  try {
-    loadingSupp.value = true
-    const resp = await api.getApiV1AdministrationPartsAdditionnelles()
-    const data = (resp as any).data ?? (resp as any)
-    rowsSupp.value = Array.isArray(data) ? data : []
-  } catch (e: any) {
-    errorSupp.value = e?.message ?? 'Une erreur est survenue lors du chargement.'
-  } finally {
-    loadingSupp.value = false
-  }
+  await loadCooperateurs(0, pageSize.value)
+  await loadSouscriptionsSupplementaires(0, pageSizeSupp.value)
 })
 </script>
 
@@ -766,5 +853,52 @@ td { padding: .5rem .5rem; border-bottom: 1px solid #f3f4f6; }
 
 .tab.active .tab-count {
   background: rgba(0, 0, 0, 0.08);
+}
+
+/* Pagination controls */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 1rem;
+}
+
+.pagination-btn {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  padding: 0 1rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.page-size-select {
+  padding: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-left: 1rem;
 }
 </style>

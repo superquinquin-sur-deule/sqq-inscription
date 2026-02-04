@@ -36,10 +36,16 @@ public class WebUITest {
     @BeforeAll
     public static void setup() throws StripeException, URISyntaxException {
         Stripe mockedStripe = Mockito.mock(Stripe.class);
-        Mockito.when(mockedStripe.paySouscription(ArgumentMatchers.any())).thenReturn(new URI("http://localhost:8081/success"));
+        Mockito.when(mockedStripe.paySouscription(ArgumentMatchers.any())).thenAnswer(invocation -> {
+            Cooperateur cooperateur = invocation.getArgument(0);
+            return new URI("http://localhost:8081/payment-result?uuid=" + cooperateur.uuid);
+        });
         Mockito.when(mockedStripe.hasPaid(ArgumentMatchers.any())).thenReturn(true);
-        Mockito.when(mockedStripe.paySouscriptionSupplementaire(ArgumentMatchers.any())).thenReturn(new URI("http://localhost:8081/parts-supplementaires-success"));
-    
+        Mockito.when(mockedStripe.paySouscriptionSupplementaire(ArgumentMatchers.any())).thenAnswer(invocation -> {
+            SouscriptionSupplementaire souscription = invocation.getArgument(0);
+            return new URI("http://localhost:8081/payment-result?uuid=" + souscription.uuid + "&type=supplementaire");
+        });
+
         Mockito.when(mockedStripe.hasPaidSouscriptionSupplementaire(ArgumentMatchers.any())).thenReturn(true);
         QuarkusMock.installMockForType(mockedStripe, Stripe.class);
     }

@@ -3,20 +3,16 @@ import { createRouter, createWebHistory } from 'vue-router'
 import './style.css'
 import App from './App.vue'
 import Registration from "./views/Registration.vue";
-import SuccessfulRegistration from "./views/SuccessfulRegistration.vue";
 import AdminCooperateurs from "./views/AdminCooperateurs.vue";
 import PartsSupplementaires from "./views/PartsSupplementaires.vue";
-import SuccessfulPartsSupplementaires from "./views/SuccessfulPartsSupplementaires.vue";
-import RetryPayment from "./views/RetryPayment.vue";
+import PaymentResult from "./views/PaymentResult.vue";
 
 
 const routes = [
     { path: '/', component: Registration },
-    { path: '/success', component: SuccessfulRegistration },
+    { path: '/payment-result', component: PaymentResult },
     { path: '/admin', component: AdminCooperateurs },
     { path: '/parts-supplementaires', component: PartsSupplementaires },
-    { path: '/parts-supplementaires-success', component: SuccessfulPartsSupplementaires },
-    { path: '/retry-payment', component: RetryPayment },
 ]
 
 const router = createRouter({

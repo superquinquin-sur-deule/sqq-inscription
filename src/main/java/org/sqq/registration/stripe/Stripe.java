@@ -28,8 +28,8 @@ public class Stripe {
         SessionCreateParams params =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setSuccessUrl(stripeConfiguration.redirectDomain() + "/success?uuid=" + cooperateur.uuid)
-                        .setCancelUrl(stripeConfiguration.redirectDomain() + "/retry-payment?uuid=" + cooperateur.uuid)
+                        .setSuccessUrl(stripeConfiguration.redirectDomain() + "/payment-result?uuid=" + cooperateur.uuid)
+                        .setCancelUrl(stripeConfiguration.redirectDomain() + "/payment-result?uuid=" + cooperateur.uuid)
                         .setCustomerEmail(cooperateur.email)
                         .setLocale(SessionCreateParams.Locale.FR)
                         .setCurrency("eur")
@@ -65,8 +65,8 @@ public class Stripe {
         SessionCreateParams params =
                 SessionCreateParams.builder()
                         .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setSuccessUrl(stripeConfiguration.redirectDomain() + "/parts-supplementaires-success?uuid=" + souscription.uuid)
-                        .setCancelUrl(stripeConfiguration.redirectDomain() + "/retry-payment?uuid=" + souscription.uuid + "&type=supplementaire")
+                        .setSuccessUrl(stripeConfiguration.redirectDomain() + "/payment-result?uuid=" + souscription.uuid + "&type=supplementaire")
+                        .setCancelUrl(stripeConfiguration.redirectDomain() + "/payment-result?uuid=" + souscription.uuid + "&type=supplementaire")
                         .setCustomerEmail(souscription.email)
                         .setLocale(SessionCreateParams.Locale.FR)
                         .setCurrency("eur")

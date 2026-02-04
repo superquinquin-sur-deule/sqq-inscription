@@ -16,3 +16,7 @@ export * from "./postApiV1PartsSupplementairesBody";
 export * from "./postApiV1RegistrationsBody";
 export * from "./postApiV1SouscriptionsSupplementairesBody";
 export * from "./souscriptionSupplementaireDTO";
+export * from "./getApiV1AdministrationCooperateursParams";
+export * from "./getApiV1AdministrationPartsAdditionnellesParams";
+export * from "./pageDTOCooperateurDTO";
+export * from "./pageDTOSouscriptionSupplementaireDTO";
