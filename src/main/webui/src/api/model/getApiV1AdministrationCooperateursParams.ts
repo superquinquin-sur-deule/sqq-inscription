@@ -4,9 +4,8 @@
  * sqq-inscription API
  * OpenAPI spec version: 1.2.1-SNAPSHOT
  */
+import type { CooperateurStatus } from "./cooperateurStatus";
 
 export type GetApiV1AdministrationCooperateursParams = {
-  page?: number;
-  size?: number;
-  search?: string;
+  statuses?: CooperateurStatus[];
 };

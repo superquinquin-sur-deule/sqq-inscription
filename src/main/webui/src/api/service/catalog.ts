@@ -11,10 +11,9 @@ import type {
   CooperateurDTO,
   GetApiV1AdministrationCooperateursParams,
   GetApiV1AdministrationPartsAdditionnellesParams,
-  PageDTOCooperateurDTO,
-  PageDTOSouscriptionSupplementaireDTO,
   PostApiV1PartsSupplementairesBody,
   PostApiV1RegistrationsBody,
+  SouscriptionSupplementaireDTO,
 } from "../model";
 
 export const getSqqInscriptionAPI = () => {
@@ -22,7 +21,7 @@ export const getSqqInscriptionAPI = () => {
    * @summary List
    */
   const getApiV1AdministrationCooperateurs = <
-    TData = AxiosResponse<PageDTOCooperateurDTO>,
+    TData = AxiosResponse<CooperateurDTO[]>,
   >(
     params?: GetApiV1AdministrationCooperateursParams,
     options?: AxiosRequestConfig,
@@ -49,6 +48,22 @@ export const getSqqInscriptionAPI = () => {
   };
 
   /**
+   * @summary Archive Cooperateur
+   */
+  const postApiV1AdministrationCooperateursIdArchive = <
+    TData = AxiosResponse<unknown>,
+  >(
+    id: number,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    return axios.default.post(
+      `/api/v1/administration/cooperateurs/${id}/archive`,
+      undefined,
+      options,
+    );
+  };
+
+  /**
    * @summary Mark As Processed
    */
   const postApiV1AdministrationCooperateursIdProcess = <
@@ -68,7 +83,7 @@ export const getSqqInscriptionAPI = () => {
    * @summary List Souscriptions Supplementaires
    */
   const getApiV1AdministrationPartsAdditionnelles = <
-    TData = AxiosResponse<PageDTOSouscriptionSupplementaireDTO>,
+    TData = AxiosResponse<SouscriptionSupplementaireDTO[]>,
   >(
     params?: GetApiV1AdministrationPartsAdditionnellesParams,
     options?: AxiosRequestConfig,
@@ -77,6 +92,22 @@ export const getSqqInscriptionAPI = () => {
       ...options,
       params: { ...params, ...options?.params },
     });
+  };
+
+  /**
+   * @summary Archive Souscription Supplementaire
+   */
+  const postApiV1AdministrationPartsAdditionnellesIdArchive = <
+    TData = AxiosResponse<unknown>,
+  >(
+    id: number,
+    options?: AxiosRequestConfig,
+  ): Promise<TData> => {
+    return axios.default.post(
+      `/api/v1/administration/parts-additionnelles/${id}/archive`,
+      undefined,
+      options,
+    );
   };
 
   /**
@@ -335,8 +366,10 @@ export const getSqqInscriptionAPI = () => {
   return {
     getApiV1AdministrationCooperateurs,
     getApiV1AdministrationCooperateursId,
+    postApiV1AdministrationCooperateursIdArchive,
     postApiV1AdministrationCooperateursIdProcess,
     getApiV1AdministrationPartsAdditionnelles,
+    postApiV1AdministrationPartsAdditionnellesIdArchive,
     postApiV1AdministrationPartsAdditionnellesIdProcess,
     postApiV1PartsSupplementaires,
     postApiV1PartsSupplementairesSuccessUuid,
@@ -348,14 +381,20 @@ export const getSqqInscriptionAPI = () => {
     getApiV1RetryPaymentSouscriptionUuid,
   };
 };
-export type GetApiV1AdministrationCooperateursResult =
-  AxiosResponse<PageDTOCooperateurDTO>;
+export type GetApiV1AdministrationCooperateursResult = AxiosResponse<
+  CooperateurDTO[]
+>;
 export type GetApiV1AdministrationCooperateursIdResult =
   AxiosResponse<CooperateurDTO>;
+export type PostApiV1AdministrationCooperateursIdArchiveResult =
+  AxiosResponse<unknown>;
 export type PostApiV1AdministrationCooperateursIdProcessResult =
   AxiosResponse<unknown>;
-export type GetApiV1AdministrationPartsAdditionnellesResult =
-  AxiosResponse<PageDTOSouscriptionSupplementaireDTO>;
+export type GetApiV1AdministrationPartsAdditionnellesResult = AxiosResponse<
+  SouscriptionSupplementaireDTO[]
+>;
+export type PostApiV1AdministrationPartsAdditionnellesIdArchiveResult =
+  AxiosResponse<unknown>;
 export type PostApiV1AdministrationPartsAdditionnellesIdProcessResult =
   AxiosResponse<unknown>;
 export type PostApiV1PartsSupplementairesResult = AxiosResponse<unknown>;

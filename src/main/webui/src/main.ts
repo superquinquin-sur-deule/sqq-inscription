@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
+import './api/axiosInstance' // Configure axios before any API calls
 import './style.css'
 import App from './App.vue'
 import Registration from "./views/Registration.vue";
