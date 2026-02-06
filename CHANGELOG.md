@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.0 (2026-02-06)
+
+## What's Changed
+* feat: remove matrix notification by @lucas-dclrcq in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/63
+* chore(main): release 1.4.1-SNAPSHOT by @lucas-dclrcq in https://github.com/superquinquin-sur-deule/sqq-inscription/pull/62
+
+
+**Full Changelog**: https://github.com/superquinquin-sur-deule/sqq-inscription/compare/v1.4.0...v1.5.0
+
 ## 1.4.0 (2026-02-04)
 
 ## What's Changed
