@@ -1,35 +1,175 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color-scheme: light;
-  --accent: #f1dc43;
-  --bg: white;
-  color: #1f2937;
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import "tailwindcss";
+
+/* Custom theme configuration using Tailwind CSS 4 syntax */
+@theme {
+   
+    /* Colors */
+    --color-text: #1f2937;
+    --color-text-dark: #111827;
+    --color-muted: #6b7280;
+    --color-error: #b3261e;
+    --color-error-red: #dc2626;
+    --color-error-bg: #fef2f2;
+    --color-req: #8a7a00;
+
+    --color-bg: #f6f7fb;
+    --color-bg-alt: #efefee;
+    --color-surface: #ffffff;
+    --color-surface-hover: #fcfcfe;
+    --color-surface-light: #fbfbfe;
+    --color-surface-dark: #fdfdfd;
+    --color-surface-gray: #f9fafb;
+
+    --color-border: #e6e8ee;
+    --color-border-gray: #e5e7eb;
+    --color-border-light: #f3f4f6;
+
+    --color-accent: #f1dc43;
+    --color-accent-dark: #d8c237;
+    --color-accent-light: #ffe66b;
+    --color-accent-pale: #ffe873;
+    --color-accent-contrast: #111827;
+
+    /* Status colors (Admin page) */
+    --color-status-pending-bg: #ffedd5;
+    --color-status-pending-text: #9a3412;
+    --color-status-paid-bg: #fef9c3;
+    --color-status-paid-text: #854d0e;
+    --color-status-processed-bg: #dcfce7;
+    --color-status-processed-text: #166534;
+    --color-status-archived-bg: #e5e7eb;
+    --color-status-archived-text: #6b7280;
+
+    /* Action button colors */
+    --color-action-green: #10b981;
+    --color-action-green-hover: #059669;
+    --color-action-orange: #f59e0b;
+    --color-action-orange-hover: #d97706;
+    --color-action-gray: #6b7280;
+    --color-action-gray-hover: #4b5563;
+    --color-binome-bg: #dbeafe;
+    --color-binome-text: #1d4ed8;
+    --color-binome-hover: #bfdbfe;
+
+    /* Tab colors */
+    --color-tab-bg: #e5e7eb;
+    --color-tab-text: #374151;
+    --color-tab-hover: #d1d5db;
+
+    /* Fonts */
+    --font-family-sans: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+
+    /* Border radius */
+    --radius-input: 12px;
+    --radius-container: 10px;
+    --radius-section: 8px;
+    --radius-btn: 12px;
+    --radius-full: 999px;
+
+    /* Shadows */
+    --shadow-card: 0 10px 30px rgba(16, 24, 40, 0.06);
+    --shadow-option: 0 4px 18px rgba(16, 24, 40, 0.04);
+    --shadow-btn: 0 8px 24px rgba(241, 220, 67, 0.35);
+    --shadow-btn-hover: 0 10px 28px rgba(241, 220, 67, 0.45);
+    --shadow-stepper: 0 6px 18px rgba(241, 220, 67, 0.35);
+    --shadow-stepper-hover: 0 8px 22px rgba(241, 220, 67, 0.45);
+    --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-tab-active: 0 -2px 8px rgba(0, 0, 0, 0.05);
 }
 
-html, body { height: 100%; }
+/* Base styles that apply globally */
+@layer base {
+    html, body {
+        height: 100%;
+    }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background:
-    radial-gradient(800px 200px at -10% -20%, rgba(241,220,67,0.10), transparent),
-    radial-gradient(800px 200px at 110% -30%, rgba(241,220,67,0.08), transparent),
-    var(--bg);
+    body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+        line-height: 1.5;
+        color-scheme: light;
+        color: var(--color-text);
+        background: radial-gradient(800px 200px at -10% -20%, rgba(241, 220, 67, 0.10), transparent),
+        radial-gradient(800px 200px at 110% -30%, rgba(241, 220, 67, 0.08), transparent),
+        white;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    #app {
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+    button {
+        font-family: inherit;
+    }
+
+    input[type="radio"], input[type="checkbox"] {
+        accent-color: var(--color-accent);
+    }
 }
 
-#app {
-  margin: 0 auto;
-  padding: 1rem;
+/* Component styles - outside @layer for proper specificity */
+
+/* Stepper input - hide number spinners */
+.stepper-input {
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
-a { color: inherit; text-decoration: none; }
+.stepper-input::-webkit-outer-spin-button,
+.stepper-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 
-button { font-family: inherit; }
+/* Yellow accent gradient bar for options */
+.option-accent-bar {
+    position: relative;
+    overflow: visible;
+}
+
+.option-accent-bar::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: -1px;
+    bottom: -1px;
+    width: 5px;
+    background: linear-gradient(180deg, #f1dc43, #ffe873);
+    border-radius: 2px 0 0 2px;
+}
+
+/* Section header decorative bar */
+.section-title-bar::after {
+    content: '';
+    display: inline-block;
+    width: 44px;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #f1dc43, #ffe66b);
+}
+
+/* Input focus ring */
+.input-focus-accent:focus {
+    outline: none;
+    border-color: #f1dc43;
+    box-shadow: 0 0 0 4px rgba(241, 220, 67, 0.35);
+}
+
+/* Option card background gradient */
+.option-gradient {
+    background: linear-gradient(180deg, #ffffff, #fdfdfd);
+    border-radius: 8px;
+}

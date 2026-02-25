@@ -1,67 +1,76 @@
 <template>
-  <main class="container">
-    <header class="header">
-      <div class="brand">
-        <img src="/superquinquin_logo_deule.svg" alt="SuperQuinquin sur Deûle" class="logo" />
-        <div class="brand-text">
-          <h1>Coopérateurs</h1>
-          <p class="subtitle">Administration — liste des coopérateurs enregistrés</p>
+  <main class="bg-bg-alt w-full max-w-none m-0 py-8 px-4 text-text rounded-none">
+    <header class="py-4 px-5 mb-4">
+      <div class="flex items-center gap-4">
+        <img src="/superquinquin_logo_deule.svg" alt="SuperQuinquin sur Deûle" class="h-[72px]" />
+        <div class="flex flex-col">
+          <h1 class="m-0 mb-[0.35rem] text-3xl font-semibold">Coopérateurs</h1>
+          <p class="text-sm text-muted m-0">Administration — liste des coopérateurs enregistrés</p>
         </div>
       </div>
     </header>
 
-    <div class="tabs">
+    <div class="flex gap-2 mb-4">
       <button
-        class="tab"
-        :class="{ active: activeTab === 'inscriptions' }"
+        class="py-3 px-5 border-none bg-tab-bg text-tab-text text-[0.95rem] font-semibold rounded-section cursor-pointer transition-all duration-200 flex items-center gap-2 hover:bg-tab-hover"
+        :class="{ 'bg-white text-text shadow-tab-active': activeTab === 'inscriptions' }"
         @click="activeTab = 'inscriptions'"
       >
         Souscriptions
-        <span class="tab-count">{{ totalElements }}</span>
+        <span class="inline-flex items-center justify-center min-w-[1.5rem] h-6 px-[0.4rem] bg-black/10 rounded-full text-sm font-bold" :class="{ 'bg-black/[0.08]': activeTab === 'inscriptions' }">{{ totalElements }}</span>
       </button>
       <button
-        class="tab"
-        :class="{ active: activeTab === 'supplementaires' }"
+        class="py-3 px-5 border-none bg-tab-bg text-tab-text text-[0.95rem] font-semibold rounded-section cursor-pointer transition-all duration-200 flex items-center gap-2 hover:bg-tab-hover"
+        :class="{ 'bg-white text-text shadow-tab-active': activeTab === 'supplementaires' }"
         @click="activeTab = 'supplementaires'"
       >
         Parts supplémentaires
-        <span class="tab-count">{{ totalElementsSupp }}</span>
+        <span class="inline-flex items-center justify-center min-w-[1.5rem] h-6 px-[0.4rem] bg-black/10 rounded-full text-sm font-bold" :class="{ 'bg-black/[0.08]': activeTab === 'supplementaires' }">{{ totalElementsSupp }}</span>
       </button>
     </div>
 
-    <section class="section" v-show="activeTab === 'inscriptions'">
-      <div class="toolbar">
+    <section class="bg-white border border-border rounded-section p-4" v-show="activeTab === 'inscriptions'">
+      <div class="flex items-center gap-3 mb-3 flex-wrap">
         <input
           v-model="query"
           type="search"
           placeholder="Rechercher (nom, prénom, email)"
-          class="search"
+          class="flex-1 py-2 px-3 border border-border-gray rounded-section"
         />
-        <div class="status-filter">
-          <span class="filter-label">Statut:</span>
-          <label v-for="status in allStatuses" :key="status" class="status-checkbox">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-sm text-muted whitespace-nowrap">Statut:</span>
+          <label v-for="status in allStatuses" :key="status" class="flex items-center gap-1 cursor-pointer">
             <input
               type="checkbox"
               :value="status"
               v-model="selectedStatuses"
               @change="loadCooperateurs(0, pageSize)"
+              class="cursor-pointer"
             />
-            <span class="status" :class="statusClass(status)">{{ format(status) }}</span>
+            <span
+              class="inline-block py-1.5 px-2 rounded-sm text-sm font-semibold leading-[1.2]"
+              :class="{
+                'bg-status-pending-bg text-status-pending-text': status === 'PAYMENT_PENDING',
+                'bg-status-paid-bg text-status-paid-text': status === 'PAID',
+                'bg-status-processed-bg text-status-processed-text': status === 'PROCESSED',
+                'bg-status-archived-bg text-status-archived-text': status === 'ARCHIVED'
+              }"
+            >{{ format(status) }}</span>
           </label>
         </div>
-        <span class="meta" v-if="!loading && !error">{{ totalElements }} résultat(s)</span>
+        <span class="text-muted text-sm" v-if="!loading && !error">{{ totalElements }} résultat(s)</span>
       </div>
 
-      <div v-if="loading" class="state">Chargement…</div>
-      <div v-else-if="error" class="state error">{{ error }}</div>
+      <div v-if="loading" class="p-4 text-tab-text">Chargement…</div>
+      <div v-else-if="error" class="p-4 text-red-700">{{ error }}</div>
 
-      <div v-else class="table-wrapper">
-        <table class="table">
+      <div v-else class="overflow-auto">
+        <table class="w-full border-collapse">
           <thead>
             <tr>
-              <th v-for="col in columns" :key="col.key" @click="toggleSort(col.key)" :class="['th', sortableClass(col.key)]">
+              <th v-for="col in columns" :key="col.key" @click="toggleSort(col.key)" class="sticky top-0 bg-surface-gray text-left py-2 px-2 border-b border-border-gray cursor-pointer select-none whitespace-nowrap hover:bg-gray-100">
                 <span>{{ col.label }}</span>
-                <span class="sort-icon" aria-hidden="true" v-if="sortKey === col.key">
+                <span class="ml-[0.35rem] text-xs text-muted" aria-hidden="true" v-if="sortKey === col.key">
                   {{ sortDir === 'asc' ? '▲' : '▼' }}
                 </span>
               </th>
@@ -69,46 +78,54 @@
           </thead>
           <tbody>
             <tr v-for="row in sortedRows" :key="row.id">
-              <td>{{ row.id }}</td>
-              <td>{{ format(row.genre) }}</td>
-              <td>{{ row.prenom }}</td>
-              <td>{{ row.nom }}</td>
-              <td>{{ row.email }}</td>
-              <td>{{ row.telephone }}</td>
-              <td>{{ row.adresse }}</td>
-              <td>{{ row.codePostal }}</td>
-              <td>{{ row.ville }}</td>
-              <td>{{ yesNo(row.etudiantOuMinimasSociaux) }}</td>
-              <td>{{ row.nombreDePersonnesDansLeFoyer }}</td>
-              <td>{{ row.parts }}</td>
-              <td>{{ row.partsDeSoutien }}</td>
-              <td>{{ yesNo(row.acceptationDesStatus) }}</td>
-              <td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.id }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ format(row.genre) }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.prenom }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.nom }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.email }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.telephone }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.adresse }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.codePostal }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.ville }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ yesNo(row.etudiantOuMinimasSociaux) }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.nombreDePersonnesDansLeFoyer }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.parts }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.partsDeSoutien }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ yesNo(row.acceptationDesStatus) }}</td>
+              <td class="py-2 px-2 border-b border-border-light">
                 <button
                     v-if="row.binome"
-                    class="binome-btn"
+                    class="bg-binome-bg text-binome-text border-none py-1 px-[0.6rem] rounded cursor-pointer text-sm font-medium hover:bg-binome-hover"
                     @click="openBinomeModal(row.binome)"
                 >
                   Oui
                 </button>
-                <span v-else class="no-binome">Non</span>
+                <span v-else class="text-gray-400">Non</span>
               </td>
-              <td>
-                <span class="status" :class="statusClass(row.status)">{{ format(row.status) }}</span>
+              <td class="py-2 px-2 border-b border-border-light">
+                <span
+                  class="inline-block py-1 px-2 rounded-sm text-sm font-semibold leading-[1.2]"
+                  :class="{
+                    'bg-status-pending-bg text-status-pending-text': row.status === 'PAYMENT_PENDING',
+                    'bg-status-paid-bg text-status-paid-text': row.status === 'PAID',
+                    'bg-status-processed-bg text-status-processed-text': row.status === 'PROCESSED',
+                    'bg-status-archived-bg text-status-archived-text': row.status === 'ARCHIVED'
+                  }"
+                >{{ format(row.status) }}</span>
               </td>
-              <td>{{ formatDate(row.createdAt) }}</td>
-              <td>{{ formatDate(row.updatedAt) }}</td>
-              <td>
+              <td class="py-2 px-2 border-b border-border-light">{{ formatDate(row.createdAt) }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ formatDate(row.updatedAt) }}</td>
+              <td class="py-2 px-2 border-b border-border-light">
                 <button
                   v-if="row.status === 'PAYMENT_PENDING'"
-                  class="copy-btn"
+                  class="bg-action-orange text-white border-none py-[0.35rem] px-3 rounded cursor-pointer text-sm font-medium whitespace-nowrap hover:bg-action-orange-hover"
                   @click="copyRetryLink(row)"
                 >
                   {{ copiedId === row.id ? 'Copie !' : 'Copier lien' }}
                 </button>
                 <button
                   v-if="row.status === 'PAYMENT_PENDING'"
-                  class="archive-btn"
+                  class="bg-action-gray text-white border-none py-[0.35rem] px-3 rounded cursor-pointer text-sm font-medium whitespace-nowrap ml-1 hover:bg-action-gray-hover disabled:opacity-60 disabled:cursor-not-allowed"
                   @click="archiveCooperateur(row)"
                   :disabled="archiving === row.id"
                 >
@@ -116,7 +133,7 @@
                 </button>
                 <button
                   v-if="row.status === 'PAID'"
-                  class="action-btn"
+                  class="bg-action-green text-white border-none py-[0.35rem] px-3 rounded cursor-pointer text-sm font-medium whitespace-nowrap hover:bg-action-green-hover disabled:opacity-60 disabled:cursor-not-allowed"
                   @click="markAsProcessed(row)"
                   :disabled="processing === row.id"
                 >
@@ -128,23 +145,23 @@
         </table>
 
         <!-- Pagination controls -->
-        <div class="pagination" v-if="totalPages > 1">
-          <button class="pagination-btn" @click="goToPage(0)" :disabled="currentPage === 0">
+        <div class="flex items-center justify-center gap-2 py-4 border-t border-border-gray mt-4" v-if="totalPages > 1">
+          <button class="py-2 px-3 border border-border-gray bg-white rounded cursor-pointer text-sm transition-all duration-200 hover:bg-surface-gray hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" @click="goToPage(0)" :disabled="currentPage === 0">
             &laquo;
           </button>
-          <button class="pagination-btn" @click="goToPage(currentPage - 1)" :disabled="currentPage === 0">
+          <button class="py-2 px-3 border border-border-gray bg-white rounded cursor-pointer text-sm transition-all duration-200 hover:bg-surface-gray hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" @click="goToPage(currentPage - 1)" :disabled="currentPage === 0">
             &lsaquo;
           </button>
-          <span class="pagination-info">
+          <span class="px-4 text-muted text-sm">
             Page {{ currentPage + 1 }} sur {{ totalPages }}
           </span>
-          <button class="pagination-btn" @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages - 1">
+          <button class="py-2 px-3 border border-border-gray bg-white rounded cursor-pointer text-sm transition-all duration-200 hover:bg-surface-gray hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages - 1">
             &rsaquo;
           </button>
-          <button class="pagination-btn" @click="goToPage(totalPages - 1)" :disabled="currentPage >= totalPages - 1">
+          <button class="py-2 px-3 border border-border-gray bg-white rounded cursor-pointer text-sm transition-all duration-200 hover:bg-surface-gray hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" @click="goToPage(totalPages - 1)" :disabled="currentPage >= totalPages - 1">
             &raquo;
           </button>
-          <select :value="pageSize" @change="changePageSize(Number(($event.target as HTMLSelectElement).value))" class="page-size-select">
+          <select :value="pageSize" @change="changePageSize(Number(($event.target as HTMLSelectElement).value))" class="py-2 px-2 border border-border-gray rounded bg-white text-sm cursor-pointer ml-4">
             <option :value="10">10 / page</option>
             <option :value="20">20 / page</option>
             <option :value="50">50 / page</option>
@@ -154,39 +171,48 @@
       </div>
     </section>
 
-    <section class="section" v-show="activeTab === 'supplementaires'">
-      <div class="toolbar">
+    <section class="bg-white border border-border rounded-section p-4" v-show="activeTab === 'supplementaires'">
+      <div class="flex items-center gap-3 mb-3 flex-wrap">
         <input
           v-model="querySupp"
           type="search"
           placeholder="Rechercher (nom, prénom, email)"
-          class="search"
+          class="flex-1 py-2 px-3 border border-border-gray rounded-section"
         />
-        <div class="status-filter">
-          <span class="filter-label">Statut:</span>
-          <label v-for="status in allStatuses" :key="status" class="status-checkbox">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-sm text-muted whitespace-nowrap">Statut:</span>
+          <label v-for="status in allStatuses" :key="status" class="flex items-center gap-1 cursor-pointer">
             <input
               type="checkbox"
               :value="status"
               v-model="selectedStatusesSupp"
               @change="loadSouscriptionsSupplementaires(0, pageSizeSupp)"
+              class="cursor-pointer"
             />
-            <span class="status" :class="statusClass(status)">{{ format(status) }}</span>
+            <span
+              class="inline-block py-1 px-2 rounded-sm text-sm font-semibold leading-[1.2]"
+              :class="{
+                'bg-status-pending-bg text-status-pending-text': status === 'PAYMENT_PENDING',
+                'bg-status-paid-bg text-status-paid-text': status === 'PAID',
+                'bg-status-processed-bg text-status-processed-text': status === 'PROCESSED',
+                'bg-status-archived-bg text-status-archived-text': status === 'ARCHIVED'
+              }"
+            >{{ format(status) }}</span>
           </label>
         </div>
-        <span class="meta" v-if="!loadingSupp && !errorSupp">{{ totalElementsSupp }} résultat(s)</span>
+        <span class="text-muted text-sm" v-if="!loadingSupp && !errorSupp">{{ totalElementsSupp }} résultat(s)</span>
       </div>
 
-      <div v-if="loadingSupp" class="state">Chargement…</div>
-      <div v-else-if="errorSupp" class="state error">{{ errorSupp }}</div>
+      <div v-if="loadingSupp" class="p-4 text-tab-text">Chargement…</div>
+      <div v-else-if="errorSupp" class="p-4 text-red-700">{{ errorSupp }}</div>
 
-      <div v-else class="table-wrapper">
-        <table class="table">
+      <div v-else class="overflow-auto">
+        <table class="w-full border-collapse">
           <thead>
             <tr>
-              <th v-for="col in columnsSupp" :key="col.key" @click="toggleSortSupp(col.key)" :class="['th', sortableClassSupp(col.key)]">
+              <th v-for="col in columnsSupp" :key="col.key" @click="toggleSortSupp(col.key)" class="sticky top-0 bg-surface-gray text-left py-2 px-2 border-b border-border-gray cursor-pointer select-none whitespace-nowrap hover:bg-gray-100">
                 <span>{{ col.label }}</span>
-                <span class="sort-icon" aria-hidden="true" v-if="sortKeySupp === col.key">
+                <span class="ml-[0.35rem] text-xs text-muted" aria-hidden="true" v-if="sortKeySupp === col.key">
                   {{ sortDirSupp === 'asc' ? '▲' : '▼' }}
                 </span>
               </th>
@@ -194,28 +220,36 @@
           </thead>
           <tbody>
             <tr v-for="row in sortedRowsSupp" :key="row.id">
-              <td>{{ row.id }}</td>
-              <td>{{ row.prenom }}</td>
-              <td>{{ row.nom }}</td>
-              <td>{{ row.email }}</td>
-              <td>{{ row.partsSupplementaires }}</td>
-              <td>{{ (row.partsSupplementaires || 0) * 10 }} €</td>
-              <td>
-                <span class="status" :class="statusClass(row.status)">{{ format(row.status) }}</span>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.id }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.prenom }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.nom }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.email }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ row.partsSupplementaires }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ (row.partsSupplementaires || 0) * 10 }} €</td>
+              <td class="py-2 px-2 border-b border-border-light">
+                <span
+                  class="inline-block py-1 px-2 rounded-sm text-sm font-semibold leading-[1.2]"
+                  :class="{
+                    'bg-status-pending-bg text-status-pending-text': row.status === 'PAYMENT_PENDING',
+                    'bg-status-paid-bg text-status-paid-text': row.status === 'PAID',
+                    'bg-status-processed-bg text-status-processed-text': row.status === 'PROCESSED',
+                    'bg-status-archived-bg text-status-archived-text': row.status === 'ARCHIVED'
+                  }"
+                >{{ format(row.status) }}</span>
               </td>
-              <td>{{ formatDate(row.createdAt) }}</td>
-              <td>{{ formatDate(row.updatedAt) }}</td>
-              <td>
+              <td class="py-2 px-2 border-b border-border-light">{{ formatDate(row.createdAt) }}</td>
+              <td class="py-2 px-2 border-b border-border-light">{{ formatDate(row.updatedAt) }}</td>
+              <td class="py-2 px-2 border-b border-border-light">
                 <button
                   v-if="row.status === 'PAYMENT_PENDING'"
-                  class="copy-btn"
+                  class="bg-action-orange text-white border-none py-[0.35rem] px-3 rounded cursor-pointer text-sm font-medium whitespace-nowrap hover:bg-action-orange-hover"
                   @click="copyRetryLinkSupp(row)"
                 >
                   {{ copiedIdSupp === row.id ? 'Copie !' : 'Copier lien' }}
                 </button>
                 <button
                   v-if="row.status === 'PAYMENT_PENDING'"
-                  class="archive-btn"
+                  class="bg-action-gray text-white border-none py-[0.35rem] px-3 rounded cursor-pointer text-sm font-medium whitespace-nowrap ml-1 hover:bg-action-gray-hover disabled:opacity-60 disabled:cursor-not-allowed"
                   @click="archiveSouscriptionSupplementaire(row)"
                   :disabled="archivingSupp === row.id"
                 >
@@ -223,7 +257,7 @@
                 </button>
                 <button
                   v-if="row.status === 'PAID'"
-                  class="action-btn"
+                  class="bg-action-green text-white border-none py-[0.35rem] px-3 rounded cursor-pointer text-sm font-medium whitespace-nowrap hover:bg-action-green-hover disabled:opacity-60 disabled:cursor-not-allowed"
                   @click="markSuppAsProcessed(row)"
                   :disabled="processingSupp === row.id"
                 >
@@ -235,23 +269,23 @@
         </table>
 
         <!-- Pagination controls -->
-        <div class="pagination" v-if="totalPagesSupp > 1">
-          <button class="pagination-btn" @click="goToPageSupp(0)" :disabled="currentPageSupp === 0">
+        <div class="flex items-center justify-center gap-2 py-4 border-t border-border-gray mt-4" v-if="totalPagesSupp > 1">
+          <button class="py-2 px-3 border border-border-gray bg-white rounded cursor-pointer text-sm transition-all duration-200 hover:bg-surface-gray hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" @click="goToPageSupp(0)" :disabled="currentPageSupp === 0">
             &laquo;
           </button>
-          <button class="pagination-btn" @click="goToPageSupp(currentPageSupp - 1)" :disabled="currentPageSupp === 0">
+          <button class="py-2 px-3 border border-border-gray bg-white rounded cursor-pointer text-sm transition-all duration-200 hover:bg-surface-gray hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" @click="goToPageSupp(currentPageSupp - 1)" :disabled="currentPageSupp === 0">
             &lsaquo;
           </button>
-          <span class="pagination-info">
+          <span class="px-4 text-muted text-sm">
             Page {{ currentPageSupp + 1 }} sur {{ totalPagesSupp }}
           </span>
-          <button class="pagination-btn" @click="goToPageSupp(currentPageSupp + 1)" :disabled="currentPageSupp >= totalPagesSupp - 1">
+          <button class="py-2 px-3 border border-border-gray bg-white rounded cursor-pointer text-sm transition-all duration-200 hover:bg-surface-gray hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" @click="goToPageSupp(currentPageSupp + 1)" :disabled="currentPageSupp >= totalPagesSupp - 1">
             &rsaquo;
           </button>
-          <button class="pagination-btn" @click="goToPageSupp(totalPagesSupp - 1)" :disabled="currentPageSupp >= totalPagesSupp - 1">
+          <button class="py-2 px-3 border border-border-gray bg-white rounded cursor-pointer text-sm transition-all duration-200 hover:bg-surface-gray hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed" @click="goToPageSupp(totalPagesSupp - 1)" :disabled="currentPageSupp >= totalPagesSupp - 1">
             &raquo;
           </button>
-          <select :value="pageSizeSupp" @change="changePageSizeSupp(Number(($event.target as HTMLSelectElement).value))" class="page-size-select">
+          <select :value="pageSizeSupp" @change="changePageSizeSupp(Number(($event.target as HTMLSelectElement).value))" class="py-2 px-2 border border-border-gray rounded bg-white text-sm cursor-pointer ml-4">
             <option :value="10">10 / page</option>
             <option :value="20">20 / page</option>
             <option :value="50">50 / page</option>
@@ -262,49 +296,49 @@
     </section>
 
     <!-- Binome Modal -->
-    <div v-if="selectedBinome" class="modal-overlay" @click.self="closeBinomeModal">
-      <div class="modal">
-        <div class="modal-header">
-          <h2>Information du binôme</h2>
-          <button class="modal-close" @click="closeBinomeModal">&times;</button>
+    <div v-if="selectedBinome" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000]" @click.self="closeBinomeModal">
+      <div class="bg-white rounded-section w-[90%] max-w-[480px] max-h-[90vh] overflow-auto shadow-modal">
+        <div class="flex items-center justify-between p-4 px-5 border-b border-border-gray">
+          <h2 class="m-0 text-[1.125rem] font-semibold">Information du binôme</h2>
+          <button class="bg-transparent border-none text-2xl leading-none text-muted cursor-pointer hover:text-text" @click="closeBinomeModal">&times;</button>
         </div>
-        <div class="modal-body">
-          <dl class="binome-details">
-            <div class="detail-row">
-              <dt>Genre</dt>
-              <dd>{{ format(selectedBinome.genre) }}</dd>
+        <div class="p-5">
+          <dl class="m-0">
+            <div class="flex py-2 border-b border-border-light">
+              <dt class="flex-[0_0_140px] font-medium text-muted">Genre</dt>
+              <dd class="m-0 text-text">{{ format(selectedBinome.genre) }}</dd>
             </div>
-            <div class="detail-row">
-              <dt>Prénom</dt>
-              <dd>{{ selectedBinome.prenom }}</dd>
+            <div class="flex py-2 border-b border-border-light">
+              <dt class="flex-[0_0_140px] font-medium text-muted">Prénom</dt>
+              <dd class="m-0 text-text">{{ selectedBinome.prenom }}</dd>
             </div>
-            <div class="detail-row">
-              <dt>Nom</dt>
-              <dd>{{ selectedBinome.nom }}</dd>
+            <div class="flex py-2 border-b border-border-light">
+              <dt class="flex-[0_0_140px] font-medium text-muted">Nom</dt>
+              <dd class="m-0 text-text">{{ selectedBinome.nom }}</dd>
             </div>
-            <div class="detail-row">
-              <dt>Date de naissance</dt>
-              <dd>{{ selectedBinome.dateNaissance || '—' }}</dd>
+            <div class="flex py-2 border-b border-border-light">
+              <dt class="flex-[0_0_140px] font-medium text-muted">Date de naissance</dt>
+              <dd class="m-0 text-text">{{ selectedBinome.dateNaissance || '—' }}</dd>
             </div>
-            <div class="detail-row">
-              <dt>Téléphone</dt>
-              <dd>{{ selectedBinome.telephone || '—' }}</dd>
+            <div class="flex py-2 border-b border-border-light">
+              <dt class="flex-[0_0_140px] font-medium text-muted">Téléphone</dt>
+              <dd class="m-0 text-text">{{ selectedBinome.telephone || '—' }}</dd>
             </div>
-            <div class="detail-row">
-              <dt>Email</dt>
-              <dd>{{ selectedBinome.email || '—' }}</dd>
+            <div class="flex py-2 border-b border-border-light">
+              <dt class="flex-[0_0_140px] font-medium text-muted">Email</dt>
+              <dd class="m-0 text-text">{{ selectedBinome.email || '—' }}</dd>
             </div>
-            <div class="detail-row">
-              <dt>Adresse</dt>
-              <dd>{{ selectedBinome.adresse || '—' }}</dd>
+            <div class="flex py-2 border-b border-border-light">
+              <dt class="flex-[0_0_140px] font-medium text-muted">Adresse</dt>
+              <dd class="m-0 text-text">{{ selectedBinome.adresse || '—' }}</dd>
             </div>
-            <div class="detail-row">
-              <dt>Ville</dt>
-              <dd>{{ selectedBinome.ville || '—' }}</dd>
+            <div class="flex py-2 border-b border-border-light">
+              <dt class="flex-[0_0_140px] font-medium text-muted">Ville</dt>
+              <dd class="m-0 text-text">{{ selectedBinome.ville || '—' }}</dd>
             </div>
-            <div class="detail-row">
-              <dt>Code postal</dt>
-              <dd>{{ selectedBinome.codePostal || '—' }}</dd>
+            <div class="flex py-2">
+              <dt class="flex-[0_0_140px] font-medium text-muted">Code postal</dt>
+              <dd class="m-0 text-text">{{ selectedBinome.codePostal || '—' }}</dd>
             </div>
           </dl>
         </div>
@@ -604,14 +638,6 @@ const sortDir = ref<SortDir>('desc')
 const sortKeySupp = ref<ColumnKeySupp>('createdAt')
 const sortDirSupp = ref<SortDir>('desc')
 
-function sortableClass(key: ColumnKey) {
-  return sortKey.value === key ? (sortDir.value === 'asc' ? 'sorted-asc' : 'sorted-desc') : 'sortable'
-}
-
-function sortableClassSupp(key: ColumnKeySupp) {
-  return sortKeySupp.value === key ? (sortDirSupp.value === 'asc' ? 'sorted-asc' : 'sorted-desc') : 'sortable'
-}
-
 function toggleSort(key: ColumnKey) {
   if (sortKey.value === key) {
     sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
@@ -671,21 +697,6 @@ function format(v: unknown) {
   }
 }
 
-function statusClass(v?: CooperateurStatus) {
-  switch (v) {
-    case 'PAYMENT_PENDING':
-      return 'pending'
-    case 'PAID':
-      return 'paid'
-    case 'PROCESSED':
-      return 'processed'
-    case 'ARCHIVED':
-      return 'archived'
-    default:
-      return 'unknown'
-  }
-}
-
 // Client-side sorting and pagination
 const sortedRows = computed(() => {
   const key = sortKey.value
@@ -730,338 +741,3 @@ onMounted(async () => {
   await loadSouscriptionsSupplementaires(0, pageSizeSupp.value)
 })
 </script>
-
-<style scoped>
-.container {
-  background: #efefee;
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  padding: 2rem 1rem;
-  color: #1f2937;
-  border-radius: 0;
-}
-.header {
-  padding: 1rem 1.25rem;
-  margin-bottom: 1rem;
-}
-.brand { display: flex; align-items: center; gap: 1rem; }
-.logo { height: 72px; }
-.subtitle { color: #6b7280; margin: 0; }
-
-.section { background: #fff; border: 1px solid #e6e8ee; padding: 1rem; border-radius: 8px; }
-.toolbar { display: flex; align-items: center; gap: .75rem; margin-bottom: .75rem; }
-.search { flex: 1; padding: .5rem .75rem; border: 1px solid #e5e7eb; border-radius: 8px; }
-.meta { color: #6b7280; font-size: .9rem; }
-.state { padding: 1rem; color: #374151; }
-.state.error { color: #b91c1c; }
-
-.table-wrapper { overflow: auto; }
-.table { width: 100%; border-collapse: collapse; }
-.table thead th { position: sticky; top: 0; background: #fafafa; }
-.th { text-align: left; padding: .5rem .5rem; border-bottom: 1px solid #e5e7eb; cursor: pointer; user-select: none; white-space: nowrap; }
-td { padding: .5rem .5rem; border-bottom: 1px solid #f3f4f6; }
-.th.sortable:hover { background: #f9fafb; }
-.sorted-asc, .sorted-desc { background: #f9fafb; }
-.sort-icon { margin-left: .35rem; font-size: .75rem; color: #6b7280; }
-
-/* Status badges */
-.status {
-  display: inline-block;
-  padding: .15rem .5rem;
-  border-radius: 999px;
-  font-size: .85rem;
-  font-weight: 600;
-  line-height: 1.2;
-}
-.status.pending {
-  background: #ffedd5; /* orange-100 */
-  color: #9a3412;     /* orange-700 */
-}
-.status.paid {
-  background: #fef9c3; /* yellow-100 */
-  color: #854d0e;      /* yellow-800 */
-}
-.status.processed {
-  background: #dcfce7; /* green-100 */
-  color: #166534;      /* green-700 */
-}
-.status.unknown {
-  background: #e5e7eb; /* gray-200 */
-  color: #374151;      /* gray-700 */
-}
-
-/* Binome column */
-.binome-btn {
-  background: #dbeafe;
-  color: #1d4ed8;
-  border: none;
-  padding: .25rem .6rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: .85rem;
-  font-weight: 500;
-}
-.binome-btn:hover {
-  background: #bfdbfe;
-}
-.no-binome {
-  color: #9ca3af;
-}
-
-/* Modal */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-.modal {
-  background: #fff;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 480px;
-  max-height: 90vh;
-  overflow: auto;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-.modal-header h2 {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  line-height: 1;
-  color: #6b7280;
-  cursor: pointer;
-}
-.modal-close:hover {
-  color: #1f2937;
-}
-.modal-body {
-  padding: 1.25rem;
-}
-.binome-details {
-  margin: 0;
-}
-.detail-row {
-  display: flex;
-  padding: .5rem 0;
-  border-bottom: 1px solid #f3f4f6;
-}
-.detail-row:last-child {
-  border-bottom: none;
-}
-.detail-row dt {
-  flex: 0 0 140px;
-  font-weight: 500;
-  color: #6b7280;
-}
-.detail-row dd {
-  margin: 0;
-  color: #1f2937;
-}
-
-/* Action button */
-.action-btn {
-  background: #10b981;
-  color: white;
-  border: none;
-  padding: .35rem .75rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: .8rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-.action-btn:hover:not(:disabled) {
-  background: #059669;
-}
-.action-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-.processed-label {
-  color: #166534;
-  font-size: .85rem;
-}
-
-/* Copy link button */
-.copy-btn {
-  background: #f59e0b;
-  color: white;
-  border: none;
-  padding: .35rem .75rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: .8rem;
-  font-weight: 500;
-  white-space: nowrap;
-}
-.copy-btn:hover {
-  background: #d97706;
-}
-
-/* Tabs */
-.tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.tab {
-  padding: 0.75rem 1.25rem;
-  border: none;
-  background: #e5e7eb;
-  color: #374151;
-  font-size: 0.95rem;
-  font-weight: 600;
-  border-radius: 8px 8px 8px 8px;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.tab:hover {
-  background: #d1d5db;
-}
-
-.tab.active {
-  background: #fff;
-  color: #1f2937;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.tab-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.5rem;
-  height: 1.5rem;
-  padding: 0 0.4rem;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.tab.active .tab-count {
-  background: rgba(0, 0, 0, 0.08);
-}
-
-/* Status filter */
-.status-filter {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.filter-label {
-  font-size: 0.85rem;
-  color: #6b7280;
-  white-space: nowrap;
-}
-
-.status-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  cursor: pointer;
-}
-
-.status-checkbox input {
-  cursor: pointer;
-}
-
-/* Archived status badge */
-.status.archived {
-  background: #e5e7eb;
-  color: #6b7280;
-}
-
-/* Archive button */
-.archive-btn {
-  background: #6b7280;
-  color: white;
-  border: none;
-  padding: .35rem .75rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: .8rem;
-  font-weight: 500;
-  white-space: nowrap;
-  margin-left: 0.25rem;
-}
-
-.archive-btn:hover:not(:disabled) {
-  background: #4b5563;
-}
-
-.archive-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Pagination controls */
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem 0;
-  border-top: 1px solid #e5e7eb;
-  margin-top: 1rem;
-}
-
-.pagination-btn {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.pagination-btn:hover:not(:disabled) {
-  background: #f9fafb;
-  border-color: #d1d5db;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pagination-info {
-  padding: 0 1rem;
-  color: #6b7280;
-  font-size: 0.9rem;
-}
-
-.page-size-select {
-  padding: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  background: #fff;
-  font-size: 0.85rem;
-  cursor: pointer;
-  margin-left: 1rem;
-}
-</style>
